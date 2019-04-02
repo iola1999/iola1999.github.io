@@ -4,6 +4,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{{ page.title | append: ' - ' |append: site.name }}</title>
 
+	{% if page.title%}
+		<title>{{ page.title | append: ' - ' |append: site.name }}</title>
+    {% else %}
+	    <title>{{site.name }}</title>
+    {% endif %}
+	
 	<link rel="shortcut icon" href="{{ '/styles/images/favicon.jpg' | prepend: site.baseurl }}">
 	<link rel="icon" href="{{ '/styles/images/favicon.jpg' | prepend: site.baseurl }}">
 
