@@ -4,10 +4,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{{ page.title | append: ' - ' |append: site.name }}</title>
 
-	{% if page.title%}
+	{% if page.title %}
 		<title>{{ page.title | append: ' - ' |append: site.name }}</title>
     {% else %}
-	    <title>{{site.name }}</title>
+	    <title>{{ site.name }}</title>
     {% endif %}
 	
 	<link rel="shortcut icon" href="{{ '/styles/images/favicon.jpg' | prepend: site.baseurl }}">
@@ -23,7 +23,7 @@
 	<meta name="description" content="{{site.meta_description}}">
 
 	<script src="{{ '/styles/js/jquery.min.js' | prepend: site.baseurl }}"></script>
-  	<script>
+  	<!--script>
 		var _hmt = _hmt || [];
 		(function() {
 		  var hm = document.createElement("script");
@@ -31,7 +31,7 @@
 		  var s = document.getElementsByTagName("script")[0]; 
 		  s.parentNode.insertBefore(hm, s);
 		})();
-	</script>
+	</script-->
   	<style type="text/css">
 	  	.docs-content{
 	  		margin-bottom: 10px;
