@@ -1,1 +1,26 @@
-theme: jekyll-theme-minimal
+# Site settings
+name: iolaSay
+email: fwl1998@foxmail.com
+author: iola1999
+url: https://iola1999.github.io
+resume_site: https://iola1999.github.io
+github: https://github.com/iola1999
+baseurl: "/iolaSay"
+description: 影言
+meta_description: 影言;个人博客
+motto: no sysysysysysy
+banner: no banneranner
+
+#permalink: /:categories/:year/:month/:day/:title/
+permalink: /:year/:month/:day/:title/
+paginate: 10
+
+exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile']
+
+github_username: luoyan35714
+
+# Build settings
+markdown: kramdown
+
+baidu_analysis: 0000000000000000000000000000
+
