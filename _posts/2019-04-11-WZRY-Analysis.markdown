@@ -3,7 +3,7 @@ layout: post
 title:  抓取、分析王者荣耀高分段战绩
 date:   2019-04-11 21:43:00 +0800
 categories: 折腾
-tag: Python,爬虫,数据分析,王者荣耀
+tag: Python 爬虫 数据分析 王者荣耀
 ---
 
 * content
