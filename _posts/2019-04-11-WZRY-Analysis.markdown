@@ -14,7 +14,7 @@ tag: 数据分析
 
 
 
-2019/4/11			{#wtf}
+2019/4/11			{#start}
 ====================================
 
 写了几天的代码，目前完成了玩家、对局数据积累的工作（Python 实现的）。
@@ -24,13 +24,28 @@ tag: 数据分析
 
 这一过程中遇到了不少坑，目前也不知道从哪里说起。就先放一些图片凑个数。
 
-![/styles/images/WZRY-Analysis/git_0411.png]({{ '/styles/images/WZRY-Analysis/git_0411.png' | prepend: site.baseurl  }})
+![最近的git动态]({{ '/styles/images/WZRY-Analysis/git_0411.png' | prepend: site.baseurl  }})
 
-![/styles/images/WZRY-Analysis/wzry_data1.png]({{ '/styles/images/WZRY-Analysis/wzry_data1.png' | prepend: site.baseurl  }})
+![一些数据]({{ '/styles/images/WZRY-Analysis/wzry_data1.png' | prepend: site.baseurl  }})
 
 关于数据分析，基础层次我打算做英雄胜率统计、玩家搜集（争取存下所有荣耀王者玩家）和对局质量分析，进阶一些，我打算尝试机器学习来评价阵容、预测胜率和推荐英雄（目前在采集数据时尽可能地为机器学习做准备了）。
 
 有个计划参考的项目： [https://github.com/vpus/dota2-win-rate-prediction-v1](https://github.com/vpus/dota2-win-rate-prediction-v1) 
+
+
+
+2019/4/13
+====================================
+这两天主要的工作是加快采集数据的速度，注册了一堆农药小号来跑，没遇到过封禁了。
+
+还有就是丰富了一些数据字段，比如。。。忘了。
+
+上张图吧：
+
+![对局数量、玩家数增长趋势0413]({{ '/styles/images/WZRY-Analysis/number_of_data_0413.png' | prepend: site.baseurl  }})
+
+最近在入门前端。先忙了。
+
 
 待续			{#coming}
 ====================================
