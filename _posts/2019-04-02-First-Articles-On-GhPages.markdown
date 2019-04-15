@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  尝试gh-pages上的第一篇博文
+title:  尝试 gh-pages 上的第一篇博文
 date:   2019-04-02 21:34:00 +0800
 categories: 杂谈
 tag: useless
