@@ -8,8 +8,8 @@ github: https://github.com/iola1999
 baseurl: ""
 description: 影言
 meta_description: 影言;个人博客
-motto: no sysysysysysy
-banner: no banneranner
+motto:  
+banner:  
 
 #permalink: /:categories/:year/:month/:day/:title/
 permalink: /:year/:month/:day/:title/
