@@ -30,9 +30,24 @@ tag: useless
 了解你的听众			{#learn}
 ====================================
 
-场景再现是最重要的，虽然你很清楚发生了什么，但是面试官不知道，花些时间来确保他们可以设身处地的知道当时的情况。如果你不这么做，剩下的故事将是对牛弹琴。
-
 我个人也一直将同样的方法用在各种面试中。
+
+{% highlight java%}
+ /**
+  * The main timer loop.  (See class comment.)
+  */
+private void mainLoop() {
+    while (true) {
+        try {
+           	//*****
+            if (taskFired)  // Task fired; run it, holding no locks
+                task.run();
+        } catch(InterruptedException e) {
+        }
+    }
+}
+{% endhighlight %}
+
 
 保持冷静			{#keep-calm}
 ====================================
