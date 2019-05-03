@@ -2,12 +2,12 @@
 <div class="banner">
   <div class="container">
   	{% if page.categories != null %}
-    	<a href="{{ '/categories/' | prepend: site.baseurl }}#{{page.categories}}-ref">{{page.categories}}</a>
+    	分类：<a href="{{ '/categories/' | prepend: site.baseurl }}#{{page.categories}}-ref">{{page.categories}}</a>
 		<!-- /
     	<a href="{{ '/tag/' | prepend: site.baseurl }}#{{page.tag}}-ref">{{page.tag}}</a> 不要标签了。这是假的标签 hehe -->
     {% else %}
 		<!-- {{ site.banner }} -->
-    	未分类
+    	分类文章列表
     {% endif %}
   </div>
 </div>
