@@ -31,7 +31,7 @@ tag: 数据分析
 3 上面“思路参考”页面使用的是 Selenium 操作公众号后台群发页面，也可以尝试直接模拟请求，虽然效率上的提升并不会很明显（请求要限频，否则会封一天），但是少了依赖，实现起来也舒服一些（其实是我前端基础太差......）。这个方法需要一个公众号账户（可以用个人订阅号），相较以上方法门槛高了一点。
 
 
-取链接实现			{#two}
+取文章链接的实现			{#two}
 ====================================
 基于方法 3，这里写一下 Python 实现。
 
@@ -45,9 +45,9 @@ startLoginUrl = '/cgi-bin/bizlogin?action=startlogin'	# 提交邮箱、密码，
 
 validateUrl = '/cgi-bin/bizlogin?action=validate&lang=zh_CN&account=邮箱'	# 先请求一次该页面
 
-getQrcodeUrl = ‘/cgi-bin/loginqrcode?action=getqrcode&param=4300&rd=三位随机数’	# 再取二维码图片
+getQrcodeUrl = '/cgi-bin/loginqrcode?action=getqrcode&param=4300&rd=三位随机数'	# 再取二维码图片
 
-askLoginUrl': '/cgi-bin/loginqrcode?action=ask&token=&lang=zh_CN&f=json&ajax=1'	# 持续检测用户扫码结果（0 未扫，1 已扫可以跳转，4 已扫尚未确认）
+askLoginUrl = '/cgi-bin/loginqrcode?action=ask&token=&lang=zh_CN&f=json&ajax=1'	# 持续检测用户扫码结果（0 未扫，1 已扫可以跳转，4 已扫尚未确认）
 
 loginUrl = '/cgi-bin/bizlogin?action=login'	# 最终登录，然后访问一下平台首页，页面里可以找到 token
 
