@@ -35,12 +35,12 @@ tag:
    - 架构：视 CPU 选择，一般建议 32 位选 armhf，64 位选 arm64
    - 源地址：https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/
    - 安装类型：Linux 系统的存放位置，这个网络上很多建议用“镜像文件”，也就是提前建立一个固定大小的磁盘。我个人觉得这样既浪费空间，又不能扩容，实在想不到什么好处。所以我用的是“目录”，实际位置是：`/data/user/0/ru.meefik.linuxdeploy/env（这部分在应用左上角抽屉菜单里设置）/rootfs/linux（配置名）`
-   - 本地化：看喜好，我反正是选了 zh-cn。
+   - 本地化：看喜好，zh-cn 是简中。
    - SSH：勾选
    - 图形界面：这里不用管。需要的话安装后可以系统里自己装。
 3. 应用左上角抽屉菜单里 设置：
 
-   - 常亮、锁定 WiFi、持续唤醒 CPU。
+   - 常亮、锁定 WiFi、持续唤醒 CPU
    
    - PATH 需要修改为 /system/xbin
 4. 点击首页右上角，选择安装，然后等待几分钟。
@@ -66,13 +66,13 @@ ip:22，这没啥好说的。用 android（或者自定的）连上去。
 
 有时候图形还是方便一点点......
 
-`apt-get install xfce4 xfce4-goodies tightvncserver` 装 xfce（也可以考虑 Ubuntu Mate 或者 Gnome2）、vnc
+`apt-get install xfce4 xfce4-goodies tightvncserver` 装 Xfce（也可以考虑 Ubuntu Mate 或者 Gnome2）、vnc
 
 `apt-get install ttf-wqy-zenhei` 中文
 
 `vncserver`启动，设置个密码，连上去看看（vnc viewer 用两百多k的那种绿色版就可以了，不必安装完整版），应该是一片白，就一个终端框。
 
-`vim ~/.vnc/xstartup` 修改 vnc 配置（下面三行），博客上高亮：
+`vim ~/.vnc/xstartup` 修改 vnc 配置：
 
 ```shell
 #! /bin/bash
@@ -83,3 +83,5 @@ startxfce4 &
 `chmod +x ~/.vnc/xstartup`改下权限。
 
 然后再启动应该就可以了。另外，vncserver 可以带参数，比如`vncserver -geometry 1280x720`设置分辨率。
+
+`vncserver -kill :1` 关闭 vnc
