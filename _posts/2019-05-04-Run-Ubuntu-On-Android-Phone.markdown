@@ -72,11 +72,13 @@ ip:22，这没啥好说的。用 android（或者自定的）连上去。
 
 `vncserver`启动，设置个密码，连上去看看（vnc viewer 用两百多k的那种绿色版就可以了，不必安装完整版），应该是一片白，就一个终端框。
 
-`vim ~/.vnc/xstartup` 修改 vnc 配置：
+`vim ~/.vnc/xstartup` 修改 vnc 配置（下面三行），博客上高亮：
 
-> \#! /bin/bash
-> xrdb $HOME/.Xresources
-> startxfce4 &
+```shell
+#! /bin/bash
+xrdb $HOME/.Xresources
+startxfce4 &
+```
 
 `chmod +x ~/.vnc/xstartup`改下权限。
 
