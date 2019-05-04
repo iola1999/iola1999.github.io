@@ -74,13 +74,13 @@ ip:22，这没啥好说的。用 android（或者自定的）连上去。
 
 `vim ~/.vnc/xstartup` 修改 vnc 配置：
 
+```shell
 {% highlight shell%}
-
-\# !/bin/bash
+#!/bin/bash
 xrdb $HOME/.Xresources
 startxfce4 &
-
 {% endhighlight %}
+```
 
 `chmod +x ~/.vnc/xstartup`改下权限。
 
