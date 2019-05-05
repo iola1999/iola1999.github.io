@@ -33,7 +33,7 @@ tag:
 2. 打开 Linux Deploy，点右下角设置，做以下修改：
    - 发行版：Ubuntu，版本我选择的是 Xenial（16.04）
    - 架构：视 CPU 选择，一般建议 32 位选 armhf，64 位选 arm64
-   - 源地址：https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/
+   - 源地址：`https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/`
    - 安装类型：Linux 系统的存放位置，这个网络上很多建议用“镜像文件”，也就是提前建立一个固定大小的磁盘。我个人觉得这样既浪费空间，又不能扩容，实在想不到什么好处。所以我用的是“目录”，实际位置是：`/data/user/0/ru.meefik.linuxdeploy/env（这部分在应用左上角抽屉菜单里设置）/rootfs/linux（配置名）`
    - 本地化：看喜好，zh-cn 是简中。
    - SSH：勾选
@@ -58,9 +58,13 @@ ip:22，这没啥好说的。用 android（或者自定的）连上去。
 
 ### 账户
 
-上去先`sudo passwd root`重置一下 root 密码。虽然用 root 账户比较危险......
+~~上去先`sudo passwd root`重置一下 root 密码。虽然用 root 账户比较危险......~~
 
-可能默认配置不允许用 root 登录，那就`apt-get install vim` 装个 vim，然后`vim /etc/ssh/sshd_config`，找到`PermitRootLogin`改成 yes。
+~~可能默认配置不允许用 root 登录，那就`apt-get install vim` 装个 vim，然后`vim /etc/ssh/sshd_config`，找到`PermitRootLogin`改成 yes。~~
+
+`sudo apt-get install fish` fish shell 安排上
+
+`chsh -s /usr/bin/fish` 设置为默认 shell
 
 ### 图形界面
 
