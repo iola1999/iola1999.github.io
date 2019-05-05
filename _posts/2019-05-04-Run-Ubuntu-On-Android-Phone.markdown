@@ -89,3 +89,20 @@ startxfce4 &
 然后再启动应该就可以了。另外，vncserver 可以带参数，比如`vncserver -geometry 1280x720`设置分辨率。
 
 `vncserver -kill :1` 关闭 vnc
+
+### screen 的使用
+
+通过 screen 可以实现进程后台运行（且能够随时恢复交互）。
+
+`sudo apt-get install -y screen` 安装
+
+`screen -S 自定义名称` 新建窗口
+
+`Ctrl + A + D` 离开当前窗口
+
+`screen -r 窗口名称或者进程 id` 回到该窗口
+
+`kill -9` 关闭窗口
+
+`screen -wipe` 清理窗口（内部进程自动结束了的）
+
