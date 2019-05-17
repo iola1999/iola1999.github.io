@@ -24,3 +24,6 @@ markdown: kramdown
 
 baidu_analysis: 0000000000000000000000000000
 
+# 20190517 Disqus control
+layout: default
+comments: true
