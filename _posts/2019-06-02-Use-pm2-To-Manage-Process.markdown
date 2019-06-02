@@ -53,20 +53,31 @@ module.exports = {
 
 # 任务控制
 
-pm2 start 配置文件名
-pm2 ls
-pm2 delete 任务名/配置文件名/id/all		停止并删除
-pm2 stop 任务名/配置文件名/id/all		停止
-pm2 start 任务名/配置文件名/id/all		启动
-pm2 restart 任务名/配置文件名/id/all		重启
+`pm2 start 配置文件名` 		**开始一项任务（初次运行）**
+
+`pm2 ls`		**列出任务**
+
+`pm2 delete 任务名/配置文件名/id/all`		**停止并删除**
+
+`pm2 stop 任务名/配置文件名/id/all`		**停止**
+
+`pm2 start 任务名/配置文件名/id/all`		**启动**
+
+`pm2 restart 任务名/配置文件名/id/all`		**重启**
+
 
 # 日志
 
-查看日志：pm2 logs 任务名/id/all
+**查看**日志：`pm2 logs 任务名/id/all`
 
 如果没有配置 log 路径，默认日志文件在 ~/.pm2/logs/ 下
 
-清空日志：pm2 flush
+**清空**日志：`pm2 flush`
+
+
+
+
+
 
 
 
