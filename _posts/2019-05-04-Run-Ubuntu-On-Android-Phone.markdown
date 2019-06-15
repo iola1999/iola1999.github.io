@@ -14,8 +14,7 @@ tag:
 
 
 
-准备			{#one}
-====================================
+## 准备			{#one}
 
 + 从[此处](https://github.com/meefik/linuxdeploy/releases)下载 Linux Deploy
 + 从[此处](https://github.com/meefik/busybox/releases)下载 busybox 安装器
@@ -28,7 +27,7 @@ tag:
 
 
 安装			{#two}
-====================================
+------------------------------------
 1. 将 busybox 安装到 /system/xbin
 2. 打开 Linux Deploy，点右下角设置，做以下修改：
    - 发行版：Ubuntu，版本我选择的是 Xenial（16.04）
@@ -50,7 +49,7 @@ tag:
 
 
 系统配置、使用			{#three}
-====================================
+------------------------------------
 
 ### 连接
 

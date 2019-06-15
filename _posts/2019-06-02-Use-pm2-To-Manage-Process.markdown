@@ -12,7 +12,7 @@ tag:
 
 最近一直在用上篇文章里提到的 `Ubuntu on Android` 跑些后台任务，screen 用起来似乎并不是很方便，这里考虑使用 pm2 来管理后台的进程。
 
-# 安装node、npm、pm2：
+## 安装node、npm、pm2：
 
 1. sudo apt-get install nodejs-legacy
 2. sudo apt-get install npm
@@ -26,7 +26,7 @@ tag:
    sudo npm -v
 8. npm install pm2 -g
 
-# 生成配置文件
+## 生成配置文件
 
 以 Python 为例，使用 pm2 init 生成一份配置文件（js），或者自己手动创建这样的（json也可以，可以找找格式要求）：
 
@@ -51,7 +51,7 @@ module.exports = {
 
 ```
 
-# 任务控制
+## 任务控制
 
 `pm2 start 配置文件名` 		**开始一项任务（初次运行）**
 
@@ -66,7 +66,7 @@ module.exports = {
 `pm2 restart 任务名/配置文件名/id/all`		**重启**
 
 
-# 日志
+## 日志
 
 **查看**日志：`pm2 logs 任务名/id/all`
 
