@@ -12,6 +12,9 @@ tag: 路由器
 
 这是2017年写在博客上的一篇短文，最近指导同学安装闪讯路由器，顺便完善下吧。
 
+2019.10.21 最近看到此文多了许多访问量，如果有疑问的话可以来 issue 交流： [https://github.com/iola1999/iola1999.github.io/issues](https://github.com/iola1999/iola1999.github.io/issues)
+
+顺便加点标签：浙江 闪讯 路由器 破解 sxplugin.so
 
 原内容			{#original}
 ====================================
