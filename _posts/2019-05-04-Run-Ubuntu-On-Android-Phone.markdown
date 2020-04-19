@@ -108,4 +108,4 @@ startxfce4 &
 ### 使用 pm2 管理进程
 
 最近一直在用这机器跑些后台任务，screen 用起来似乎并不是很方便，这里考虑使用 pm2 来管理后台的进程。
-此文过长了些，放到另一篇博文中： [https://iola1999.github.io/2019/06/02/Use-pm2-To-Manage-Process](https://iola1999.github.io/2019/06/02/Use-pm2-To-Manage-Process)
+此文过长了些，放到另一篇博文中： [/2019/06/02/Use-pm2-To-Manage-Process](/2019/06/02/Use-pm2-To-Manage-Process)
