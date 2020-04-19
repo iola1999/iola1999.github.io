@@ -14,7 +14,7 @@ tag:
 
 ## 先放图
 
-![小程序码]({{ '/styles/images/zjutMpTool/qrCode.jpg' | prepend: site.baseurl  }})
+![小程序码]({{ '/styles/images/zjutMpTool/qrCode.png' | prepend: site.baseurl  }})
 
 ![宿舍低电提醒]({{ '/styles/images/zjutMpTool/watchEl.jpg' | prepend: site.baseurl  }})
 
