@@ -16,6 +16,10 @@ tag:
 
 ![朴实无华的首页]({{ '/styles/images/netease-game-quick-login/netease-game-quick-login-home.png' | prepend: site.baseurl  }})
 
+扫码后选择账号
+
+![扫码后选择账号]({{ '/styles/images/netease-game-quick-login/netease-game-quick-login-after-scan.png' | prepend: site.baseurl  }})
+
 账号管理页面
 
 ![账号管理页面]({{ '/styles/images/netease-game-quick-login/netease-game-quick-login-accountlist.png' | prepend: site.baseurl  }})
