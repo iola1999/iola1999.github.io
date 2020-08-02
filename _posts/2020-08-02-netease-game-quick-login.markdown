@@ -12,9 +12,15 @@ tag:
 
 ## 先放图
 
+朴实无华的首页
+
 ![朴实无华的首页]({{ '/styles/images/netease-game-quick-login/netease-game-quick-login-home.png' | prepend: site.baseurl  }})
 
+账号管理页面
+
 ![账号管理页面]({{ '/styles/images/netease-game-quick-login/netease-game-quick-login-accountlist.png' | prepend: site.baseurl  }})
+
+大致开发进程（遇到的坑......）
 
 ![大致开发进程]({{ '/styles/images/netease-game-quick-login/netease-game-quick-login-git.png' | prepend: site.baseurl  }})
 
@@ -25,7 +31,9 @@ tag:
 
 经历过上上个月用`Python + tkinter`那痛苦的布局体验后，这次我尝试了一下`Vue.js + Electron`的实现方式，果然是好看、现代得多。
 
-`Electron`分主进程和渲染进程两部分，简单理解的话就是`Node.js端`和`Web端`（吧）。要做一个扫码工具，容易想到的思路是前端点一下按钮通知主进程对屏幕截图（使用`ipcRenderer`通信），Node.js端截图解析二维码返回给前端（`ipcMain`通信）。实际操作上，这个Node.js对系统屏幕的截图实在是难以操作，遇到的坑一个接一个。多种fix无果后还是掏出了老本行，Python使用Windows原生Api对指定窗口截图（还能实现后台截图呢，窗口挡住了也没事），然后解析，Node.js拿到二维码内容返回给前端处理。
+`Electron`分主进程和渲染进程两部分，简单理解的话就是`Node.js端`和`Web端`（吧）。要做一个扫码工具，容易想到的思路是前端点一下按钮通知主进程对屏幕截图（使用`ipcRenderer`通信），Node.js 端截图解析二维码返回给前端（`ipcMain`通信）。实际操作上，这个 Node.js 对系统屏幕的截图实在是难以操作，遇到的坑一个接一个。
+
+多种尝试无果后，再次掏出老本行：使用 Python 通过 Windows 原生 Api 对指定窗口截图（还能实现后台截图呢，窗口挡住了也没事），然后寻找、解析二维码。Node.js 调用生成的 Python 程序，拿到二维码内容返回给前端走后面的流程。
 
 比较庆幸的是，在登录协议上倒是没花多少时间。网易提供了`网易手游管家`这一微信小程序，而众所周知微信小程序能看到源码哈哈。分析了一波账号登录、扫码、确认登录的请求后，拿来用用很简单就搞定了协议部分嘿嘿。
 
