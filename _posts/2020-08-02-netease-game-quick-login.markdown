@@ -10,6 +10,8 @@ tag:
 {:toc}
 网易的不少端游都是由手游转制来的，还不给账号密码的登录方式，只能用手机扫码。有人提出需求：养了一堆小号，每次要上号都很麻烦，能不能弄个PC端的扫码登录工具。额......趁周末实现了一个。
 
+append: 后面又更新了几次，更新日志放文末。
+
 ## 先放图
 
 朴实无华的首页
@@ -40,6 +42,25 @@ tag:
 多种尝试无果后，再次掏出老本行：使用 Python 通过 Windows 原生 Api 对指定窗口截图（还能实现后台截图呢，窗口挡住了也没事），然后寻找、解析二维码。Node.js 调用生成的 Python 程序，拿到二维码内容返回给前端走后面的流程。
 
 比较庆幸的是，在登录协议上倒是没花多少时间。网易提供了`网易手游管家`这一微信小程序，而众所周知微信小程序能看到源码哈哈。分析了一波账号登录、扫码、确认登录的请求后，拿来用用很简单就搞定了协议部分嘿嘿。
+
+
+## 更新20200811
+
+大致更新日志
+
+![大致更新日志]({{ '/styles/images/netease-game-quick-login/netease-game-quick-login-git20200811.png' | prepend: site.baseurl  }})
+
+支持多用户，登录窗口
+
+![支持多用户，登录窗口]({{ '/styles/images/netease-game-quick-login/netease-game-quick-login-login.png' | prepend: site.baseurl  }})
+
+自动检查更新，支持自动下载、安装
+
+![自动检查更新，支持自动下载、安装]({{ '/styles/images/netease-game-quick-login/netease-game-quick-login-autoupdate.png' | prepend: site.baseurl  }})
+
+首页布局优化
+
+![首页布局优化]({{ '/styles/images/netease-game-quick-login/netease-game-quick-login-home20200811.png' | prepend: site.baseurl  }})
 
 
 ## 后记
