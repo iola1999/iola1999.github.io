@@ -2,7 +2,7 @@
 layout: post
 title:  使用 pm2 管理非 node 进程
 date:   2019-06-02 22:30:00 +0800
-categories: 折腾
+categories: 笔记
 tag: 
 ---
 

@@ -2,7 +2,7 @@
 layout: post
 title:  浙江闪讯路由器不完全使用指北
 date:   2019-03-20 14:00:00 +0800
-categories: 折腾
+categories: 笔记
 tag: 路由器
 ---
 

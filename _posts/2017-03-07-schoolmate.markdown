@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  《同学》--席慕容
+title:  《同学》-- 席慕容
 date:   2017-03-07 23:15:00 +0800
-categories: 笔记
+categories: 文字
 tag: 旧文
 ---
 
