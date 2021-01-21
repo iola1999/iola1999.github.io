@@ -54,7 +54,7 @@ typora-root-url: ..
 
 ![image-20210121192832436](/upload/images/2021-01-21-DingTalk-mod/image-20210121192832436.png)
 
-其实还有更简单粗暴的方法，参考上图，直接修改`a.baseMessage.recallStatus = 0`，即可实现完全的阻止撤回。该方案来源于代码中未注释的 model 定义。
+其实还有更简单粗暴的方法，参考上图，直接修改`a.baseMessage.recallStatus = 0`，即可实现完全的阻止撤回。该方案来源于代码中的 model 定义。
 
 ![image-20210121193046322](/upload/images/2021-01-21-DingTalk-mod/image-20210121193046322.png)
 
