@@ -4,6 +4,7 @@ title:  调戏钉钉PC客户端
 date:  2021-01-21 12:00:00 +0800
 categories: 折腾
 tag: 
+typora-root-url: ..
 ---
 
 * content
@@ -12,6 +13,8 @@ tag:
 
 
 
-![image-20210121110241405](assets/image-20210121110241405.png)
+![image-20210121110241405](/upload/images/image-20210121110241405.png)
+
+
 
 -END-
