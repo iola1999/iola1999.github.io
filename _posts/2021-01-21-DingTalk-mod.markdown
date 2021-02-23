@@ -73,3 +73,5 @@ typora-root-url: ..
 折腾仅因个人兴趣，记录分享仅为研究学习交流，请勿用于违法用途。
 
 -END-
+
+![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.DingTalk-mod)

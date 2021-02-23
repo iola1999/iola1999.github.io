@@ -70,3 +70,5 @@ append: 后面又更新了几次，更新日志放文末。
 
 
 -END-
+
+![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.netease-game-quick-login)

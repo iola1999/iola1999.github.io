@@ -49,3 +49,5 @@ tag:
 
 
 -END-
+
+![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.game-helper)
