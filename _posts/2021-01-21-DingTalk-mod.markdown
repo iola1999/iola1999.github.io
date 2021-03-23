@@ -9,6 +9,7 @@ typora-root-url: ..
 
 * content
 {:toc}
+![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.DingTalk-mod)
 ## 提前致谢
 
 思路来源：[https://blog.csdn.net/cwg2552298/article/details/109260541](https://blog.csdn.net/cwg2552298/article/details/109260541)  [web archive](https://web.archive.org/web/20210121104923/https://blog.csdn.net/cwg2552298/article/details/109260541)，个人对逆向并不熟悉，写篇文章记录一下稍详细的折腾过程。
@@ -40,6 +41,10 @@ typora-root-url: ..
 
 示例图的解压密码`272dcfc58`仅适用于`6.0.0-Release.11405`版本的PC钉钉。
 
+PC钉钉`6.0.3.22302`版本的解压密码为`43c82c8a9`。
+
+PC钉钉[DingTalk_v6.0.8.3310263](https://dtapp-pub.dingtalk.com/dingtalk-desktop/win_installer/Release/DingTalk_v6.0.8.3310263.exe)版本的解压密码为`55b744249`。
+
 ### 魔改钉钉
 
 使用上面拿到的密码解压`web_content.pak`，使用喜欢的代码编辑器打开项目。搜索`撤回了一条消息`找到`assets/chatbox-index.js`。
@@ -54,7 +59,7 @@ typora-root-url: ..
 
 ![image-20210121192832436](/upload/images/2021-01-21-DingTalk-mod/image-20210121192832436.png)
 
-其实还有更简单粗暴的方法，参考上图，直接修改`a.baseMessage.recallStatus = 0`，即可实现完全的阻止撤回。该方案来源于代码中的 model 定义。
+其实还有更简单粗暴的方法，参考上图，直接修改`a.baseMessage.recallStatus = 0`（在`a.baseMessage.shieldStatus === ke.L.YES`这一行之上修改），即可实现完全的阻止撤回。该方案来源于代码中的 model 定义。
 
 ![image-20210121193046322](/upload/images/2021-01-21-DingTalk-mod/image-20210121193046322.png)
 
@@ -73,5 +78,3 @@ typora-root-url: ..
 折腾仅因个人兴趣，记录分享仅为研究学习交流，请勿用于违法用途。
 
 -END-
-
-![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.DingTalk-mod)
