@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  JavaScript 基础 review
+title:  JavaScript Basics Review
 date:  2021-04-05 12:00:00 +0800
 categories: 笔记
 tag: 
@@ -9,7 +9,7 @@ typora-root-url: ..
 
 * content
 {:toc}
-![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.JavaScript-basic-review)
+![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.JavaScript-basics-review)
 
 看了一篇 JavaScript 基础的文章，参考着手动写一遍常用的方法。
 
@@ -115,6 +115,8 @@ console.log(dogB.getPossibleColors()); // [ 'black', 'white' ] 未影响
 ```
 
 ### 寄生式组合继承
+
+能避免调用两次父类构造函数。
 
 ```javascript
 function Animal(name) {
@@ -284,19 +286,19 @@ function getRealType(obj) {
   return Object.prototype.toString.call(obj).split(" ")[1].replace("]", "").toLowerCase();
 }
 // 如何手动实现？递归。下面这个写法有些问题还没处理好 TODO:再看看吧，现在不想折腾了
-const shallowCopy = obj => {
+const deepCopy = obj => {
   let isArray = Array.isArray(obj);
   const result = isArray ? [] : {};
   if (isArray) {
     obj.forEach(item => {
       ["object", "array"].includes(getRealType(item))
-        ? result.push(shallowCopy(item))
+        ? result.push(deepCopy(item))
         : result.push(item);
     });
   } else {
     Object.keys(obj).forEach(key => {
       ["object", "array"].includes(getRealType(obj[key]))
-        ? (result[key] = shallowCopy(obj[key]))
+        ? (result[key] = deepCopy(obj[key]))
         : (result[key] = obj[key]);
     });
   }
@@ -304,7 +306,7 @@ const shallowCopy = obj => {
 };
 const _ = require("lodash");
 var resultLodash = _.cloneDeep(source);
-const resultMine = shallowCopy(source);
+const resultMine = deepCopy(source);
 // source.h.push(4);
 // source.f.f2 = 4;
 console.log(resultLodash, resultMine);
