@@ -362,6 +362,7 @@ console.log(queryStringParser(queryString));
 练习下正则使用。
 
 ```javascript
+// 博客页面内，下面的 \{\} 被 Jekyll 解析了，看 markdown 原文吧。
 const strTemplate =
   "我是{{name}}，年龄{{age}}，女朋友是{{girlfriend}}，恶心的测试用例{{a\\{\\{b}}可以吗";
 const strTemplateParser = (template, obj) => {
