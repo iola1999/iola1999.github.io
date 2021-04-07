@@ -260,11 +260,17 @@ console.log([1, 2, 3].some2(item => item > 9));
 ### 实现 reduce
 
 ```javascript
-// TODO 不熟悉，也很少使用，先过了
 Array.prototype.reduce2 = function (func, initialValue) {
+  let currentValue = initialValue;
+  const backupArray = Object(this);
+  for (let i = 0; i < backupArray.length; i++) {
+    currentValue = func(currentValue, backupArray[i]);
+  }
+  return currentValue;
 };
-let arr = [2, 1, 4, 9];
-arr.reduce((acc, current) => acc + current);//16
+let arr = [1, 2, 3, 4];
+const result = arr.reduce2((acc, current) => acc + current, 0); //10
+console.log(result);
 ```
 
 ## 常用方法
