@@ -13,7 +13,7 @@ typora-root-url: ..
 
 看了一篇 JavaScript 基础的文章，参考着手动写一遍常用的方法。
 
-## 基础
+## 常用方法
 
 ### 类型识别
 
@@ -28,6 +28,253 @@ getRealType(new Date());
 getRealType(() => {});
 getRealType(null);
 getRealType(new Function("console.log(123)"));
+```
+
+### 深浅拷贝
+
+```javascript
+const source = {
+  a: 1,
+  b: 2,
+  c: true,
+  d: /abc/g,
+  e: function () {},
+  f: { f1: null, f2: 1 },
+  g: undefined,
+  h: [1, 2, 3],
+};
+function getRealType(obj) {
+  return Object.prototype.toString.call(obj).split(" ")[1].replace("]", "").toLowerCase();
+}
+// 如何手动实现？递归。下面这个写法有些问题还没处理好 TODO:再看看吧，现在不想折腾了
+const deepCopy = obj => {
+  let isArray = Array.isArray(obj);
+  const result = isArray ? [] : {};
+  if (isArray) {
+    obj.forEach(item => {
+      ["object", "array"].includes(getRealType(item))
+        ? result.push(deepCopy(item))
+        : result.push(item);
+    });
+  } else {
+    Object.keys(obj).forEach(key => {
+      ["object", "array"].includes(getRealType(obj[key]))
+        ? (result[key] = deepCopy(obj[key]))
+        : (result[key] = obj[key]);
+    });
+  }
+  return result;
+};
+const _ = require("lodash");
+var resultLodash = _.cloneDeep(source);
+const resultMine = deepCopy(source);
+// source.h.push(4);
+// source.f.f2 = 4;
+console.log(resultLodash, resultMine);
+// // 原文参考写法：
+// const isObject = (target) => (typeof target === "object" || typeof target === "function") && target !== null;
+//
+// function deepClone(target, map = new WeakMap()) {
+//   if (map.get(target)) {
+//     return target;
+//   }
+//   // 获取当前值的构造函数：获取它的类型
+//   let constructor = target.constructor;
+//   // 检测当前对象target是否与正则、日期格式对象匹配
+//   if (/^(RegExp|Date)$/i.test(constructor.name)) {
+//     // 创建一个新的特殊对象(正则类/日期类)的实例
+//     return new constructor(target);
+//   }
+//   if (isObject(target)) {
+//     map.set(target, true);  // 为循环引用的对象做标记
+//     const cloneTarget = Array.isArray(target) ? [] : {};
+//     for (let prop in target) {
+//       if (target.hasOwnProperty(prop)) {
+//         cloneTarget[prop] = deepClone(target[prop], map);
+//       }
+//     }
+//     return cloneTarget;
+//   } else {
+//     return target;
+//   }
+// }
+```
+
+### 解析 URL 参数为对象
+
+应该就是写个 qs ?没考虑 url encode
+
+```javascript
+const queryString = "a=1&b=2&c=3&d&e=4";
+const queryStringParser = qs => {
+  const result = {};
+  qs.split("&").forEach(queryPart => {
+    if (queryPart.indexOf("=") !== -1) {
+      result[queryPart.split("=")[0]] = queryPart.split("=")[1];
+    } else {
+      result[queryPart] = true;
+    }
+  });
+  return result;
+};
+console.log(queryStringParser(queryString));
+```
+
+### 替换字符串模板
+
+练习下正则使用。
+
+```javascript
+// 博客页面内，下面的 \{\} 被 Jekyll 解析了，看 markdown 原文吧。
+const strTemplate =
+  "我是{{name}}，年龄{{age}}，女朋友是{{girlfriend}}，恶心的测试用例{{a\\{\\{b}}可以吗";
+const strTemplateParser = (template, obj) => {
+  const regExp = /{{(.*?)}}/; // 用 (\w+) 的话也行
+  if (regExp.test(template)) {
+    const [replaceStr, key, ..._] = regExp.exec(template);
+    console.log(replaceStr, key);
+    template = template.replace(replaceStr, obj[key]);
+    return strTemplateParser(template, obj);
+  } else {
+    return template;
+  }
+};
+console.log(strTemplateParser(strTemplate, { name: "Xiaoming", age: 17, "a\\{\\{b": "haha" }));
+```
+
+### 函数防抖
+
+```javascript
+const handleSumbit = function (name) {
+  console.log("handleSumbit 真正执行", name);
+};
+// 简单版本
+const debounceV1 = function (func, waitExec) {
+  let timer;
+  return function () {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, arguments); // 记一下 apply bind call 等区别，还有 arguments
+    }, waitExec);
+  };
+};
+// immediate 是指第一次调用时就执行，后面防抖间隔内调用的忽略。
+// 支持取消（仅限非immediate时）、立即执行、（立即执行时）返回结果（这个算了 没啥应用场景额）。是否可以做成 Promise 返回结果？
+const debounce = function (func, waitExec, immediate) {
+  let timer;
+  const debounced = function () {
+    clearTimeout(timer);
+    if (immediate) {
+      if (!timer) {
+        func.apply(this, arguments);
+      }
+      timer = setTimeout(() => {
+        timer = null; // 说明这次防抖间隔结束了。必须置null，clearTimeout 的还是有值的，影响上面 if (!timer)
+      }, waitExec);
+    } else {
+      timer = setTimeout(() => {
+        func.apply(this, arguments); // 记一下 apply bind call 等区别，还有 arguments
+      }, waitExec);
+    }
+  };
+  debounced.cancel = function () {
+    clearTimeout(timer);
+    timer = null;
+  };
+  return debounced;
+};
+const handleSumbitDebounced = debounce(handleSumbit, 1000, true);
+setTimeout(handleSumbitDebounced, 0, "try1");
+setTimeout(handleSumbitDebounced, 700, "try2");
+setTimeout(handleSumbitDebounced, 1500, "try3");
+setTimeout(() => {
+  console.log("第二轮测试");
+}, 2600);
+setTimeout(handleSumbitDebounced, 2600, "try4");
+setTimeout(handleSumbitDebounced, 2800, "try5");
+```
+
+### 函数节流
+
+```javascript
+const handleSumbit = function (name) {
+  console.log("handleSumbit 真正执行", name);
+};
+const throttle = function (func, waitExec) {
+  let lastSuccessExec = 0;
+  return function () {
+    if (+new Date() - lastSuccessExec >= waitExec) {
+      lastSuccessExec = +new Date();
+      func.apply(this, arguments);
+    }
+  };
+};
+const handleSumbitThrottled = throttle(handleSumbit, 1000);
+setTimeout(handleSumbitThrottled, 0, "try1"); // 第一次
+setTimeout(handleSumbitThrottled, 700, "try2"); // 未到 0+1000
+setTimeout(handleSumbitThrottled, 1100, "try3"); // 超过了 0+1000
+setTimeout(handleSumbitThrottled, 2050, "try4"); // 应该是跟谁比较呢，是 0+1100 +1000 吧， 不执行
+setTimeout(handleSumbitThrottled, 2250, "try5"); // 超过了 0+1100 +1000
+// TODO: 复杂需求 leading、tailing 就先不写了
+```
+
+### 发布订阅 EventEmitter
+
+```javascript
+class EventEmitter {
+  constructor() {
+    this.events = Object.create(null);
+  }
+  on(eventName, fn) {
+    if (!this.events[eventName]) {
+      this.events[eventName] = [];
+    }
+    this.events[eventName].push(fn);
+  }
+  once(eventName, fn) {
+    // 即生成一个函数，代替调用on+off
+    const tempFn = (...args) => {
+      fn(...args);
+      this.off(eventName, tempFn);
+    };
+    this.on(eventName, tempFn);
+  }
+  emit(eventName, ...args) {
+    const callbackQueue = this.events[eventName] || [];
+    callbackQueue.forEach(cb => {
+      cb(...args);
+    });
+  }
+  off(eventName, fn) {
+    if (fn) {
+      this.events[eventName] = this.events[eventName].filter(fnItem => fnItem !== fn);
+    } else {
+      // 不传第二个参数的话，会清空所有的注册
+      this.events[eventName] = [];
+    }
+  }
+}
+let eventBus = new EventEmitter();
+let fn1 = function (value) {
+  console.log("fn1 called", value);
+};
+let fn2 = function (value) {
+  console.log("fn2 called", value);
+};
+eventBus.on("onFun1", fn1);
+eventBus.on("onFun1", fn1);
+eventBus.on("onFun1", fn2);
+eventBus.on("onFun2", fn2);
+eventBus.emit("onFun1", 11);
+eventBus.emit("onFun2", 12);
+eventBus.off("onFun1", fn1);
+eventBus.emit("onFun1", 15);
+eventBus.off("onFun1");
+eventBus.off("onFun2");
+console.log("全部取消，测试一下once");
+eventBus.once("onFun1", fn1);
+eventBus.emit("onFun1", 17);
+eventBus.emit("onFun1", 17);
 ```
 
 ## 继承
@@ -273,255 +520,6 @@ const result = arr.reduce2((acc, current) => acc + current, 0); //10
 console.log(result);
 ```
 
-## 常用方法
-
-### 深浅拷贝
-
-```javascript
-const source = {
-  a: 1,
-  b: 2,
-  c: true,
-  d: /abc/g,
-  e: function () {},
-  f: { f1: null, f2: 1 },
-  g: undefined,
-  h: [1, 2, 3],
-};
-function getRealType(obj) {
-  return Object.prototype.toString.call(obj).split(" ")[1].replace("]", "").toLowerCase();
-}
-// 如何手动实现？递归。下面这个写法有些问题还没处理好 TODO:再看看吧，现在不想折腾了
-const deepCopy = obj => {
-  let isArray = Array.isArray(obj);
-  const result = isArray ? [] : {};
-  if (isArray) {
-    obj.forEach(item => {
-      ["object", "array"].includes(getRealType(item))
-        ? result.push(deepCopy(item))
-        : result.push(item);
-    });
-  } else {
-    Object.keys(obj).forEach(key => {
-      ["object", "array"].includes(getRealType(obj[key]))
-        ? (result[key] = deepCopy(obj[key]))
-        : (result[key] = obj[key]);
-    });
-  }
-  return result;
-};
-const _ = require("lodash");
-var resultLodash = _.cloneDeep(source);
-const resultMine = deepCopy(source);
-// source.h.push(4);
-// source.f.f2 = 4;
-console.log(resultLodash, resultMine);
-// // 原文参考写法：
-// const isObject = (target) => (typeof target === "object" || typeof target === "function") && target !== null;
-//
-// function deepClone(target, map = new WeakMap()) {
-//   if (map.get(target)) {
-//     return target;
-//   }
-//   // 获取当前值的构造函数：获取它的类型
-//   let constructor = target.constructor;
-//   // 检测当前对象target是否与正则、日期格式对象匹配
-//   if (/^(RegExp|Date)$/i.test(constructor.name)) {
-//     // 创建一个新的特殊对象(正则类/日期类)的实例
-//     return new constructor(target);
-//   }
-//   if (isObject(target)) {
-//     map.set(target, true);  // 为循环引用的对象做标记
-//     const cloneTarget = Array.isArray(target) ? [] : {};
-//     for (let prop in target) {
-//       if (target.hasOwnProperty(prop)) {
-//         cloneTarget[prop] = deepClone(target[prop], map);
-//       }
-//     }
-//     return cloneTarget;
-//   } else {
-//     return target;
-//   }
-// }
-```
-
-### 解析 URL 参数为对象
-
-应该就是写个 qs ?没考虑 url encode
-
-```javascript
-const queryString = "a=1&b=2&c=3&d&e=4";
-const queryStringParser = qs => {
-  const result = {};
-  qs.split("&").forEach(queryPart => {
-    if (queryPart.indexOf("=") !== -1) {
-      result[queryPart.split("=")[0]] = queryPart.split("=")[1];
-    } else {
-      result[queryPart] = true;
-    }
-  });
-  return result;
-};
-console.log(queryStringParser(queryString));
-```
-
-### 替换字符串模板
-
-练习下正则使用。
-
-```javascript
-// 博客页面内，下面的 \{\} 被 Jekyll 解析了，看 markdown 原文吧。
-const strTemplate =
-  "我是{{name}}，年龄{{age}}，女朋友是{{girlfriend}}，恶心的测试用例{{a\\{\\{b}}可以吗";
-const strTemplateParser = (template, obj) => {
-  const regExp = /{{(.*?)}}/; // 用 (\w+) 的话也行
-  if (regExp.test(template)) {
-    const [replaceStr, key, ..._] = regExp.exec(template);
-    console.log(replaceStr, key);
-    template = template.replace(replaceStr, obj[key]);
-    return strTemplateParser(template, obj);
-  } else {
-    return template;
-  }
-};
-console.log(strTemplateParser(strTemplate, { name: "Xiaoming", age: 17, "a\\{\\{b": "haha" }));
-```
-
-### 函数防抖
-
-```javascript
-const handleSumbit = function (name) {
-  console.log("handleSumbit 真正执行", name);
-};
-// 简单版本
-const debounceV1 = function (func, waitExec) {
-  let timer;
-  return function () {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func.apply(this, arguments); // 记一下 apply bind call 等区别，还有 arguments
-    }, waitExec);
-  };
-};
-// immediate 是指第一次调用时就执行，后面防抖间隔内调用的忽略。
-// 支持取消（仅限非immediate时）、立即执行、（立即执行时）返回结果（这个算了 没啥应用场景额）。是否可以做成 Promise 返回结果？
-const debounce = function (func, waitExec, immediate) {
-  let timer;
-  const debounced = function () {
-    clearTimeout(timer);
-    if (immediate) {
-      if (!timer) {
-        func.apply(this, arguments);
-      }
-      timer = setTimeout(() => {
-        timer = null; // 说明这次防抖间隔结束了。必须置null，clearTimeout 的还是有值的，影响上面 if (!timer)
-      }, waitExec);
-    } else {
-      timer = setTimeout(() => {
-        func.apply(this, arguments); // 记一下 apply bind call 等区别，还有 arguments
-      }, waitExec);
-    }
-  };
-  debounced.cancel = function () {
-    clearTimeout(timer);
-    timer = null;
-  };
-  return debounced;
-};
-const handleSumbitDebounced = debounce(handleSumbit, 1000, true);
-setTimeout(handleSumbitDebounced, 0, "try1");
-setTimeout(handleSumbitDebounced, 700, "try2");
-setTimeout(handleSumbitDebounced, 1500, "try3");
-setTimeout(() => {
-  console.log("第二轮测试");
-}, 2600);
-setTimeout(handleSumbitDebounced, 2600, "try4");
-setTimeout(handleSumbitDebounced, 2800, "try5");
-```
-
-### 函数节流
-
-```javascript
-const handleSumbit = function (name) {
-  console.log("handleSumbit 真正执行", name);
-};
-const throttle = function (func, waitExec) {
-  let lastSuccessExec = 0;
-  return function () {
-    if (+new Date() - lastSuccessExec >= waitExec) {
-      lastSuccessExec = +new Date();
-      func.apply(this, arguments);
-    }
-  };
-};
-const handleSumbitThrottled = throttle(handleSumbit, 1000);
-setTimeout(handleSumbitThrottled, 0, "try1"); // 第一次
-setTimeout(handleSumbitThrottled, 700, "try2"); // 未到 0+1000
-setTimeout(handleSumbitThrottled, 1100, "try3"); // 超过了 0+1000
-setTimeout(handleSumbitThrottled, 2050, "try4"); // 应该是跟谁比较呢，是 0+1100 +1000 吧， 不执行
-setTimeout(handleSumbitThrottled, 2250, "try5"); // 超过了 0+1100 +1000
-// TODO: 复杂需求 leading、tailing 就先不写了
-```
-
-## 发布订阅 EventEmitter
-
-```javascript
-class EventEmitter {
-  constructor() {
-    this.events = Object.create(null);
-  }
-  on(eventName, fn) {
-    if (!this.events[eventName]) {
-      this.events[eventName] = [];
-    }
-    this.events[eventName].push(fn);
-  }
-  once(eventName, fn) {
-    // 即生成一个函数，代替调用on+off
-    const tempFn = (...args) => {
-      fn(...args);
-      this.off(eventName, tempFn);
-    };
-    this.on(eventName, tempFn);
-  }
-  emit(eventName, ...args) {
-    const callbackQueue = this.events[eventName] || [];
-    callbackQueue.forEach(cb => {
-      cb(...args);
-    });
-  }
-  off(eventName, fn) {
-    if (fn) {
-      this.events[eventName] = this.events[eventName].filter(fnItem => fnItem !== fn);
-    } else {
-      // 不传第二个参数的话，会清空所有的注册
-      this.events[eventName] = [];
-    }
-  }
-}
-let eventBus = new EventEmitter();
-let fn1 = function (value) {
-  console.log("fn1 called", value);
-};
-let fn2 = function (value) {
-  console.log("fn2 called", value);
-};
-eventBus.on("onFun1", fn1);
-eventBus.on("onFun1", fn1);
-eventBus.on("onFun1", fn2);
-eventBus.on("onFun2", fn2);
-eventBus.emit("onFun1", 11);
-eventBus.emit("onFun2", 12);
-eventBus.off("onFun1", fn1);
-eventBus.emit("onFun1", 15);
-eventBus.off("onFun1");
-eventBus.off("onFun2");
-console.log("全部取消，测试一下once");
-eventBus.once("onFun1", fn1);
-eventBus.emit("onFun1", 17);
-eventBus.emit("onFun1", 17);
-```
-
 ## html 原生开发相关
 
 ### 图片懒加载
@@ -585,7 +583,7 @@ console.log(addCurry(1, 2)(3));
 ### 偏函数
 
 ```javascript
-const { partial } = require("lodash");
+// const { partial } = require("lodash");
 function add(a, b, c) {
   return a + b + c;
 }
@@ -624,26 +622,79 @@ partialClg(1, 3); // 依次打印：1, 2, 3
 
 ```javascript
 Function.prototype.call2 = function (obj) {
-  obj = obj ? Object(obj) : window;
+  obj = obj ? Object(obj) : window; // 绑定为 null 时指向全局
   obj.fn = this; // this 是 dmeoFunc（即 call2 的调用源）
   let args = [...arguments].slice(1); // 剩余的参数
   let result = obj.fn(...args);
   delete obj.fn;
   return result;
 };
+
 function dmeoFunc(age, color) {
   console.log(this.name, age, color);
 }
-function Cat(name) {
-  this.name = name;
+
+const cat = {
+  name: 'Tom'
 }
-const cat = new Cat("Tom");
 dmeoFunc.call(cat, 3, "yellow");
 dmeoFunc.call2(cat, 3, "yellow");
+dmeoFunc.apply(cat, [3, "yellow"]);
+dmeoFunc.apply2(cat, [3, "yellow"]);
+console.log(Object.prototype.toString.call2([]))
+// 如果不让用 ES6 展开运算符的话，会麻烦不少，
+```
+
+### 实现 函数原型方法 apply
+
+apply 区别是 函数参数用数组传入。TODO：null等边界情况未考虑
+
+```javascript
+Function.prototype.apply2 = function (obj) {
+  obj = obj ? Object(obj) : window;
+  obj.fn = this; // this 是 dmeoFunc（即 call2 的调用源）
+  let args = arguments[1]; // 剩余的参数
+  let result = obj.fn(...args);
+  delete obj.fn;
+  return result;
+};
+```
+
+### 实现 函数原型方法 bind
+
+bind 是返回一个绑定了 this 的函数，支持柯里化
+
+```javascript
+Function.prototype.bind2 = function (obj) {
+  const partArgs = [...arguments].slice(1); // [0] 是 dmeoFunc
+  obj = obj ? Object(obj) : window;
+  obj.fn = this; // this 是 dmeoFunc
+  return function (...args) {
+    return obj.fn(...partArgs, ...args);
+  };
+};
+
+function dmeoFunc(age, color) {
+  console.log(this.name, age, color);
+}
+
+const cat = {
+  name: "Tom",
+};
+const boundFunc = dmeoFunc.bind(cat, 3);
+boundFunc("yellow");
+const boundFuncTest = dmeoFunc.bind2(cat, 3);
+boundFuncTest("yellow");
+new boundFunc // undefined 3 undefined
+new boundFuncTest // Tom 3 undefined
+
+// 可以看到 new 调用时 this 指向不太对 参考 https://www.cnblogs.com/echolun/p/12178655.html
 ```
 
 ## 参考资料
 
-+ juejin 6946022649768181774 下次更新再补链接，还有一个 segmentfault、一个 cnblogs
++ [死磕 36 个 JS 手写题（搞懂后，提升真的大）](https://juejin.cn/post/6946022649768181774)
++ [JavaScript深入之call和apply的模拟实现](https://segmentfault.com/a/1190000009257663)
++ [js 五种绑定彻底弄懂this，默认绑定、隐式绑定、显式绑定、new绑定、箭头函数绑定详解](https://www.cnblogs.com/echolun/p/11962610.html)
 
 -END-
