@@ -124,8 +124,8 @@ console.log(queryStringParser(queryString));
 
 练习下正则使用。
 
+{% raw %}
 ```javascript
-// 博客页面内，下面的 \{\} 被 Jekyll 解析了，看 markdown 原文吧。
 const strTemplate =
   "我是{{name}}，年龄{{age}}，女朋友是{{girlfriend}}，恶心的测试用例{{a\\{\\{b}}可以吗";
 const strTemplateParser = (template, obj) => {
@@ -141,6 +141,7 @@ const strTemplateParser = (template, obj) => {
 };
 console.log(strTemplateParser(strTemplate, { name: "Xiaoming", age: 17, "a\\{\\{b": "haha" }));
 ```
+{% endraw %}
 
 ### 函数防抖
 
@@ -508,12 +509,12 @@ console.log([1, 2, 3].some2(item => item > 9));
 
 ```javascript
 Array.prototype.reduce2 = function (func, initialValue) {
-  let currentValue = initialValue;
-  const backupArray = Object(this);
-  for (let i = 0; i < backupArray.length; i++) {
-    currentValue = func(currentValue, backupArray[i]);
-  }
-  return currentValue;
+    const backupArray = Object(this);
+    let currentValue = initialValue || backupArray[0] || null;  // 允许不传第二个参数，不传时用第一项，且从第二项开始遍历
+    for (let i = initialValue ? 0 : 1; i < backupArray.length; i++) {
+        currentValue = func(currentValue, backupArray[i]);
+    }
+    return currentValue;
 };
 let arr = [1, 2, 3, 4];
 const result = arr.reduce2((acc, current) => acc + current, 0); //10
@@ -647,7 +648,7 @@ console.log(Object.prototype.toString.call2([]))
 
 ### 实现 函数原型方法 apply
 
-apply 区别是 函数参数用数组传入。TODO：null等边界情况未考虑
+apply 区别是 函数参数用数组传入。TODO：null 等边界情况未考虑
 
 ```javascript
 Function.prototype.apply2 = function (obj) {
