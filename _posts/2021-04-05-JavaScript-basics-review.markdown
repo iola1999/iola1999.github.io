@@ -841,7 +841,7 @@ console.log(quickSort(sourceArray));
 
 [https://es6.ruanyifeng.com/#docs/proxy](https://es6.ruanyifeng.com/#docs/proxy)
 
-Proxy 对象使你能够包装目标对象 通过这样可以拦截和重新定义该对象的基本操作。
+Proxy 对象使你能够包装目标对象 通过这样可以拦截和重新定义该对象的基本操作。Vue3 的响应式就是基于它的。
 
 ```typescript
 interface DetailInfo {
@@ -1009,7 +1009,9 @@ test?.(); // 42
 
 - &&= 逻辑与赋值。`x &&= y` 等于 `x && (x = y);`。
 
+{% raw %}
 - ||= 逻辑或分配。`x ||= y` 等于 `x || (x = y);`。左值 truthy 时，右值不会分配给左值。
+{% endraw %}
 
 ### 空值合并运算符 ??
 
