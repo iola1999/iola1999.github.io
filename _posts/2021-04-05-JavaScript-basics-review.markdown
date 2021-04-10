@@ -7,9 +7,9 @@ tag:
 typora-root-url: ..
 ---
 
-- content
-  {:toc}
-  ![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.JavaScript-basics-review)
+* content
+{:toc}
+![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.JavaScript-basics-review)
 
 计划开溜，复习一下。
 
