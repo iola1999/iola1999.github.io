@@ -1,17 +1,21 @@
 ---
 layout: post
-title:  JavaScript Basics Review
-date:  2021-04-05 12:00:00 +0800
+title: JavaScript Basics Review
+date: 2021-04-05 12:00:00 +0800
 categories: 笔记
-tag: 
+tag:
 typora-root-url: ..
 ---
 
-* content
-{:toc}
-![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.JavaScript-basics-review)
+- content
+  {:toc}
+  ![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.JavaScript-basics-review)
 
-看了一篇 JavaScript 基础的文章，参考着手动写一遍常用的方法。
+计划开溜，复习一下。
+
++ 2021.04.05 初版。JavaScript 基础（类型、原型链、函数），手写常用方法。
+
++ 2021.04.10 排序方法，ES6+ 语法/提案。
 
 ## 常用方法
 
@@ -22,7 +26,13 @@ typeof 可以正确识别：Undefined、Boolean、Number、String、Symbol、Fun
 ```javascript
 console.log(typeof new Date());
 function getRealType(obj) {
-  console.log(Object.prototype.toString.call(obj).split(" ")[1].replace("]", "").toLowerCase());
+  console.log(
+    Object.prototype.toString
+      .call(obj)
+      .split(" ")[1]
+      .replace("]", "")
+      .toLowerCase()
+  );
 }
 getRealType(new Date());
 getRealType(() => {});
@@ -44,20 +54,24 @@ const source = {
   h: [1, 2, 3],
 };
 function getRealType(obj) {
-  return Object.prototype.toString.call(obj).split(" ")[1].replace("]", "").toLowerCase();
+  return Object.prototype.toString
+    .call(obj)
+    .split(" ")[1]
+    .replace("]", "")
+    .toLowerCase();
 }
 // 如何手动实现？递归。下面这个写法有些问题还没处理好 TODO:再看看吧，现在不想折腾了
-const deepCopy = obj => {
+const deepCopy = (obj) => {
   let isArray = Array.isArray(obj);
   const result = isArray ? [] : {};
   if (isArray) {
-    obj.forEach(item => {
+    obj.forEach((item) => {
       ["object", "array"].includes(getRealType(item))
         ? result.push(deepCopy(item))
         : result.push(item);
     });
   } else {
-    Object.keys(obj).forEach(key => {
+    Object.keys(obj).forEach((key) => {
       ["object", "array"].includes(getRealType(obj[key]))
         ? (result[key] = deepCopy(obj[key]))
         : (result[key] = obj[key]);
@@ -106,9 +120,9 @@ console.log(resultLodash, resultMine);
 
 ```javascript
 const queryString = "a=1&b=2&c=3&d&e=4";
-const queryStringParser = qs => {
+const queryStringParser = (qs) => {
   const result = {};
-  qs.split("&").forEach(queryPart => {
+  qs.split("&").forEach((queryPart) => {
     if (queryPart.indexOf("=") !== -1) {
       result[queryPart.split("=")[0]] = queryPart.split("=")[1];
     } else {
@@ -125,6 +139,7 @@ console.log(queryStringParser(queryString));
 练习下正则使用。
 
 {% raw %}
+
 ```javascript
 const strTemplate =
   "我是{{name}}，年龄{{age}}，女朋友是{{girlfriend}}，恶心的测试用例{{a\\{\\{b}}可以吗";
@@ -139,8 +154,15 @@ const strTemplateParser = (template, obj) => {
     return template;
   }
 };
-console.log(strTemplateParser(strTemplate, { name: "Xiaoming", age: 17, "a\\{\\{b": "haha" }));
+console.log(
+  strTemplateParser(strTemplate, {
+    name: "Xiaoming",
+    age: 17,
+    "a\\{\\{b": "haha",
+  })
+);
 ```
+
 {% endraw %}
 
 ### 函数防抖
@@ -242,13 +264,15 @@ class EventEmitter {
   }
   emit(eventName, ...args) {
     const callbackQueue = this.events[eventName] || [];
-    callbackQueue.forEach(cb => {
+    callbackQueue.forEach((cb) => {
       cb(...args);
     });
   }
   off(eventName, fn) {
     if (fn) {
-      this.events[eventName] = this.events[eventName].filter(fnItem => fnItem !== fn);
+      this.events[eventName] = this.events[eventName].filter(
+        (fnItem) => fnItem !== fn
+      );
     } else {
       // 不传第二个参数的话，会清空所有的注册
       this.events[eventName] = [];
@@ -283,8 +307,9 @@ eventBus.emit("onFun1", 17);
 ### 原型链继承
 
 存在的问题：
-+ 原型中包含的引用类型属性将被所有实例共享；
-+ 子类在实例化的时候不能给父类构造函数传参；
+
+- 原型中包含的引用类型属性将被所有实例共享；
+- 子类在实例化的时候不能给父类构造函数传参；
 
 ```javascript
 function Animal() {
@@ -325,7 +350,7 @@ function Animal(name) {
   };
 }
 function Dog(name, age) {
-  Animal.call(this, name);  // 这样每份实例可以拥有自己独立的属性
+  Animal.call(this, name); // 这样每份实例可以拥有自己独立的属性
   this.age = age;
 }
 const dogA = new Dog("dogA", 4);
@@ -419,9 +444,9 @@ const source = [1, 2, 2, 3, 5, 5, 6];
 console.log([...new Set(source)]);
 // 这种方式（ES5），看下思路就行，filter的第 2、3 个参数
 function unique(arr) {
-    return arr.filter(function (item, index, array) {
-      return array.indexOf(item) === index;
-    });
+  return arr.filter(function (item, index, array) {
+    return array.indexOf(item) === index;
+  });
 }
 ```
 
@@ -431,14 +456,14 @@ function unique(arr) {
 const source = [1, 2, [3, 4, 5, [6, 7, 8]]];
 // console.log(source.flat());
 // 如何手动实现？递归
-const flatArray = array => {
+const flatArray = (array) => {
   const result = [];
-  array.forEach(item => {
+  array.forEach((item) => {
     Array.isArray(item) ? result.push(...flatArray(item)) : result.push(item);
   });
   return result;
 };
-console.log(flatArray(source))
+console.log(flatArray(source));
 ```
 
 ### 实现 forEach
@@ -454,7 +479,7 @@ Array.prototype.forEach2 = function (func, thisArg) {
     func.call(thisArg, backupArray[i], i, backupArray);
   }
 };
-[1, 2, 3].forEach2(item => {
+[1, 2, 3].forEach2((item) => {
   console.log(item);
 });
 ```
@@ -470,7 +495,7 @@ Array.prototype.map2 = function (func, thisArg) {
   }
   return result;
 };
-console.log([1, 2, 3].map2(item => item + "/"));
+console.log([1, 2, 3].map2((item) => item + "/"));
 // 顺便：["1", "2", "3"].map(parseInt)//返回应该是 [1, NaN, NaN]。注意参数 .map((item, index) => parseInt(item, index));
 ```
 
@@ -481,11 +506,12 @@ Array.prototype.filter2 = function (func, thisArg) {
   const backupArray = Object(this); // 防止被修改？
   const result = [];
   for (let i = 0; i < backupArray.length; i++) {
-    func.call(thisArg, backupArray[i], i, backupArray) && result.push(backupArray[i]);
+    func.call(thisArg, backupArray[i], i, backupArray) &&
+      result.push(backupArray[i]);
   }
   return result;
 };
-console.log([1, 2, 3].filter2(item => item > 1));
+console.log([1, 2, 3].filter2((item) => item > 1));
 ```
 
 ### 实现 some
@@ -502,19 +528,19 @@ Array.prototype.some2 = function (func, thisArg) {
   }
   return result;
 };
-console.log([1, 2, 3].some2(item => item > 9));
+console.log([1, 2, 3].some2((item) => item > 9));
 ```
 
 ### 实现 reduce
 
 ```javascript
 Array.prototype.reduce2 = function (func, initialValue) {
-    const backupArray = Object(this);
-    let currentValue = initialValue || backupArray[0] || null;  // 允许不传第二个参数，不传时用第一项，且从第二项开始遍历
-    for (let i = initialValue ? 0 : 1; i < backupArray.length; i++) {
-        currentValue = func(currentValue, backupArray[i]);
-    }
-    return currentValue;
+  const backupArray = Object(this);
+  let currentValue = initialValue || backupArray[0] || null; // 允许不传第二个参数，不传时用第一项，且从第二项开始遍历
+  for (let i = initialValue ? 0 : 1; i < backupArray.length; i++) {
+    currentValue = func(currentValue, backupArray[i]);
+  }
+  return currentValue;
 };
 let arr = [1, 2, 3, 4];
 const result = arr.reduce2((acc, current) => acc + current, 0); //10
@@ -528,9 +554,9 @@ console.log(result);
 TODO:这个不想写。直接看了原文。
 
 ```javascript
-addEventListener('scroll', imgLazyLoad)
-let rect = img.getBoundingClientRect()
-if (rect.top < window.innerHeight) img.src = img.dataset.src // 以及已经显示过的图片移除掉。
+addEventListener("scroll", imgLazyLoad);
+let rect = img.getBoundingClientRect();
+if (rect.top < window.innerHeight) img.src = img.dataset.src; // 以及已经显示过的图片移除掉。
 ```
 
 ### JSONP
@@ -539,7 +565,7 @@ if (rect.top < window.innerHeight) img.src = img.dataset.src // 以及已经显�
 
 ### 封装 AJAX
 
-new XMLHttpRequest() .open .setRequestHeader  .onreadystatechange
+new XMLHttpRequest() .open .setRequestHeader .onreadystatechange
 
 ## 函数相关
 
@@ -565,7 +591,7 @@ console.log(currying(add, 1)(2));
 ```javascript
 // 如何实现高阶的？
 // const { curry } = require("lodash");
-const curry = func => {
+const curry = (func) => {
   let curried = (...args) => {
     return args.length === func.length
       ? func(...args)
@@ -636,13 +662,13 @@ function dmeoFunc(age, color) {
 }
 
 const cat = {
-  name: 'Tom'
-}
+  name: "Tom",
+};
 dmeoFunc.call(cat, 3, "yellow");
 dmeoFunc.call2(cat, 3, "yellow");
 dmeoFunc.apply(cat, [3, "yellow"]);
 dmeoFunc.apply2(cat, [3, "yellow"]);
-console.log(Object.prototype.toString.call2([]))
+console.log(Object.prototype.toString.call2([]));
 // 如果不让用 ES6 展开运算符的话，会麻烦不少，
 ```
 
@@ -686,16 +712,338 @@ const boundFunc = dmeoFunc.bind(cat, 3);
 boundFunc("yellow");
 const boundFuncTest = dmeoFunc.bind2(cat, 3);
 boundFuncTest("yellow");
-new boundFunc // undefined 3 undefined
-new boundFuncTest // Tom 3 undefined
+new boundFunc(); // undefined 3 undefined
+new boundFuncTest(); // Tom 3 undefined
 
 // 可以看到 new 调用时 this 指向不太对 参考 https://www.cnblogs.com/echolun/p/12178655.html
 ```
 
+## 排序
+
+### 冒泡
+
+时间 O(n^2)
+
+```typescript
+function bubbleSort(nums: number[]): number[] {
+  const result = [...nums];
+  let rightPtr = result.length - 1;
+  while (rightPtr > 0) {
+    for (let index = 0; index < rightPtr; index++) {
+      if (result[index] > result[index + 1]) {
+        // 左边大于右边的话就交换
+        [result[index], result[index + 1]] = [result[index + 1], result[index]];
+      }
+    }
+    // 这时 rightPtr-1 ~ result.length-1 的都已经是有序的了
+    rightPtr -= 1;
+  }
+  return result;
+}
+const sourceArray: number[] = [77, 10, 7, 15, 3];
+console.log(bubbleSort(sourceArray));
+```
+
+### 选择排序
+
+遍历数组选出最小值，从原数组删除，写入新数组。时间 O(n^2)
+
+```typescript
+function chooseSort(nums: number[]): number[] {
+  const result: number[] = [];
+  const backupArr = [...nums];
+  while (backupArr.length > 0) {
+    let minValue: number = backupArr[0],
+      minIndex: number = 0;
+    for (let index = 1; index < backupArr.length; index++) {
+      if (backupArr[index] < minValue) {
+        minValue = backupArr[index];
+        minIndex = index;
+      }
+    }
+    result.push(minValue);
+    backupArr.splice(minIndex, 1);
+  }
+  return result;
+}
+const sourceArray: number[] = [77, 10, 7, 15, 3];
+console.log(chooseSort(sourceArray));
+```
+
+### 计数排序
+
+需要先知道最小值 最大值，生成一个长度是其差值+1 的数组，遍历原，计数，遍历新数组，输出结果。
+
+时间 O(m+n)，空间消耗大（在 js 中是不是还可以受益于稀疏数组？），需要知道最大值最小值。
+
+```typescript
+function countSort(nums: number[]): number[] {
+  // 假设已经知道 最小值 10，最大值 150 了，这不重要。
+  const minValue = 10,
+    maxValue = 150;
+  const countArr: number[] = new Array(maxValue - minValue + 1); // 不填充 0，可以省下空间？
+  for (let index = 0; index < nums.length; index++) {
+    if (countArr[nums[index] - minValue] === undefined) {
+      countArr[nums[index] - minValue] = 1;
+    } else {
+      countArr[nums[index] - minValue] += 1;
+    }
+  }
+  const result: number[] = [];
+  for (let index = 0; index < countArr.length; index++) {
+    if (countArr[index] > 0) {
+      // countArr[index] 个 minValue + index
+      for (let pushCount = 1; pushCount <= countArr[index]; pushCount++) {
+        result.push(minValue + index);
+      }
+    }
+  }
+
+  return result;
+}
+const sourceArray: number[] = [77, 11, 17, 10, 13, 15, 17, 13];
+console.log(countSort(sourceArray));
+```
+
+### 快速排序
+
+选一个基准值，开三个数组存分别存比基准值小的，一样的，大的。然后对小的大的数组递归调用，与中间的结果拼接起来。
+
+平均时间复杂度 O(nlog n)，最坏 O(n^2)，稳定性不如归并排序。随机取基准值的话是稳定的 O(nlog n)。空间复杂度 O(log n)。
+
+```typescript
+function quickSort(nums: number[]): number[] {
+  if (nums.length < 2) {
+    return nums;
+  }
+  const pickOneValue = nums[Math.floor(Math.random() * nums.length)]; // 随机取基准值
+  const lower: number[] = [];
+  const equal: number[] = [];
+  const higher: number[] = [];
+  nums.forEach((item) => {
+    if (item === pickOneValue) {
+      equal.push(item);
+    } else {
+      item > pickOneValue ? higher.push(item) : lower.push(item);
+    }
+  });
+  return [...quickSort(lower), ...equal, ...quickSort(higher)];
+}
+const sourceArray: number[] = [77, 11, 17, 10, 13, 15, 17, 13];
+console.log(quickSort(sourceArray));
+```
+
+## ES6 和更新的语法/提案
+
+只记录了一些平时很少用，没有注意到的。
+
+### ES6 Proxy
+
+[https://es6.ruanyifeng.com/#docs/proxy](https://es6.ruanyifeng.com/#docs/proxy)
+
+Proxy 对象使你能够包装目标对象 通过这样可以拦截和重新定义该对象的基本操作。
+
+```typescript
+interface DetailInfo {
+  auther?: string;
+  buyUrl?: string;
+}
+interface Book {
+  name: string;
+  price?: number;
+  detailInfo: DetailInfo;
+}
+const book: Book = {
+  name: "深入浅出 Node.js",
+  // price: 25, // 稍后测试一下 新增的属性能否监听
+  detailInfo: {
+    auther: "Ming",
+  },
+};
+
+const handler: ProxyHandler<Book> = {
+  get: function (target: Book, prop: string | symbol, receiver): any {
+    console.info("[Proxy]访问", prop);
+    return target[prop];
+  },
+  set: function (target: Book, prop: string | symbol, value): boolean {
+    console.info("[Proxy]修改", prop, value);
+    if (prop === "price" && value <= 0) {
+      throw new RangeError("价格数值不正确");
+    }
+    target[prop] = value;
+    return true; // 这个似乎没有作用
+  },
+};
+
+const wrappedBook = new Proxy(book, handler);
+console.log("wrappedBook.name ->", wrappedBook.name);
+wrappedBook.price = 25;
+console.log("wrappedBook.price ->", wrappedBook.price);
+// wrappedBook.price = -1;
+// console.log("wrappedBook.price ->", wrappedBook.price);
+
+wrappedBook.detailInfo.auther = "Aaa"; // 只拦截到 detailInfo，用它实现响应式 也还是需要递归调用的
+```
+
+测试一下 其他的 proxy 属性
+
+```typescript
+var twice: ProxyHandler<Function> = {
+  apply(target, ctx, args) {
+    // console.log(arguments);
+    return Reflect.apply(arguments[0], arguments[1], arguments[2]) * 2;
+  },
+};
+function sum(left: number, right: number) {
+  return left + right;
+}
+var sumProxied = new Proxy(sum, twice);
+sumProxied(1, 2); // (1+2)*2
+sumProxied.call(null, 5, 6); // call 实际上也是调用 apply？这一段没看明白
+sumProxied.apply(null, [7, 8]);
+```
+
+### 模板字符串
+
+拼接字符串时尽量用它。`` const foo = `this is a ${example}`; ``
+
+### Symbol
+
+当标识对象键的唯一值，防止与其他地方在该对象上使用的键名冲突。且它不会被 `for..in` 或者`Object.keys()`遍历到。
+
+```javascript
+var isOk = Symbol("isOk");
+window[isOk] = true;
+if (window[isOk]) {
+  // do something
+}
+```
+
+也可以作为对象内部的私有变量，外部无法通过键名来访问。
+
+### for..of
+
+结合了 forEach 的简洁性和中断循环的能力
+
+`for (const v of ['a', 'b', 'c'])` // a b c
+
+`for (const [i, v] of ['a', 'b', 'c'].entries())` // 0 'a'...
+
+遍历 map
+
+```javascript
+let map = new Map([
+  [1, "one"],
+  [2, "two"],
+  [3, "three"],
+]);
+
+map.keys();
+map.values();
+map.entries();
+
+for (let [key, value] of map.entries()) {
+  console.log(key);
+}
+```
+
+### 装饰器
+
+[https://github.com/mqyqingfeng/Blog/issues/109](https://github.com/mqyqingfeng/Blog/issues/109)
+
+```javascript
+function log(target, name, descriptor) {
+  var oldValue = descriptor.value;
+
+  descriptor.value = function (...args) {
+    console.log(`Calling ${name} with`, args);
+    return oldValue.apply(this, args);
+  };
+
+  return descriptor;
+}
+
+class MathMy {
+  @log // 它可以是一个高阶函数，比如传入防抖间隔
+  add(a, b) {
+    return a + b;
+  }
+}
+```
+
+### 函数的默认值
+
+可以直接写在入参参数名后面。`function test(quantity = 1) {}`
+
+### 双冒号运算符
+
+看着不错，不过并没有使用机会。
+
+`obj::func;` 等同于 func.bind(obj);
+
+### 可选链
+
+对于深层级对象取值、函数调用都很不错。
+
+```javascript
+const obj = {
+  foo: {
+    bar: {
+      baz: 42,
+    },
+  },
+};
+
+const baz = obj?.foo?.bar?.baz; // 42
+
+function test() {
+  return 42;
+}
+test?.(); // 42
+```
+
+### 逻辑分配运算符
+
+- ??= 逻辑无效分配。逻辑空值分配仅在左侧变量为`null`或`undefined`时才分配右值到左值。
+
+- &&= 逻辑与赋值。`x &&= y` 等于 `x && (x = y);`。
+
+- ||= 逻辑或分配。`x ||= y` 等于 `x || (x = y);`。左值 truthy 时，右值不会分配给左值。
+
+### 空值合并运算符 ??
+
+当左侧的操作数为 null 或者 undefined 时，返回其右侧操作数，否则返回左侧操作数。
+
+`a ?? b` 等于 `(a !== null && a !== void 0) ? a : b`
+
+逻辑或操作符`||`还会在左值为假值（如 0、""）时返回右值。
+
+```javascript
+const foo = null ?? "default";
+console.log(foo); // "default"
+
+const baz = 0 ?? 42;
+console.log(baz); // 0。用 || 的话就是 42。
+```
+
+### 管道操作符 |>
+
+又是一个用不上的，直接看示例就懂了。
+
+```javascript
+const double = (n) => n * 2;
+const increment = (n) => n + 1;
+
+double(increment(double(5))); // 22
+
+5 |> double |> increment |> double; // 22
+```
+
 ## 参考资料
 
-+ [死磕 36 个 JS 手写题（搞懂后，提升真的大）](https://juejin.cn/post/6946022649768181774)
-+ [JavaScript深入之call和apply的模拟实现](https://segmentfault.com/a/1190000009257663)
-+ [js 五种绑定彻底弄懂this，默认绑定、隐式绑定、显式绑定、new绑定、箭头函数绑定详解](https://www.cnblogs.com/echolun/p/11962610.html)
+- [死磕 36 个 JS 手写题（搞懂后，提升真的大）](https://juejin.cn/post/6946022649768181774)
+- [JavaScript 深入之 call 和 apply 的模拟实现](https://segmentfault.com/a/1190000009257663)
+- [js 五种绑定彻底弄懂 this，默认绑定、隐式绑定、显式绑定、new 绑定、箭头函数绑定详解](https://www.cnblogs.com/echolun/p/11962610.html)
 
 -END-
