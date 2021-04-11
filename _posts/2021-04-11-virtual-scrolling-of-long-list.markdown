@@ -179,7 +179,7 @@ I tried to change the list item component to look like this to simulate renderin
   console.log(props.productId);
   // simulate rendering complex scenes.
   for (let index = 0; index < 100000000; index++) {
-    Math.pow(Math.abs(2.7111548 ** 31 - 2.669875 ** 32), 2);
+    (2.2 ** 30 - 2.3 ** 31) ** (3 ** 2);
   }
   showValue.value = props.productId;
 </script>
