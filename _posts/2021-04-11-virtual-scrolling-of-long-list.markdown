@@ -15,7 +15,7 @@ typora-root-url: ..
 
 ~~试试放下洋屁，用蹩脚英语写一篇。虚拟滚动文章网上到处都是，本文没有参考意义，只是为了记录。~~
 
-Today I'm trying to focus on some implementation details of the virtual scrolling of long list.Try to use the vite and [vue3 composition api](https://v3.cn.vuejs.org/guide/composition-api-introduction.html#%E4%BB%80%E4%B9%88%E6%98%AF%E7%BB%84%E5%90%88%E5%BC%8F-api) by the way.
+Today I'm trying to focus on some implementation details of the virtual scrolling of long list. Try to use the vite and [vue3 composition api](https://v3.cn.vuejs.org/guide/composition-api-introduction.html#%E4%BB%80%E4%B9%88%E6%98%AF%E7%BB%84%E5%90%88%E5%BC%8F-api) by the way.
 
 ## use Vite to build project
 
