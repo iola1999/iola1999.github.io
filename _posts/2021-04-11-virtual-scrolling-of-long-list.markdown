@@ -10,6 +10,7 @@ typora-root-url: ..
 * content
 {:toc}
 ![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.virtual-scrolling-of-long-list)
+
 ~~今天看一下列表虚拟滚动的实现细节，~~
 
 ~~试试放下洋屁，用蹩脚英语写一篇。虚拟滚动文章网上到处都是，本文没有参考意义，只是为了记录。~~
