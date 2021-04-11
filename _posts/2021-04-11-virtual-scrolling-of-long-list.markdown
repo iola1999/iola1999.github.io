@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Virtual Scrolling of LongList
+title: Virtual Scrolling of Long List
 date: 2021-04-11 18:00:00 +0800
 categories: 笔记
 tag:
@@ -13,7 +13,7 @@ typora-root-url: ..
 
 ~~今天看一下列表虚拟滚动的实现细节，~~
 
-试试放下洋屁，用蹩脚英语写一篇。虚拟滚动文章网上到处都是，本文没有参考意义，只是为了记录。
+~~试试放下洋屁，用蹩脚英语写一篇。虚拟滚动文章网上到处都是，本文没有参考意义，只是为了记录。~~
 
 Today I'm trying to focus on some implementation details of the virtual scrolling of long list.Try to use the vite and [vue3 composition api](https://v3.cn.vuejs.org/guide/composition-api-introduction.html#%E4%BB%80%E4%B9%88%E6%98%AF%E7%BB%84%E5%90%88%E5%BC%8F-api) by the way.
 
@@ -158,7 +158,7 @@ The basic implementation idea is to get how far the second layer has scrolled re
 
 At the same time, the top distance of the second layer component is set correctly so that the first item rendered is displayed correctly at the top of the viewport (i.e. where it would be if it were not scrolled virtually).
 
-### some tests
+### test and optimization
 
 I tried to change the list item component to look like this to simulate rendering complex scenes.
 
@@ -185,7 +185,7 @@ I tried to change the list item component to look like this to simulate renderin
 </script>
 ```
 
-After a fast scroll time, the final position of the item takes a lot of time to show up, apparently because every child component is tried to be rendered. This can be optimized by adding debounce to the scroll event handler, but I happened to find another good optimization solution.
+After a quick scroll, items on the final position take a lot of time to show up, apparently because every child component that has appeared is tried to be rendered. This can be optimized by adding debounce to the scroll event handler, but I happened to find another good optimization solution.
 
 ```javascript
 // Omit the same content
@@ -207,5 +207,23 @@ onBeforeUnmount(() => {
   // The actual use in the project can be implemented using v-if
 });
 ```
+
+## virtual scrolling of the list with variable item height?
+
+In business code development, for data that is large and cannot be paged, we use a virtually rendered table component. The row height of each item in this case is fixed.
+
+But the above solution has an obvious shortcoming, that is, the height of each item in the list needs to be the same and fixed.
+
+Like infographic pages, or expandable table rows, the height of each item is not fixed or can change dynamically. So what is the idea to implement virtual scrolling for a list with variable height?
+
+Here's an [article](https://lkangd.com/post/virtual-infinite-scroll/) that goes into great detail, but it's too complicated for me to read. :)
+
+[And another one](https://juejin.cn/post/6844903959828627464)
+
+## summary
+
+This afternoon I tried to write a virtual scrolling list. I took this opportunity to try out vue3 composition api and felt that this coding idea is really good. It's easy to reuse the code, and can make the code much more maintainable.
+
+As well, the vite build tool is really fast to start.
 
 -END-
