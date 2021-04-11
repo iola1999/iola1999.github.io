@@ -19,7 +19,7 @@ Today I'm trying to focus on some implementation details of the virtual scrollin
 
 ## use Vite to build project
 
-`npm init @vitejs/app` Then choose the `vue` template。
+`npm init @vitejs/app` Then choose the `vue` template.
 
 ## implementation of the virtual scrolling
 
