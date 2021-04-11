@@ -45,9 +45,9 @@ The second `div` is designed to hold the height that can be used for scrolling, 
 
 To make the list items the correct distance from the top, consider the following two positioning methods.
 
-One is to dynamically modify the `height, margin-top` of the second div so that the sum is equal to the fixed height of the entire list. Then render only those list items in the visible area. The first item rendered is actually right next to the top of the second div (not counting margin-top).
+One is to dynamically modify the `height, margin-top` of the second `div` so that the sum is equal to the fixed height of the entire list. Then render only those list items in the visible area. The first item rendered is actually right next to the top of the second `div` (with `margin-top`).
 
-Another option is to set the second div to a fixed height and `position: relative`, set the list item to the style `position: absolute`, and set the `top` style to make it appear in the correct position.
+Another option is to set the second `div` to a fixed height and `position: relative`, set the list item to the style `position: absolute`, and set the `top` style to make it appear in the correct position.
 
 ### Implementation
 
@@ -197,7 +197,7 @@ timer = setTimeout(() => {
   console.log(props.productId);
   // simulate rendering complex scenes.
   for (let index = 0; index < 100000000; index++) {
-    Math.pow(Math.abs(2.7111548 ** 31 - 2.669875 ** 32), 2);
+    (2.2 ** 30 - 2.3 ** 31) ** (3 ** 2);
   }
   showValue.value = props.productId;
 }, 0);
