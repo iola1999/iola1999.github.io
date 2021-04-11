@@ -10,20 +10,19 @@ typora-root-url: ..
 * content
 {:toc}
 ![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.virtual-scrolling-of-long-list)
-
 ~~今天看一下列表虚拟滚动的实现细节，~~
 
 ~~试试放下洋屁，用蹩脚英语写一篇。虚拟滚动文章网上到处都是，本文没有参考意义，只是为了记录。~~
 
 Today I'm trying to focus on some implementation details of the virtual scrolling of long list. Try to use the vite and [vue3 composition api](https://v3.cn.vuejs.org/guide/composition-api-introduction.html#%E4%BB%80%E4%B9%88%E6%98%AF%E7%BB%84%E5%90%88%E5%BC%8F-api) by the way.
 
-## use Vite to build project
+## Use vite to build project
 
 `npm init @vitejs/app` Then choose the `vue` template.
 
-## implementation of the virtual scrolling
+## Implementation of the virtual scrolling
 
-### principle
+### Principle
 
 Rendering the entire long list has a high performance overhead (many DOM nodes and time-consuming rendering), so we can listen to the scroll event to get the currently visible range of list items and render only that part.
 
@@ -39,9 +38,9 @@ It is also necessary to keep the list height correct and the distance between li
 </div>
 ```
 
-The outer div is the display window for the list, such as the body of a table.
+The outer `div` is the display window for the list, such as the body of a table.
 
-The second div layer is designed to hold the height that can be used for scrolling, which is the height of the entirely rendered list.
+The second `div` is designed to hold the height that can be used for scrolling, which is the height of the entirely rendered list.
 
 To make the list items the correct distance from the top, consider the following two positioning methods.
 
@@ -49,7 +48,7 @@ One is to dynamically modify the `height, margin-top` of the second div so that 
 
 Another option is to set the second div to a fixed height and `position: relative`, set the list item to the style `position: absolute`, and set the `top` style to make it appear in the correct position.
 
-### implementation
+### Implementation
 
 Here I choose the first option to implement first. Prepare a list item component.
 
@@ -154,11 +153,11 @@ Next is the outer layers for showing list.
 </style>
 ```
 
-The basic implementation idea is to get how far the second layer has scrolled relative to the `container` based on scroll events, and thus know which items should be visible. The list of visible items is maintained using the `computed property` and rendered by the child component.
+The basic implementation idea is to get how far the second `div` has scrolled relative to the `container` based on scroll event, and thus know which items should be visible. The list of visible items is maintained using the `computed property` and rendered by the child component.
 
-At the same time, the top distance of the second layer component is set correctly so that the first item rendered is displayed correctly at the top of the viewport (i.e. where it would be if it were not scrolled virtually).
+At the same time, the top distance of the second `div` is set correctly by `margin-top`, so that the first item rendered is displayed correctly at the top of the viewport (i.e. where it would be if it were not scrolled virtually).
 
-### test and optimization
+### Test and optimization
 
 I tried to change the list item component to look like this to simulate rendering complex scenes.
 
@@ -208,7 +207,7 @@ onBeforeUnmount(() => {
 });
 ```
 
-## virtual scrolling of the list with variable item height?
+## Virtual scrolling of the list with variable item height?
 
 In business code development, for data that is large and cannot be paged, we use a virtually rendered table component. The row height of each item in this case is fixed.
 
@@ -216,14 +215,14 @@ But the above solution has an obvious shortcoming, that is, the height of each i
 
 Like infographic pages, or expandable table rows, the height of each item is not fixed or can change dynamically. So what is the idea to implement virtual scrolling for a list with variable height?
 
-Here's an [article](https://lkangd.com/post/virtual-infinite-scroll/) that goes into great detail, but it's too complicated for me to read. :)
+Here's an [article](https://lkangd.com/post/virtual-infinite-scroll/) that goes into great detail, but it's too complicated for me to read. `// TODO:)`
 
 [And another one](https://juejin.cn/post/6844903959828627464)
 
-## summary
+## Summary
 
 This afternoon I tried to write a virtual scrolling list. I took this opportunity to try out vue3 composition api and felt that this coding idea is really good. It's easy to reuse the code, and can make the code much more maintainable.
 
-As well, the vite build tool is really fast to start.
+As well, the `vite` build tool is really fast to start.
 
 -END-
