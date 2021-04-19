@@ -60,7 +60,7 @@ function getRealType(obj) {
     .replace("]", "")
     .toLowerCase();
 }
-// 如何手动实现？递归。下面这个写法有些问题还没处理好 TODO:再看看吧，现在不想折腾了
+// 如何手动实现？递归。下面这个写法没支持循环引用的情况
 const deepCopy = (obj) => {
   let isArray = Array.isArray(obj);
   const result = isArray ? [] : {};
@@ -832,6 +832,8 @@ function quickSort(nums: number[]): number[] {
 const sourceArray: number[] = [77, 11, 17, 10, 13, 15, 17, 13];
 console.log(quickSort(sourceArray));
 ```
+
+优化：考虑不使用新数组的原地快排？
 
 ## ES6 和更新的语法/提案
 
