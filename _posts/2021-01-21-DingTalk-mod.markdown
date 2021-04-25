@@ -53,6 +53,12 @@ PC钉钉[DingTalk_v6.0.9.4120187](https://dtapp-pub.dingtalk.com/dingtalk-deskto
 
 ![image-20210121191306918](/upload/images/2021-01-21-DingTalk-mod/Snipaste_2021-04-15_12-51-14.png)
 
+PC钉钉`DingTalk_v6.0.12-Release.4190287`版本的解压密码为`7be631b49`。
+
+有时候钉钉会静默自动升级，需要调试的则`DingDing\main\current_new\DingTalk.exe`，`web_content.pak`也是修改这个目录的。调试原来目录的的话，它启动后会退出。
+
+感觉就像安卓双系统一样，两个版本互相升级......
+
 ### 魔改钉钉
 
 使用上面拿到的密码解压`web_content.pak`，使用喜欢的代码编辑器打开项目。搜索`撤回了一条消息`找到`assets/chatbox-index.js`。
