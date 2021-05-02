@@ -547,6 +547,14 @@ const result = arr.reduce2((acc, current) => acc + current, 0); //10
 console.log(result);
 ```
 
+### ES5、ES6 数组方法
+
+ES5：indexOf, map, forEach, splice, slice, filter, every, some, reduce, reverse, join, sort, concat, push, pop, shift, unshift, toString, Array.isArray
+
+ES6：includes,  find,  findIndex,  flat,  fill,  Array.from,  Array.of
+
+会改变原数组的：splice,  reverse,  sort,  push,  pop,  shift,  unshift,  fill
+
 ## html 原生开发相关
 
 ### 图片懒加载
