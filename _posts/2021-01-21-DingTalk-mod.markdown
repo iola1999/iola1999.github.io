@@ -59,6 +59,10 @@ PC钉钉`DingTalk_v6.0.12-Release.4190287`版本的解压密码为`7be631b49`。
 
 感觉就像安卓双系统一样，两个版本互相升级......
 
+PC钉钉`DingTalk_v6.0.15-Release.5080287`版本的解压密码为`8e979bfaa`。
+
+PC钉钉`DingTalk_v6.0.15-Release.5170687`版本的解压密码为`0498ea61b`。
+
 ### 魔改钉钉
 
 使用上面拿到的密码解压`web_content.pak`，使用喜欢的代码编辑器打开项目。搜索`撤回了一条消息`找到`assets/chatbox-index.js`。
