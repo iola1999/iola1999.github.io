@@ -63,6 +63,10 @@ PC钉钉`DingTalk_v6.0.15-Release.5080287`版本的解压密码为`8e979bfaa`。
 
 PC钉钉`DingTalk_v6.0.15-Release.5170687`版本的解压密码为`0498ea61b`。
 
+PC钉钉`DingTalk_v6.0.15-Release.6090287`版本的解压密码为`7bed4b395`。
+
+PC钉钉`DingTalk_v6.0.15-Release.6110187`版本的解压密码为`72a9c5e6e`。
+
 ### 魔改钉钉
 
 使用上面拿到的密码解压`web_content.pak`，使用喜欢的代码编辑器打开项目。搜索`撤回了一条消息`找到`assets/chatbox-index.js`。
