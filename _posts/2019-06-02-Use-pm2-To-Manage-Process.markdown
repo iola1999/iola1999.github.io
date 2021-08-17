@@ -10,7 +10,7 @@ tag:
 {:toc}
 
 
-最近一直在用上篇文章里提到的 `Ubuntu on Android` 跑些后台任务，screen 用起来似乎并不是很方便，这里考虑使用 pm2 来管理后台的进程。
+最近一直在用[上篇文章](https://678234.xyz/2019/05/04/Run-Ubuntu-On-Android-Phone/)里提到的 `Ubuntu on Android` 跑些后台任务，screen 用起来似乎并不是很方便，这里考虑使用 pm2 来管理后台的进程。
 
 ## 安装node、npm、pm2：
 

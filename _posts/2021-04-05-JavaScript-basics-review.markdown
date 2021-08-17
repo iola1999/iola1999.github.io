@@ -11,11 +11,13 @@ typora-root-url: ..
 {:toc}
 ![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.JavaScript-basics-review)
 
-计划开溜，复习一下。
+复习一下。
 
 + 2021.04.05 初版。JavaScript 基础（类型、原型链、函数），手写常用方法。
 
 + 2021.04.10 排序方法，ES6+ 语法/提案。
+
++ 2021.08.17 [这里](https://github.com/iola1999/frontend-practice/tree/master/basics-practice/works-by-day) 记录了更多内容，暂不更新当前博文了
 
 ## 常用方法
 

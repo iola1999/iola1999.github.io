@@ -224,6 +224,6 @@ Here's an [article](https://lkangd.com/post/virtual-infinite-scroll/) that goes 
 
 This afternoon I tried to write a virtual scrolling list. I took this opportunity to try out vue3 composition api and felt that this coding idea is really good. It's easy to reuse the code, and can make the code much more maintainable.
 
-As well, the `vite` build tool is really fast to start.
+The `vite` build tool is really fast.
 
 -END-
