@@ -69,11 +69,15 @@ PC钉钉`DingTalk_v6.0.15-Release.6110187`版本的解压密码为`72a9c5e6e`。
 
 PC钉钉`DingTalk_v6.0.18-Release.6280687`版本的解压密码为`f0e8ba41f`。
 
+PC钉钉`DingTalk_v6.0.26-Release.8200187`版本的解压密码为`9a6c3c5a8`。
+
+PC钉钉`DingTalk_v6.0.26-Release.9039987`版本的解压密码为`7e8be02fb`。
+
 ### 魔改钉钉
 
 使用上面拿到的密码解压`web_content.pak`，使用喜欢的代码编辑器打开项目。搜索`撤回了一条消息`找到`assets/chatbox-index.js`。
 
-格式化一下代码，文件比较大，需要耐心等待一下。
+格式化一下代码，文件比较大，需要耐心等待一下。~~我的很大，你要忍一下~~
 
 搜索`dt_message_recall_message_file_format`找到最后一处使用。参考原作者的方法，读取`a.baseMessage.content.textContent.text`拼接到撤回提示后即可看到撤回的文字消息。
 
@@ -96,6 +100,16 @@ PC钉钉`DingTalk_v6.0.18-Release.6280687`版本的解压密码为`f0e8ba41f`。
 该防撤回的方案存在缺点：过一段时间后再看消息，就看不到撤回前的内容了，统一展示为已撤回。另外如果钉钉对 pak 进行校验，要绕过就复杂很多了。
 
 不过这个主要还是因为好奇，魔改防撤回只是折腾的一部分。也还有许多未成功的尝试，例如添加`--remote-debugging-port`启动参数来调试等，后面再玩吧。
+
+### 没啥用的笔记
+
+```javascript
+dingtalk.window.toast(Ln.ToastType.INFO, "recalled:"+a.baseMessage.content.textContent.text, (function () { }))
+
+a.baseMessage.content.textContent.text = Object.keys(dingtalk).join(',')+'====\n===='+Object.keys(dingtalk.util).join(',')+'====\n===='+Object.keys(dingtalk.window).join(',');
+
+a.baseMessage.content.textContent.text = "dingtalk.window.showDevTools.length:"+dingtalk.window.showDevTools.length+'====\n===='+"dingtalk.window.showDevTools.toString():"+dingtalk.window.showDevTools.toString();
+```
 
 ## 套话
 
