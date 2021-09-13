@@ -15,7 +15,7 @@ typora-root-url: ..
 
 + 2021.04.05 初版。JavaScript 基础（类型、原型链、函数），手写常用方法。
 
-+ 2021.04.10 排序方法，ES6+ 语法/提案。
++ 2021.04.10 排序方法，ES6+。
 
 + 2021.08.17 [这里](https://github.com/iola1999/frontend-practice/tree/master/basics-practice/works-by-day) 记录了更多内容，暂不更新当前博文了
 
@@ -45,75 +45,69 @@ getRealType(new Function("console.log(123)"));
 ### 深浅拷贝
 
 ```javascript
-const source = {
-  a: 1,
-  b: 2,
-  c: true,
-  d: /abc/g,
-  e: function () {},
-  f: { f1: null, f2: 1 },
-  g: undefined,
-  h: [1, 2, 3],
-};
-function getRealType(obj) {
-  return Object.prototype.toString
-    .call(obj)
-    .split(" ")[1]
-    .replace("]", "")
-    .toLowerCase();
+const getRealType = input =>
+        Object.prototype.toString.call(input).split(" ")[1].replace("]", "").toLowerCase();
+
+function deepCopy(obj, map = new WeakMap()) {
+   if (map.has(obj)) return obj;
+   map.set(obj, true)
+   // 还有函数、正则、日期类没处理。函数是 返回 bind。其他的获取类型， new 对应类型。
+   // 还可以 获取 target.constructor，然后 new 它
+   if (Array.isArray(obj)) {
+      const result = obj.map(item => ['object', 'array'].includes(getRealType(item)) ? deepCopy(item, map) : item)
+      return result
+   } else {
+      const result = {};
+      Object.keys(obj).forEach(key => {
+         const item = obj[key]
+         result[key] = ['object', 'array'].includes(getRealType(item)) ? deepCopy(item, map) : item
+      })
+      return result
+   }
 }
-// 如何手动实现？递归。下面这个写法没支持循环引用的情况
-const deepCopy = (obj) => {
-  let isArray = Array.isArray(obj);
-  const result = isArray ? [] : {};
-  if (isArray) {
-    obj.forEach((item) => {
-      ["object", "array"].includes(getRealType(item))
-        ? result.push(deepCopy(item))
-        : result.push(item);
-    });
-  } else {
-    Object.keys(obj).forEach((key) => {
-      ["object", "array"].includes(getRealType(obj[key]))
-        ? (result[key] = deepCopy(obj[key]))
-        : (result[key] = obj[key]);
-    });
-  }
-  return result;
+
+const testObj = {
+   a: "1",
+   b: 123,
+   c: ''
 };
-const _ = require("lodash");
-var resultLodash = _.cloneDeep(source);
-const resultMine = deepCopy(source);
-// source.h.push(4);
-// source.f.f2 = 4;
-console.log(resultLodash, resultMine);
-// // 原文参考写法：
-// const isObject = (target) => (typeof target === "object" || typeof target === "function") && target !== null;
-//
-// function deepClone(target, map = new WeakMap()) {
-//   if (map.get(target)) {
-//     return target;
-//   }
-//   // 获取当前值的构造函数：获取它的类型
-//   let constructor = target.constructor;
-//   // 检测当前对象target是否与正则、日期格式对象匹配
-//   if (/^(RegExp|Date)$/i.test(constructor.name)) {
-//     // 创建一个新的特殊对象(正则类/日期类)的实例
-//     return new constructor(target);
-//   }
-//   if (isObject(target)) {
-//     map.set(target, true);  // 为循环引用的对象做标记
-//     const cloneTarget = Array.isArray(target) ? [] : {};
-//     for (let prop in target) {
-//       if (target.hasOwnProperty(prop)) {
-//         cloneTarget[prop] = deepClone(target[prop], map);
-//       }
-//     }
-//     return cloneTarget;
-//   } else {
-//     return target;
-//   }
-// }
+testObj.b = testObj;
+testObj.c = testObj.b;
+console.log(deepCopy(testObj));
+
+const testArr = [1, 2];
+testArr.push(testArr)
+console.log(deepCopy(testArr));
+```
+
+```javascript
+// 完善的参考写法：
+const isObject = (target) => (typeof target === "object" || typeof target === "function") && target !== null;
+
+function deepClone(target, map = new WeakMap()) {
+   if (map.get(target)) {
+      return target;
+   }
+    // 获取当前值的构造函数：获取它的类型
+    let constructor = target.constructor;
+    // 检测当前对象target是否与正则、日期格式对象匹配
+    if (/^(RegExp|Date)$/i.test(constructor.name)) {
+        // 创建一个新的特殊对象(正则类/日期类)的实例
+        return new constructor(target);
+    }
+    if (isObject(target)) {
+        map.set(target, true);  // 为循环引用的对象做标记
+        const cloneTarget = Array.isArray(target) ? [] : {};
+        for (let prop in target) {
+            if (target.hasOwnProperty(prop)) {
+                cloneTarget[prop] = deepClone(target[prop], map);
+            }
+        }
+        return cloneTarget;
+    } else {
+        return target;
+    }
+}
 ```
 
 ### 解析 URL 参数为对象
