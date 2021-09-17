@@ -2,7 +2,7 @@
 layout: post
 title:  调戏飞书 PC 客户端
 date:  2021-09-14 23:00:00 +0800
-categories: 折腾
+categories: 逆向与调试
 tag: 
 typora-root-url: ..
 ---
@@ -12,7 +12,7 @@ typora-root-url: ..
 ![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.Debug-Feishu-PC)
 ## 闲聊
 
-之前一直尝试[调试钉钉 PC 客户端](https://678234.xyz/2021/01/21/DingTalk-mod/)，奈何钉钉捂得紧，除了解开`web_content`改改前端代码外没有更多进展了。今天因为一些需求下载了飞书 PC 客户端，不得不说比钉钉好看的多（可能是天天看都烦了）。
+之前一直尝试[调试钉钉 PC 客户端](https://678234.xyz/2021/01/21/DingTalk-mod/)，奈何钉钉捂得紧，除了解开 `web_content` 改改前端代码外没有更多进展了。今天因为一些需求下载了飞书 PC 客户端，不得不说比钉钉好看的多（可能是天天看钉钉烦了）。
 
 看了下应用目录，哦嚯直接把 `webcontent` 亮出来了~~任我玩弄~~（划掉）。
 
@@ -44,7 +44,7 @@ typora-root-url: ..
 
 怎样定位消息撤回时客户端前端做的处理呢？一个简单的方案是在代码中搜索类似“此消息已撤回”的字符串，然后阅读代码逻辑。
 
-只是，我们都能调试它了，何不换个更优雅的思路呢：
+只是，我们都能调试它了，何不换个更优雅的思路：
 
 先在手机上发送一条消息给自己，然后在消息区域 DOM 右键 `Break on - subtree modificiations`。
 

@@ -2,7 +2,7 @@
 layout: post
 title: Virtual Scrolling of Long List
 date: 2021-04-11 18:00:00 +0800
-categories: 笔记
+categories: 前端笔记
 tag:
 typora-root-url: ..
 ---

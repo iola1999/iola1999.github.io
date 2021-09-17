@@ -2,7 +2,7 @@
 layout: post
 title:  闲着写一个游戏辅助
 date:  2020-06-07 21:00:00 +0800
-categories: 折腾
+categories: 拙作
 tag: 
 ---
 

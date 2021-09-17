@@ -2,7 +2,7 @@
 layout: post
 title:  周末写一个网易游戏PC端快捷扫码登录工具
 date:  2020-08-02 21:00:00 +0800
-categories: 折腾
+categories: 拙作
 tag: 
 ---
 

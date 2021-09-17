@@ -2,7 +2,7 @@
 layout: post
 title:  调戏钉钉 PC 客户端
 date:  2021-01-21 12:00:00 +0800
-categories: 折腾
+categories: 逆向与调试
 tag: 
 typora-root-url: ..
 ---

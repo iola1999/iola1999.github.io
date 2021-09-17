@@ -2,7 +2,7 @@
 layout: post
 title:  在安卓设备上运行 Ubuntu
 date:   2019-05-04 17:00:00 +0800
-categories: 笔记
+categories: 折腾
 tag: 
 ---
 
