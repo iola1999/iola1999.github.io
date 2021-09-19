@@ -40,7 +40,7 @@ typora-root-url: ..
 ```javascript
 let testA;
 let timer = setInterval(() => {
-    hookCEF();	// 只能想到这种方式及时 hook 到 CEF 的初始化调用
+    hookCEF();	// 只能想到这种方式了，及时 hook 到 CEF 的初始化调用
 }, 10);
 
 function hookCEF() {
@@ -53,29 +53,25 @@ function hookCEF() {
     Interceptor.attach(testA, {
         onEnter: function (args, state) {
             console.log("[+] testA onEnter");
-            console.log("¦- _cef_main_args_t*: ", args[1]);
-            console.log("¦- _cef_settings_t*: ", args[2]);
-            // console.log("¦- cef_app_t*: ", args[3]);
-            // console.log("¦- windows_sandbox_info: ", args[4]);
-            let testRead = Memory.readByteArray(args[2], 512);
-            console.log("¦- testRead");
-            console.log(testRead);
+            console.log("¦- context: ", JSON.stringify(this.context));
+            // console.log("¦- _cef_main_args_t*: ", args[1]);
+            // console.log("¦- _cef_settings_t*: ", args[2]);
+            console.log("¦- testRead args[1]");
+            console.log(Memory.readByteArray(args[1], 256));
 
-            let tryPortAddr = args[2].add(ptr("0x92"));	// 这个结构体偏移不对，还在调试
+            console.log("¦- modfiy debug port");
+            let tryPortAddr = args[1].add(ptr("0x28"));
             Memory.writeInt(tryPortAddr, 9222);
-            testRead = Memory.readByteArray(args[2], 512);
-            console.log("¦- testRead");
-            console.log(testRead);
 
-            // console.log(hexdump(args[2], {offset: 0, length: 4096, header: true, ansi: true,}));
+            console.log("¦- testRead args[1]");
+            console.log(Memory.readByteArray(args[1], 256));
         },
 
         onLeave: function () {
-            console.log("[+] leave testA");
+            console.log("[+] testA onLeave");
         },
     });
 }
-
 ```
 
 使用 `frida path-toDingTalk.exe -l path-to-hook.js --no-pause` 来启动。
@@ -83,6 +79,12 @@ function hookCEF() {
 惭愧，C++ 学艺不精，已经忘完了，中午的进展也仅限于此了，暂且记录一下。
 
 ![image-20210915171007267](/upload/images/2021-09-15-DingTalk-Mod-Hook-CEF-Call/hook-demo1.png)
+
+20210919 update: 
+
+又看了一下午，这个偏移量怎么这么难找......我真菜。
+
+还想到一个方案：自行编译 CEF，硬编码这个调试端口。
 
 ## 套话
 
