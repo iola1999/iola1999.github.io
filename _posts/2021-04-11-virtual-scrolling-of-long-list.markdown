@@ -178,8 +178,9 @@ I tried to change the list item component to look like this to simulate renderin
 
   console.log(props.productId);
   // simulate rendering complex scenes.
-  for (let index = 0; index < 100000000; index++) {
-    (2.2 ** 30 - 2.3 ** 31) ** (3 ** 2);
+  const now = new Date()
+  while (new Date() - now < 40) {
+
   }
   showValue.value = props.productId;
 </script>
@@ -196,8 +197,9 @@ let timer;
 timer = setTimeout(() => {
   console.log(props.productId);
   // simulate rendering complex scenes.
-  for (let index = 0; index < 100000000; index++) {
-    (2.2 ** 30 - 2.3 ** 31) ** (3 ** 2);
+  const now = new Date()
+  while (new Date() - now < 40) {
+
   }
   showValue.value = props.productId;
 }, 0);
@@ -208,7 +210,7 @@ onBeforeUnmount(() => {
 });
 ```
 
-## Virtual scrolling of the list with variable item height?
+## Virtual scrolling of the list with variable item height
 
 In business code development, for data that is large and cannot be paged, we use a virtually rendered table component. The row height of each item in this case is fixed.
 
@@ -220,9 +222,132 @@ Here's an [article](https://lkangd.com/post/virtual-infinite-scroll/) that goes 
 
 [And another one](https://juejin.cn/post/6844903959828627464)
 
+### Test
+
+```html
+<template>
+  <div class="container" @scroll="handleScroll">
+    <div class="scroll-container"
+         :style="{height: totalHeight+'px', position: 'relative'}">
+      <ComplexListComponent v-for="item in visibleDateList" :key="item.id" :item="item"
+                            @resize="handleListItemResize(item, $event)"/>
+    </div>
+  </div>
+</template>
+
+<script>
+import ComplexListComponent from "../components/ComplexListComponent";
+
+export default {
+  name: 'Demo',
+  components: {ComplexListComponent},
+  data() {
+    return {
+      dataList: [],
+      visibleIndexStart: 0,
+      visibleIndexEnd: 500 / 50,
+      renderBuffer: 3
+    };
+  },
+  methods: {
+    handleScroll(e) {
+      this.visibleIndexStart = this.dataList.findIndex(item => item._beforeHeight >= e.target.scrollTop);
+      this.visibleIndexStart = this.visibleIndexStart - this.renderBuffer >= 0 ? this.visibleIndexStart - this.renderBuffer : 0;
+      this.visibleIndexEnd = this.dataList.findIndex(item => item._beforeHeight >= e.target.scrollTop + 500);
+      if (this.visibleIndexEnd === -1) {
+        this.visibleIndexEnd = this.dataList.length - 1
+      } else {
+        this.visibleIndexEnd = this.visibleIndexEnd + this.renderBuffer <= this.dataList.length - 1
+            ? this.visibleIndexEnd + this.renderBuffer
+            : this.dataList.length - 1;
+      }
+    },
+    handleListItemResize(item, height) {
+      item._realHeight = height;
+      const index = this.dataList.indexOf(item);
+      // update _beforeHeight after it
+      for (let i = index + 1; i < this.dataList.length; i++) {
+        this.dataList[i]._beforeHeight = this.dataList[i - 1]._beforeHeight + this.dataList[i - 1]._realHeight;
+      }
+    }
+  },
+  created() {
+    for (let i = 0; i <= 200; i++) {
+      this.dataList.push({id: i, content: i + '', _realHeight: 50, _beforeHeight: 50 * i});
+    }
+  },
+  computed: {
+    visibleDateList() {
+      return this.dataList.slice(this.visibleIndexStart, this.visibleIndexEnd + 1)
+    },
+    totalHeight() {
+      if (!this.dataList.length) return 0;
+      return this.dataList[this.dataList.length - 1]._beforeHeight + this.dataList[this.dataList.length - 1]._realHeight
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.container {
+  height: 500px;
+  overflow: auto;
+}
+</style>
+```
+
+```html
+<template>
+  <div class="list-item"
+       :style="{height: realHeight+'px', position: 'absolute', transform: 'translateY('+item._beforeHeight+'px)'}">
+    {{ item.content }}
+  </div>
+</template>
+
+<script>
+export default {
+  name: "ComplexListComponent",
+  props: {
+    item: {
+      type: Object
+    }
+  },
+  data() {
+    return {
+      realHeight: 50
+    }
+  },
+  created() {
+    // const now = new Date()
+    // while (new Date() - now < 40) {
+    //
+    // }
+    // console.log("render done")
+    this.timer = setTimeout(() => {
+      // such as text/image
+      this.realHeight = parseInt(Math.random() * 100, 10) + 50;
+      this.$emit("resize", this.realHeight)   // should use resize observer
+    }, 2000)
+  },
+  beforeDestroy() {
+    clearTimeout(this.timer);
+  }
+}
+</script>
+
+<style scoped>
+.list-item {
+  border: 1px solid #d7dde4;
+  width: 100%;
+}
+</style>
+```
+
 ## Summary
 
-This afternoon I tried to write a virtual scrolling list. I took this opportunity to try out vue3 composition api and felt that this coding idea is really good. It's easy to reuse the code, and can make the code much more maintainable.
+A virtual scrolling list.
+
+I took this opportunity to try out vue3 composition api and felt that this coding idea is really good. It's easy to reuse the code, and can make the code much more maintainable.
 
 The `vite` build tool is really fast.
 
