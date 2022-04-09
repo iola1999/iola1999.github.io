@@ -7,13 +7,15 @@ tag:
 typora-root-url: ..
 ---
 
-- content
-  {:toc}
-  ![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.Make-money-with-smart-contract)
+* content
+{:toc}
+![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.Make-money-with-smart-contract)
 
-> 比较火热的概念，学习一下，万一能靠这个赚钱
+> 比较火热的概念，学习一下~~，万一能靠这个赚钱~~
 
 先看示例，接下来分享如何逐步实现它。
+
+> WIP
 
 ## 基础概念
 
