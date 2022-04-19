@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 如何用智能合约捞钱
+title: Web3.0 捞钱入门
 date: 2022-04-09 16:00:00 +0800
 categories: 折腾
 tag:
@@ -14,6 +14,8 @@ typora-root-url: ..
 > 比较火热的概念，学习一下~~，万一能靠这个赚钱~~
 
 先看示例，接下来分享如何逐步实现它。
+
+[https://web3-fe.vercel.app/](https://web3-fe.vercel.app/)
 
 > WIP
 
