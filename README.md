@@ -4,7 +4,7 @@
 
 Powered by [Jekyll](http://jekyllrb.com), themed from [Less](http://lesscss.cn), refactored by [Freud Kang](http://www.hifreud.com).
 
-# develop
+## develop
 
 ```bash
 export SDKROOT=$(xcrun --show-sdk-path)
@@ -16,3 +16,10 @@ gem install --user-install bundler jekyll
 jekyll build
 http-server _site
 ```
+
+## Write with Typora
+
+### Save image to relative directory
+
+`../upload/images/${filename}`
+
