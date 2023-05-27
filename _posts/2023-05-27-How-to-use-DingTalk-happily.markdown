@@ -13,7 +13,9 @@ typora-root-url: ..
 
 忙太久没冒泡了，水一篇工作相关的吧。
 
-标题有点科幻，不过最近确实解了两个一直困扰我的问题：思考的间隙无意识点开钉钉看一眼，以及因为好奇谁没读我在群里发的消息而点击已读状态翻一翻。靠掰正习惯、调整心态来解决它们难度有点高，最近找了些技术流的解法效果不错，记录一下万一能帮到谁呢~
+标题有点科幻，不过最近确实解了钉钉上困扰我的两个问题：思考的间隙无意识点开钉钉看一眼，以及因为好奇谁没读我在群里发的消息而点击已读状态翻一翻。
+
+靠掰正习惯、调整心态来解决它们难度有点高，最近找了些技术流的解法效果不错，记录一下万一能帮到谁呢~
 
 ## 如何避免无消息时看钉钉
 
@@ -23,7 +25,7 @@ typora-root-url: ..
 
 - 将钉钉的小图标收起来，Windows 上托盘区自带了，macOS 上可以用 [Hidden Bar](https://github.com/dwarvesf/hidden) 这个软件；
 
-- Windows 能直接钉钉让它离开任务栏，而 macOS 上将 Dock 上的钉钉图标隐藏麻烦了些，查了些方案都有点高（比如得关 SIP 或者要借助些付费软件），对比下来还是 `sudo lsappinfo setinfo -app 钉钉 ApplicationType=UIElement`这样一行命令搞定最为方便，虽然有些副作用（影响不大就不写了），也可以临时 set 回 `Foreground`恢复；
+- Windows 能直接关掉钉钉窗口让它离开任务栏，而 macOS 上想隐藏 Dock 上的钉钉图标麻烦了些，查了些方案都有点高（比如得关 SIP 或者要借助些付费软件），对比下来还是 `sudo lsappinfo setinfo -app 钉钉 ApplicationType=UIElement` 这样一行命令搞定最为方便，虽然有些副作用（影响不大就不写了），也可以临时 set 回 `Foreground` 恢复；
 
 - [可选]直接退出钉钉，隔久一点时间再打开看下或者单纯靠手机的通知被找。
 
@@ -33,7 +35,7 @@ typora-root-url: ..
 
 Windows 上需要参考前文找一下 webContents 压缩包密码，而 macOS 上的钉钉干脆直接没压缩 webContents ~~任人摆布~~（飞书：？）。
 
-要修改的文件是 `webContents/assets/chatbox-index.[hash].js`（跟撤回的一样），文件中搜一下`msg-unread-indicator`可以看到几处 createElement，不用关具体都是啥场景了，都将第三个参数改成空字符串即可。
+要修改的文件是 `webContents/assets/chatbox-index.[hash].js`（跟撤回的一样），文件中搜一下 `msg-unread-indicator` 可以看到几处 createElement，不用管具体都是啥场景，都将第三个参数改成空字符串即可。
 
 不便拿公司电脑截图，本文就不附图了，效果完美到就跟钉钉没有已读回执这种 👻 东西一样。
 
