@@ -11,6 +11,8 @@ typora-root-url: ..
 {:toc}
 ![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.Calc-Ssimulacra2-in-FE)
 
+> 受限于数据安全规定，暂不能贴出本文的完整版。当前已经有了 [napi 版本的 ssimulacra2](https://github.com/plwljobue77256/nrs-binding-ssimulacra2) 实现，可以用在 Node.js 服务端。
+
 ## 关于图像处理
 
 关于图片处理前后的质量差异，有多种评价指标: PSNR SSIM SSIMULACRA SSIMULACRA2

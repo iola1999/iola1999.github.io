@@ -82,6 +82,7 @@ typora-root-url: ..
 
 ![image-20210915002435920](/upload/images/2021-09-14-Debug-Feishu-PC/FeishuAntiRecall.gif)
 
+> 这里没找到另一个飞书账号来一起测， 只能自己撤回演示一下了
 
 完美。
 
