@@ -25,9 +25,9 @@ typora-root-url: ..
 
 - 将钉钉的小图标收起来，Windows 上托盘区自带了，macOS 上可以用 [Hidden Bar](https://github.com/dwarvesf/hidden) 这个软件；
 
-- Windows 能直接关掉钉钉窗口让它离开任务栏，而 macOS 上想隐藏 Dock 上的钉钉图标麻烦了些，查了些方案都有点高（比如得关 SIP 或者要借助些付费软件），对比下来还是 `sudo lsappinfo setinfo -app 钉钉 ApplicationType=UIElement` 这样一行命令搞定最为方便，虽然有些副作用（影响不大就不写了），也可以临时 set 回 `Foreground` 恢复；
+- Windows 能直接关掉钉钉窗口让它离开任务栏，而 macOS 上想隐藏 Dock 上的钉钉图标麻烦了些，查了些方案成本都有点高（比如得关 SIP 或者要借助些付费软件），对比下来还是 `sudo lsappinfo setinfo -app 钉钉 ApplicationType=UIElement` 这样一行命令搞定最为方便，虽然有些副作用（影响不大就不写了），也可以临时 set 回 `Foreground` 恢复；
 
-- [可选]直接退出钉钉，隔久一点时间再打开看下或者单纯靠手机的通知被找。
+- [可选] 直接退出钉钉，隔久一点时间再打开看下或者单纯靠手机的通知被找。
 
 ## 如何不去看别人的已读状态
 
