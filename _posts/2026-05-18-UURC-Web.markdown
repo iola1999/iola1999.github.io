@@ -1,0 +1,77 @@
+---
+layout: post
+title: UURC-Web：在公司浏览器里偷家（划掉）远控的二三事
+date: 2026-05-18 10:00:00 +0800
+categories: 折腾
+tag: [远控, 逆向, WebRTC, Cloudflare]
+---
+
+* content
+{:toc}
+
+![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.UURC-Web-Project)
+
+> **声明：本文包含 AI 辅助创作。**
+> 
+> 折腾仅因个人兴趣，记录分享仅为研究学习交流，请勿用于违法用途。
+
+很久没更新这种长篇大论的“考古”记录了。最近搞了个新坑：[UURC-Web](https://github.com/iola1999/uurc-web)。
+
+起因很简单：公司电脑为了安全，严禁安装任何第三方远控软件。但有时候人坐在工位上，心却在家里那台 Mac 上。既然客户端不让装，那“万物皆可浏览器”的思路就该上线了。
+
+于是，我花了几天时间，把网易 UU 远程（UURemote）给“调教”成了一个纯网页版。
+
+## 为什么要折腾这玩意？
+
+除了前面说的避开公司电脑的安装限制，还有一个重要原因是 UU 远程在 macOS 上的表现确实不错，尤其是低延迟和高画质。但它没有网页版主控端，这就逼得我不得不拿起 IDA Pro 开始“自力更生”。
+
+目标：一个网页，能登录，能看屏幕，能点鼠标，能打字。最好还能白嫖 Cloudflare 的免费做个中转，直连控制互不干扰。
+
+## 考古现场：逆向、调研与“写 Bug”
+
+### 第一阶段：拆解 Android APK
+
+第一步当然是看别人是怎么做的。我把 Android 版的 `com.netease.uuremote` 拖出来，反手就是一个 `apktool d`。
+
+分析发现，这玩意儿的业务逻辑基本都在 Java/Kotlin 层，走的是普通的 HTTPS 请求（网易 `nrd` API）。但最核心的音视频流、信令（Signaling）和 WebRTC 协商，全都缩在 `libstreamer.so` 这个 native 库里。
+
+这就是所谓的“硬骨头”。为了对齐协议，我用了 IDA Pro 盯着那些 native 符号反复摩擦。看到了熟悉的 `socket.io`、`SDP`、`ICE` 以及 `DTLS/SRTP`。基本确定了架构：**业务 API + Socket.io 信令 + WebRTC 数据通道**。
+
+### 第二阶段：WebRTC 协议的“买家秀”与“卖家秀”
+
+原生客户端在 native 层创建了 5 路 `video` 收流和 1 路 `audio`。我一个纯浏览器端，要对齐这种“非主流”的 WebRTC 布局，还是费了不少劲。
+
+最坑的是，UU 的信令并不是标准的 WebRTC 交换，它包裹了一层叫 `SOAC` (Signaling Offer/Answer/Candidate) 的自定义结构，甚至还会用 Gzip 压缩 SDP 字符串来节省那几 KB 的流量。为了让受控端识别我的 Offer，我不得不手动构造了和原生一模一样的 Protobuf 风格的封包（Envelope）和二进制 payload。
+
+### 第三阶段：解决那些令人抓狂的 Bug
+
+1. **画面“十秒真男人”：** 
+   刚跑通时，画面动十几秒就卡死。查了半天 WebRTC stats，发现是因为我为了所谓“兼容性”在浏览器里禁掉了 `video/rtx`。结果在某些网络环境下，一旦丢包，浏览器没有重传（Retransmission）能力，解码直接罢工。加回 RTX 后，画面终于能丝滑地跑上几分钟了。
+
+2. **断连之谜：**
+   画面不卡了，但几分钟后总会被服务端踢下线（收到 `leave` 事件）。回看 native 代码发现，官方 App 每隔 100ms 就会发一个 `SendEchoRequest` 的心跳包。我也依样画葫芦补了个心跳，于是远控连接终于像我上班摸鱼的时间一样长了。
+
+3. **输入没反应：**
+   能看到画面了，但鼠标点不动。翻开 `libinputmanager.so` 一看，好家伙，它有一套复杂的键码映射（Android KeyCode -> Label -> Mac/Win KeyCode）。我必须把浏览器的事件转换成 Android 的 `KEYCODE_A` 这种形式发过去，它才认。
+
+## 现在的样子
+
+折腾了一周，现在的 [UURC-Web](https://github.com/iola1999/uurc-web) 已经是个完全可用的状态了：
+
+- **短信登录**：模拟 App 的登录流，支持验证码。
+- **设备列表**：能看到家里电脑的在线状态、延迟和当前有没有人在控制。
+- **纯网页远控**：支持 WebRTC 直连（LAN/P2P）和 UU 官方 Relay。
+- **全屏交互**：虽然滚动方向和剪贴板同步还有点小瑕疵，但基本的键鼠操作已经很稳了。
+- **部署简单**：支持 Docker 一键拉起，也支持部署到 Cloudflare Worker + Durable Objects，实现“真·云主控”。
+
+## 后记
+
+这次折腾最大的感触就是：现在的 Native 客户端为了性能和防破解，把越来越多的逻辑下沉到 C++ 层，但这恰恰也是最有趣的地方。通过 IDA Pro 这种“透视眼”去观察代码的运行路径，比单纯写业务代码要有意思得多。
+
+当然，这也是因为公司电脑真的不让装远控……（再次强调）。
+
+目前项目代码已经开源，如果你也有这种“特殊需求”，或者单纯想研究一下网易的远控协议是怎么跑的，欢迎去仓库里点个 Star 或者提个 Issue。
+
+顺便，祝大家摸鱼愉快！2333
+
+-END-
