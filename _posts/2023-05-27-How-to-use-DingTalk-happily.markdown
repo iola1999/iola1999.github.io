@@ -9,7 +9,6 @@ typora-root-url: ..
 
 - content
 {:toc}
-![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.How-to-ignore-unread-status-in-DingTalk)
 
 忙太久没冒泡了，水一篇工作相关的吧。
 

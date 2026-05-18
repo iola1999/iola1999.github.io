@@ -9,7 +9,6 @@ typora-root-url: ..
 
 * content
 {:toc}
-![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.Debug-Feishu-PC)
 ## 闲聊
 
 之前一直尝试[调试钉钉 PC 客户端](https://678234.xyz/2021/01/21/DingTalk-mod/)，奈何钉钉捂得紧，除了解开 `web_content` 改改前端代码外没有更多进展了。今天因为一些需求下载了飞书 PC 客户端，不得不说比钉钉好看的多（可能是天天看钉钉烦了）。

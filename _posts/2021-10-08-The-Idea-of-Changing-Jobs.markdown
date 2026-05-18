@@ -9,7 +9,6 @@ typora-root-url: ..
 
 * content
 {:toc}
-![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.The-Idea-of-Changing-Jobs)
 
 ## 正文
 

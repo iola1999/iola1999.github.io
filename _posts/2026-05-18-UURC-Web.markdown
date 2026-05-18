@@ -1,6 +1,6 @@
 ---
 layout: post
-title: UURC-Web：在公司浏览器里偷家（划掉）远控的二三事
+title: UURC-Web：如何愉快地从公司电脑连回家
 date: 2026-05-18 10:00:00 +0800
 categories: 折腾
 tag: [远控, 逆向, WebRTC, Cloudflare]
@@ -9,7 +9,6 @@ tag: [远控, 逆向, WebRTC, Cloudflare]
 * content
 {:toc}
 
-![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.UURC-Web-Project)
 
 > **声明：本文包含 AI 辅助创作。**
 > 

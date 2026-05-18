@@ -9,7 +9,6 @@ typora-root-url: ..
 
 * content
 {:toc}
-![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.DingTalk-Mod-Hook-CEF-Call)
 ## 书接上回
 
 在之前[调试钉钉 PC 客户端](https://678234.xyz/2021/01/21/DingTalk-mod/)中，文末提到了没能成功通过命令行参数启用 CEF 调试。昨天研究[调戏飞书 PC 客户端](https://678234.xyz/2021/09/14/Debug-Feishu-PC/)时，仔细看了一下 CEF 的调试开启方法，想到一个新的思路，趁午休测试一下记录下来。

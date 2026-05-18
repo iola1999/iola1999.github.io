@@ -9,7 +9,6 @@ typora-root-url: ..
 
 * content
 {:toc}
-![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.Make-money-with-smart-contract)
 
 先看示例 [https://web3-fe.vercel.app/](https://web3-fe.vercel.app/) ，接下来分享如何实现它，看完你也有机会去捞钱。
 

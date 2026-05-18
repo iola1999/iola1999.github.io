@@ -9,7 +9,6 @@ typora-root-url: ..
 
 * content
 {:toc}
-![read_count](https://visitor-badge.glitch.me/badge?page_id=iola1999.blog.DingTalk-mod)
 ## 提前致谢
 
 思路来源：[https://blog.csdn.net/cwg2552298/article/details/109260541](https://blog.csdn.net/cwg2552298/article/details/109260541)  [web archive](https://web.archive.org/web/20210121104923/https://blog.csdn.net/cwg2552298/article/details/109260541)，个人对逆向并不熟悉，写篇文章记录一下稍详细的折腾过程。
