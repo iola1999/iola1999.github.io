@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Vibe Coding：今年业余时间我几乎没写过代码
+title: 最近 Vibe Coding 的玩具们
 date: 2026-05-18 20:00:00 +0800
 categories: 折腾
 tag: [Vibe Coding, AI, 玩具, 效率]
