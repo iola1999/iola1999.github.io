@@ -189,9 +189,15 @@ session = frida.get_usb_device().attach(PID)
 
 ### 面板截图
 
-![策划属性调试面板](/upload/images/2026-06-14-WZRY-GM-Panel/design-attribute-debug.png)
+**训练营**：
 
-标题为「策划属性调试」，包含大量分类按钮菜单。该面板偏对局内属性/数值调试，UI 使用独立的 Canvas 渲染，可能在非标准分辨率下缩放偏小。
+![策划属性调试面板-训练营](/upload/images/2026-06-14-WZRY-GM-Panel/design-attribute-debug.png)
+
+**离线单机模式**（无需网络，仅本地对局）：
+
+![策划属性调试面板-离线](/upload/images/2026-06-14-WZRY-GM-Panel/offline-design-debug.png)
+
+标题为「策划属性调试」，包含大量分类按钮菜单。该面板偏对局内属性/数值调试，UI 使用独立的 Canvas 渲染，在非标准分辨率下缩放偏小（已知问题，Canvas `set_scaleFactor` 方法已定位，待后续适配）。
 
 ### 方法列表
 
