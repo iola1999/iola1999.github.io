@@ -10,7 +10,7 @@ tag: [王者荣耀, Android, 逆向, 调试, cheatcode]
 {:toc}
 
 
-> **声明：本文仅记录个人设备、本地安装包和授权调试环境下的分析结论。本文完全为 AI 创作。**
+> **声明：本文仅记录个人设备、本地安装包下的分析结论。本文完全为 AI 创作。**
 
 ## 结论
 
@@ -21,7 +21,7 @@ tag: [王者荣耀, Android, 逆向, 调试, cheatcode]
 - 当前版本存在**两条独立的调试入口**：
   1. 外层 `CheatCode` 配置面板 — 通过隐藏触摸暗码触发，需 patch 设备登记检查
   2. 深层「策划属性调试」面板 — 需要对局上下文 + TP 绕过 + `_GMDesignDebugCommand`
-- TP (TerSafe) 反外挂可在对局中通过 ptrace + anon_03 内存 patch 绕过，不产生 crash/tombstone
+- TP (TerSafe) 反外挂可通过在选服页 patch libtprt 线程创建函数绕过，对局内不产生 crash/tombstone
 - 旧截图中的 `GM指令`/`DldGMPanel`/`OpenGM` 资源链在当前版本中仍然存在（与体验服字节级同构），目前尚未成功在大厅中直接打开
 
 ---
@@ -36,7 +36,7 @@ tag: [王者荣耀, Android, 逆向, 调试, cheatcode]
 左上 -> 右上 -> 右上 -> 右下 -> 左下 -> 中心
 ```
 
-暗码由 Java 层 `com.tencent.tmgp.Common.SmobaEx.TestEvent` 识别。命中后内部开关 `m_bOpenCheat` 置为 true，随后进入 Unity 层的 GM/Cheat 显示逻辑。
+暗码由 Java 层的触摸事件处理器识别。命中后内部开关置为 true，随后进入 Unity 层的 GM/Cheat 显示逻辑。
 
 ### 设备登记拦截
 
@@ -51,64 +51,17 @@ tag: [王者荣耀, Android, 逆向, 调试, cheatcode]
 点击确定复制
 ```
 
-背后是 IL2CPP 侧的 `CheckMacAddressInWhiteList` 异步状态机，对应请求：
-
-```text
-POST /api/checkauth HTTP/1.1
-Host: sgame-test.native.qq.com
-```
-
-请求头中带 `macaddr`、`token`、`nonce`、`version` 等字段。
+背后是 IL2CPP 侧的设备登记检查异步状态机，会向服务端发起 HTTP 请求验证当前设备是否在白名单中。
 
 ### 运行时 Patch
 
-关键分支位于 `<CheckMacAddressInWhiteList>d__9.MoveNext`，RVA `0x5f6a334`：
+设备登记检查的异步状态机中有一个关键条件分支。在进程启动后、暗码触发前，通过 root 权限修改当前进程内存，将该分支 `nop` 掉即可绕过设备登记检查。失败路径会继续显示"设备未登记"弹窗；nop 后走成功侧清理路径，进入 CheatCode 面板。
 
-```text
-RVA: 0x5f6a334
-原始指令: 75 04 00 36   ; tbz w21,#0, failure
-Patch:    1f 20 03 d5   ; nop
-```
-
-失败路径会继续显示"设备未登记"弹窗；nop 后走成功侧清理路径，进入 CheatCode 面板。
-
-稳定复现流程：
-
-```text
-启动应用
-等待 libil2cpp.so 映射完成
-计算 patch_addr = libil2cpp_base + 0x5f6a334
-写入 NOP
-在开场视频阶段输入隐藏触摸暗码
-```
-
-注意：运行时 patch 必须落在当前 PID；脚本若重启应用，需要在新 PID 重新写入。
+运行时 patch 必须落在当前 PID；若应用重启，需要在新 PID 重新写入。
 
 ### 验证日志
 
-暗码命中时，日志中出现 0~4 的区域序列以及开关状态：
-
-```text
-print 0
-print 1
-print 1
-print 2
-print 3
-print 4
-m_bOpenCheat true
-java IsShowCheatWindow true
-```
-
-成功复现时的 patch 输出：
-
-```text
-patch addr=0x74249bb334 len=4 before=75 04 00 36 after=1f 20 03 d5
-pid_before: 29286
-pid_after:  29286
-base:       0x741ea51000
-```
-
-`pid_before` 和 `pid_after` 一致，说明 patch 和触发发生在同一进程。
+暗码命中时，日志中出现 0~4 的区域序列以及 `m_bOpenCheat true`、`java IsShowCheatWindow true` 等开关状态变化。patch 前后的 PID 保持一致，说明 patch 和触发发生在同一进程。
 
 ### CheatCode 面板
 
@@ -126,21 +79,7 @@ base:       0x741ea51000
 
 ### 方法暴露
 
-Java 层入口：
-
-- `SmobaEx.TestEvent(...)` — 识别隐藏触摸暗码
-- `SGameUtility.g_ShowCheatWindow` — 显示开关
-- `SGameUtility.IsShowCheatWindow()` — 被 Unity/Native 查询
-
-Unity/IL2CPP 层：
-
-- `CCheatSystem.IsEnableGM()` — `public static`
-- `CCheatSystem.IsAutoOpenCheatForm()` — `public static`
-- `CCheatSystem.OpenCheatTriggerForm(...)` — `public` 实例方法
-- `CCheatSystem.CloseCheatTriggerForm()` — `public` 实例方法
-- `CCheatSystem.OpenCheatForm()` — `public` 实例方法
-
-Java 暗码是第一层入口，真正的面板打开逻辑在 Unity 的 `CCheatSystem` 里；设备登记状态是第一道明显 gate。
+Java 层存在用于识别隐藏触摸暗码的事件处理器和显示开关。Unity/IL2CPP 层暴露了完整的 Cheat 系统骨架，包含 `IsEnableGM()`、`OpenCheatForm()` 等关键方法。Java 暗码是第一层入口，真正的面板打开逻辑在 Unity 侧。
 
 ---
 
@@ -152,46 +91,18 @@ Java 暗码是第一层入口，真正的面板打开逻辑在 Unity 的 `CCheat
 
 ### TP 反外挂绕过
 
-训练营场景下，TerSafe（`libtersafe.so` + `libtprt.so`）会在大约 59 秒内检测到 Frida server 并触发进程崩溃（SIGBUS/SIGSEGV，跳近空地址）。
+对局中 TerSafe（`libtersafe.so` + `libtprt.so`）会检测动态调试工具并触发进程崩溃。
 
-**检测机制**：TP 在运行时会解包一个 RWX 匿名内存页（称为 anon_03，大小 `0x37000` = 220KB），包含完整的检测引擎代码：
-
-- `/proc/self/maps` 扫描（查 libinput.so 注入、Magisk 等）
-- XLua/Xposed hook 检测
-- 模拟器检测（libhoudini）
-- Frida 相关检测（Agent 字符串特征）
-
-**绕过方式**：anon_03 页**没有完整性自校验**。将代码段全部覆盖为 RET 指令即可使所有检测线程立即返回：
-
-```bash
-# 准备 RET 数据文件
-python3 -c "open('/tmp/rf','wb').write(b'\xc0\x03\x5f\xd6'*(0x36000//4))"
-adb push /tmp/rf /data/adb/.sgame_diag/.ret
-
-# 在对局中通过 ptrace 安全写入（目标进程冻结期间写入，TP 无感知）
-/data/adb/.sgame_diag/.ksafed64 full <PID> <anon_03_code_addr> /data/adb/.sgame_diag/.ret
-```
-
-`ptrace ATTACH → pwrite64 → ptrace DETACH` 的方式参考了社区 injtool 的安全写内存模式，进程在写入期间完全冻结，规避了直接 `dd` 写 `/proc/pid/mem` 可能触发的检测。
+**绕过思路**：TP 检测工作线程由 `libtprt.so` 中的线程创建函数启动。在选服页面通过 ptrace 冻结游戏进程，修改该创建函数的入口指令为 RET（4 字节），使检测线程永不启动。整个写入过程目标进程处于冻结状态，TP 无感知。对局中不再产生 crash/tombstone。
 
 ### 唤起方式
 
 早期通过短时 Frida 调用验证了该面板存在，但 Frida 方案多次触发封号。根因为：
 
-- **Frida 本身是 TP 的检测目标**：frida-agent.so（~8MB）注入后驻留进程、frida-server 监听端口，TP 有独立于 anon_03 的检测路径
+- **Frida 本身是 TP 的检测目标**：frida-agent.so（~8MB）注入后驻留进程、frida-server 监听端口，TP 存在多条独立的检测路径
 - 封号链路：TP 检测到异常 → 触发进程崩溃 → tombstone 上报 → 服务器标记
 
-最终改为**原生探针注入**：编译一个微型 .so（9KB），通过 ptrace 注入到游戏进程，constructor 中调用 `il2cpp_runtime_invoke` 唤起面板后立即退出。无后台进程、无网络端口、无长期内存驻留：
-
-```bash
-# 编译
-aarch64-linux-android30-clang++ -std=c++17 -O2 -shared \
-    -o libcheatbattle_native.so sgame_cheatbattle_native_probe.cpp
-
-# 注入（替换 <PID>）
-adb push libcheatbattle_native.so /data/user/0/<pkg>/files/.qv/
-adb shell "su -c 'vpost_injector --pid <PID> --lib /data/user/0/<pkg>/files/.qv/libcb_native.so'"
-```
+最终改为**原生探针注入**：编译一个微型 .so（9KB），通过 ptrace 注入到游戏进程，constructor 中调用 IL2CPP 的 `runtime_invoke` 唤起面板后立即退出。无后台进程、无网络端口、无长期内存驻留。
 
 | | Frida 方案 | 原生探针 |
 |------|------|------|
@@ -210,10 +121,6 @@ adb shell "su -c 'vpost_injector --pid <PID> --lib /data/user/0/<pkg>/files/.qv/
 **离线单机模式**：
 
 ![策划属性调试面板-离线](/upload/images/2026-06-14-WZRY-GM-Panel/offline-design-debug.png)
-
-**原生探针注入**（无 Frida，9KB so，constructor 执行完即退出）：
-
-![策划属性调试面板-原生探针](/upload/images/2026-06-14-WZRY-GM-Panel/native-probe-panel.png)
 
 标题为「策划属性调试」，包含大量分类按钮菜单。该面板偏对局内属性/数值调试，UI 使用独立的 Canvas 渲染，在非标准分辨率下缩放偏小（已知问题，Canvas `set_scaleFactor` 方法已定位，待后续适配）。
 
@@ -249,7 +156,7 @@ adb shell "su -c 'vpost_injector --pid <PID> --lib /data/user/0/<pkg>/files/.qv/
 | 脚本 | 用途 |
 |------|------|
 | `open_sgame_cheatcode_panel_root.sh` | 启动阶段 patch + 暗码触发 CheatCode 面板 |
-| `sgame_tp_race_patch.sh` | 竞速等待 anon_03 出现并 ptrace 安全打补丁 |
+| `sgame_tp_race_patch.sh` | ptrace 安全 patch libtprt，阻止 TP 检测线程启动 |
 | `sgame_frida_cheatbattle_invoke.py` | Frida 短时调用 CheatCommandBattleEntry 方法 |
 | `sgame_ptrace_memrw.cpp` | ptrace 安全内存读写（编译为 ARM64 设备二进制） |
 | `sgame_metadata_index.py` | global-metadata.dat 解析，方法/类型/token 索引 |
@@ -261,7 +168,7 @@ adb shell "su -c 'vpost_injector --pid <PID> --lib /data/user/0/<pkg>/files/.qv/
 ### 后续待补充
 
 - [x] 训练营中唤起「策划属性调试」面板 ✅
-- [x] TP 反外挂绕过（ptrace + anon_03 补丁）✅
+- [x] TP 反外挂绕过（libtprt patch + ptrace 安全写入）✅
 - [ ] `_GMBluePrintFrameCommand`（5 参数）蓝图调试面板
 - [ ] `SendCommand`（7 参数）对局内调试命令发送
 - [ ] 「策划属性调试」面板 Canvas 缩放适配（当前 UI 偏小）
