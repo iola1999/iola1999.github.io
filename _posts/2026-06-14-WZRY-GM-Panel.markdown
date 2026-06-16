@@ -3,7 +3,7 @@ layout: post
 title: 王者荣耀 GM 调试面板入口验证记录
 date: 2026-06-14 20:55:00 +0800
 categories: 折腾
-tag: [王者荣耀, Android, 逆向, 调试]
+tag: [王者荣耀, Android, 逆向, 调试, cheatcode]
 ---
 
 * content
@@ -14,13 +14,14 @@ tag: [王者荣耀, Android, 逆向, 调试]
 
 ## 结论
 
+> **更新于 2026-06-17**：已成功在训练营中唤起 `CheatCommandBattleEntry._GMDesignDebugCommand` → 「策划属性调试」面板。
+
 当前测试对象是王者荣耀 Android 版 `11.3.1.1`。结论如下：
 
-- 当前版本仍保留 GM/Cheat 相关入口。
-- 入口需要在启动阶段通过隐藏触摸暗码触发。
-- 暗码命中后先进入“设备未登记”检查。
-- root 环境早期 patch 设备登记检查后，可以拉起当前版本的 `CheatCode` 调试面板。
-- `CheatCode` 偏配置/环境切换；旧截图里的完整 `GM指令` 命令列表仍需继续定位。
+- 当前版本存在两条调试入口：外层 `CheatCode` 配置面板（通过隐藏触摸暗码触发）和深层「策划属性调试」面板（`CheatCommandBattleEntry._GMDesignDebugCommand`）。
+- `CheatCode` 面板需要在启动阶段 patch 设备登记检查后才能进入。
+- 「策划属性调试」面板**需要在训练营/对局上下文中才能唤起**（大厅中回调未注册，不会渲染 UI）。
+- TP (TerSafe) 反外挂可在对局中通过 ptrace + 内存 patch 绕过，不产生 crash/tombstone。
 
 ## 触发方式
 
@@ -146,6 +147,80 @@ patch:      0x74249bb334
 
 该面板偏配置/环境调试。旧截图中 `GM指令`、`ROOT / 工具 /`、大量 GM 命令按钮等界面，应属于另一条面板分支。
 
+## TP 反外挂绕过
+
+训练营场景下，腾讯 TerSafe 反外挂（`libtersafe.so` + `libtprt.so`）会在大约 59 秒内检测到 Frida server 并触发进程崩溃（SIGBUS/SIGSEGV 跳近空地址）。
+
+### 检测机制
+
+TP 在运行时会解包一个 RWX 匿名内存页（称为 anon_03，大小 `0x37000` = 220KB），包含完整的检测引擎代码。检测内容包括：
+
+- `/proc/self/maps` 扫描（查 libinput.so 注入、Magisk 等）
+- XLua/Xposed hook 检测
+- 模拟器检测（libhoudini）
+- Frida 相关检测（Agent 字符串特征）
+
+### 绕过方式
+
+anon_03 页**没有完整性自校验**。将代码段全部覆盖为 RET 指令即可使所有检测线程立即返回，不会触发崩溃：
+
+```bash
+# 准备 RET 数据文件
+python3 -c "open('/tmp/rf','wb').write(b'\xc0\x03\x5f\xd6'*(0x36000//4))"
+adb push /tmp/rf /data/adb/.sgame_diag/.ret
+
+# 在训练营中通过 ptrace 安全写入（目标进程冻结期间写入，TP 无感知）
+/data/adb/.sgame_diag/.ksafed64 full <PID> <anon_03_code_addr> /data/adb/.sgame_diag/.ret
+```
+
+ptrace ATTACH → pwrite64 写入 → ptrace DETACH 的方式参考了社区 injtool 的安全写内存模式，进程在写入期间完全冻结，规避了直接 `dd` 写 `/proc/pid/mem` 可能触发的检测。
+
+## 「策划属性调试」面板
+
+### 唤起方式
+
+通过 Frida 调用 `CheatCommandBattleEntry._GMDesignDebugCommand`（argc=0）：
+
+```python
+# 在训练营中执行
+import frida
+session = frida.get_usb_device().attach(PID)
+# 通过 il2cpp_runtime_invoke 调用 CheatCommandBattleEntry._GMDesignDebugCommand
+```
+
+短时 Frida（启动 → 调用 → 杀 server，<30 秒）+ 已完成的 TP 补丁 = 安全唤起。
+
+### 面板截图
+
+![策划属性调试面板](/upload/images/2026-06-14-WZRY-GM-Panel/design-attribute-debug.png)
+
+标题为「策划属性调试」，包含大量分类按钮菜单。该面板偏对局内属性/数值调试，UI 使用独立的 Canvas 渲染，可能在非标准分辨率下缩放偏小。
+
+### 方法列表
+
+通过 metadata 解析确认 `CheatCommandBattleEntry` 共有 23 个方法，已测试的关键方法：
+
+| 方法 | argc | 大厅 | 训练营 |
+|------|------|------|--------|
+| `_GMDesignDebugCommand` | 0 | 返回对象，无 UI | **弹出「策划属性调试」面板** |
+| `_GMBluePrintFrameCommand` | 5 | — | 蓝图调试（待测试） |
+| `SendCommand` | 7 | — | 发送调试命令（待测试） |
+| `StartHighlightAutoToolFunc` | 0 | **异常** | 返回正常 |
+| `IsPVECoop` | 0 | true | true |
+| `SetKillNotifyText` | 1 | 正常执行 | — |
+| `RemoveAll` | 0 | void | void |
+| `ResetSkinIds` | 0 | — | void |
+
+### 与 CheatCode 面板的关系
+
+两条入口相互独立：
+
+- **CheatCode 面板**：配置/环境调试，在启动阶段通过隐藏触摸暗码触发
+- **策划属性调试面板**：对局内属性/数值调试，需在训练营/对局上下文中通过 `_GMDesignDebugCommand` 唤起
+
+旧截图中包含 `GM指令`、`DldGMPanel`、`OpenGM` 等字符串的资源块（5165_0.db）在当前版本中**仍然存在且与体验服字节级同构**，但目前未能在大厅中直接打开——该资源链需要 UGC/Pandora app exposure 或特定对局上下文，属于另一条独立的面板分支。
+
+
 ## 方法暴露
 
 Java 层的入口比较清楚：
@@ -185,7 +260,11 @@ Unity/IL2CPP 层仍然暴露了完整的 Cheat 系统骨架：
 
 ## 后续待补充
 
-- `CheatCode` 面板和旧截图 `GM指令` 面板之间的跳转关系。
-- `CCheatSystem.OpenCheatForm()` 是否还可单独强拉旧版命令列表。
-- `GM_IsEnableGM`、`IsEnableGM()`、`IsAutoOpenCheatForm()` 等开关的最终判定路径。
-- 当前版本 GM 命令资源和旧截图命令列表的差异。
+- [x] 训练营中唤起「策划属性调试」面板（`_GMDesignDebugCommand`）✅
+- [x] TP 反外挂绕过（ptrace + anon_03 补丁）✅
+- [ ] `_GMBluePrintFrameCommand`（5 参数）蓝图调试面板
+- [ ] `SendCommand`（7 参数）对局内调试命令发送
+- [ ] 「策划属性调试」面板的 Canvas 缩放适配（当前 UI 偏小）
+- [ ] 旧截图 `DldGMPanel` / `OpenGM` 资源链的完整唤起路径
+- [ ] `CCheatSystem.OpenCheatForm()` 是否还可单独强拉旧版命令列表
+- [ ] 当前版本 GM 命令资源和旧截图命令列表的差异
