@@ -176,16 +176,30 @@ adb push /tmp/rf /data/adb/.sgame_diag/.ret
 
 ### 唤起方式
 
-TP 补丁就绪后，在训练营中通过短时 Frida 调用 `CheatCommandBattleEntry._GMDesignDebugCommand`（argc=0）：
+早期通过短时 Frida 调用验证了该面板存在，但 Frida 方案多次触发封号。根因为：
 
-```python
-import frida
-# 通过 il2cpp_runtime_invoke 调用 CheatCommandBattleEntry._GMDesignDebugCommand
-session = frida.get_usb_device().attach(PID)
-# ... 创建实例并 runtime_invoke ...
+- **Frida 本身是 TP 的检测目标**：frida-agent.so（~8MB）注入后驻留进程、frida-server 监听端口，TP 有独立于 anon_03 的检测路径
+- 封号链路：TP 检测到异常 → 触发进程崩溃 → tombstone 上报 → 服务器标记
+
+最终改为**原生探针注入**：编译一个微型 .so（9KB），通过 ptrace 注入到游戏进程，constructor 中调用 `il2cpp_runtime_invoke` 唤起面板后立即退出。无后台进程、无网络端口、无长期内存驻留：
+
+```bash
+# 编译
+aarch64-linux-android30-clang++ -std=c++17 -O2 -shared \
+    -o libcheatbattle_native.so sgame_cheatbattle_native_probe.cpp
+
+# 注入（替换 <PID>）
+adb push libcheatbattle_native.so /data/user/0/<pkg>/files/.qv/
+adb shell "su -c 'vpost_injector --pid <PID> --lib /data/user/0/<pkg>/files/.qv/libcb_native.so'"
 ```
 
-安全约束：Frida server **严格短时使用**（启动 → 调用 → 杀 server，< 30s），绝不长驻。
+| | Frida 方案 | 原生探针 |
+|------|------|------|
+| 注入物 | frida-agent.so (~8MB) | 自定义 .so (9KB) |
+| 后台进程 | frida-server 常驻 | 无 |
+| 网络端口 | 27042 | 无 |
+| 内存驻留 | 长期 | constructor 执行完即退出 |
+| 封号风险 | **高（已确认两次）** | 待验证，大幅降低 |
 
 ### 面板截图
 
@@ -193,9 +207,13 @@ session = frida.get_usb_device().attach(PID)
 
 ![策划属性调试面板-训练营](/upload/images/2026-06-14-WZRY-GM-Panel/design-attribute-debug.png)
 
-**离线单机模式**（无需网络，仅本地对局）：
+**离线单机模式**：
 
 ![策划属性调试面板-离线](/upload/images/2026-06-14-WZRY-GM-Panel/offline-design-debug.png)
+
+**原生探针注入**（无 Frida，9KB so，constructor 执行完即退出）：
+
+![策划属性调试面板-原生探针](/upload/images/2026-06-14-WZRY-GM-Panel/native-probe-panel.png)
 
 标题为「策划属性调试」，包含大量分类按钮菜单。该面板偏对局内属性/数值调试，UI 使用独立的 Canvas 渲染，在非标准分辨率下缩放偏小（已知问题，Canvas `set_scaleFactor` 方法已定位，待后续适配）。
 
