@@ -67,8 +67,11 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 .site { display: flex; flex-direction: column; min-height: 100vh; }
 .site > main { flex: 1 0 auto; }
 
-/* 内容入场：极轻的一次性淡入上移 */
-.site > main > * { animation: enter .4s ease both; }
+/* 内容入场：极轻的一次性淡入上移。
+   注意：不使用 fill-mode: both/forwards，否则动画结束态的 transform
+   会留在元素上、创建包含块，破坏文章页 .post__aside 的 position:fixed。
+   默认 fill (none) 结束后元素回归无动画状态（opacity:1 / transform:none），无缝。 */
+.site > main > * { animation: enter .4s ease; }
 @keyframes enter {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }

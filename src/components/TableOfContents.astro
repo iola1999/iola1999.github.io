@@ -45,6 +45,19 @@ const hasToc = toc.length > 1;
 
 {hasToc && (
   <script>
+    // 移动端目录：每次展开重放列表项错峰动画（<details> 二次展开 CSS 动画不会重放）
+    document.querySelectorAll<HTMLDetailsElement>('.toc--mobile').forEach((d) => {
+      d.addEventListener('toggle', () => {
+        if (!d.open) return;
+        d.querySelectorAll<HTMLElement>('.toc__item').forEach((item) => {
+          item.style.animation = 'none';
+          // 强制 reflow，使上面的 'none' 生效，才能重放
+          void item.offsetWidth;
+          item.style.animation = '';
+        });
+      });
+    });
+
     // 滚动时高亮当前章节（处理页面上全部 [data-toc-link]，移动端/桌面端同步）
     const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
     const ids = [...new Set(links.map((a) => a.getAttribute('href')?.slice(1)).filter(Boolean))] as string[];
