@@ -48,5 +48,4 @@ src/
   lib/posts.ts         永久链接 / 日期工具
   styles/global.css    全部样式（设计令牌化，换肤改 :root 即可）
 public/                静态资源（图片、CNAME、favicon）
-scripts/migrate.mjs    Jekyll → Astro 内容迁移脚本（一次性）
 ```
