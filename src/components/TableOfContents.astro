@@ -19,8 +19,8 @@ const hasToc = toc.length > 1;
       </svg>
     </summary>
     <ul class="toc__list">
-      {toc.map((h) => (
-        <li class={`toc__item toc__item--d${h.depth}`}>
+      {toc.map((h, i) => (
+        <li class={`toc__item toc__item--d${h.depth}`} style={`--i:${i}`}>
           <a href={`#${h.slug}`} data-toc-link>{h.text}</a>
         </li>
       ))}
