@@ -1,0 +1,22 @@
+{
+  "name": "iola-blog",
+  "type": "module",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "migrate": "node scripts/migrate.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.7.0",
+    "@astrojs/rss": "^4.0.11",
+    "@astrojs/sitemap": "^3.3.0"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3"
+  }
+}

@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { postPermalink, formatDate, byDateDesc } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(byDateDesc);
+  const tags = new Map<string, typeof posts>();
+  for (const p of posts) {
+    for (const t of p.data.tags) {
+      if (!tags.has(t)) tags.set(t, []);
+      tags.get(t)!.push(p);
+    }
+  }
+  return [...tags.entries()].map(([tag, items]) => ({
+    params: { tag },
+    props: { tag, items },
+  }));
+}
+const { tag, items } = Astro.props;
+---
+
+<BaseLayout title={`标签: ${tag}`}>
+  <div class="wrap taxo">
+    <h1>#{tag} <span style="color:var(--text-muted);font-size:1rem;">· {items.length} 篇</span></h1>
+    <ul class="plist">
+      {items.map((post) => (
+        <li class="plist__item">
+          <span class="plist__date">{formatDate(post.data.date)}</span>
+          <a class="plist__title" href={postPermalink(post)}>{post.data.title}</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>

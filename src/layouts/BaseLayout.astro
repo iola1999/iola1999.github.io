@@ -1,0 +1,58 @@
+---
+import { SITE } from '../config';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** 文章页传入，用于 canonical / og */
+  permalink?: string;
+}
+const { title, description = SITE.description, permalink } = Astro.props;
+const pageTitle = title ? `${title} - ${SITE.title}` : SITE.title;
+const canonical = new URL(permalink ?? Astro.url.pathname, SITE.url).href;
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={SITE.author} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.jpg" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/feed.xml" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <div class="site">
+      <header class="nav">
+        <nav class="nav__inner wrap">
+          <a href="/" class="nav__brand">{SITE.title}</a>
+          <div class="nav__links">
+            {SITE.nav.map((item) => (
+              <a
+                href={item.href}
+                aria-current={currentPath === item.href ? 'page' : undefined}
+              >{item.label}</a>
+            ))}
+          </div>
+        </nav>
+      </header>
+      <main><slot /></main>
+      <footer class="footer">
+        <div class="wrap">
+          <p>© 2017–{new Date().getFullYear()} <a href={SITE.url}>{SITE.author}</a></p>
+          <p>Built with <a href="https://astro.build">Astro</a> · <a href="/feed.xml">RSS</a> · <a href={SITE.github}>GitHub</a></p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
