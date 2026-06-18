@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config';
+import { postPermalink, formatDate, byDateDesc } from '../lib/posts';
+
+const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(byDateDesc);
+
+// 按年分组
+const groups = new Map<number, typeof posts>();
+for (const p of posts) {
+  const y = new Date(p.data.date.getTime() + 8 * 3600 * 1000).getUTCFullYear();
+  if (!groups.has(y)) groups.set(y, []);
+  groups.get(y)!.push(p);
+}
+const years = [...groups.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout>
+  <div class="wrap">
+    <section class="home__intro">
+      <h1>{SITE.title}</h1>
+      <p>{SITE.description}</p>
+    </section>
+
+    {years.map((year) => (
+      <>
+        <h2 class="year">{year}</h2>
+        <ul class="plist">
+          {groups.get(year)!.map((post) => (
+            <li class="plist__item">
+              <span class="plist__date">{formatDate(post.data.date)}</span>
+              <a class="plist__title" href={postPermalink(post)}>{post.data.title}</a>
+              <a class="plist__cat" href={`/categories/${encodeURIComponent(post.data.category)}/`}>
+                {post.data.category}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+    ))}
+  </div>
+</BaseLayout>

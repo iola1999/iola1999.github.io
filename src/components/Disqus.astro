@@ -1,0 +1,22 @@
+---
+import { SITE } from '../config';
+interface Props { title: string; permalink: string; }
+const { title, permalink } = Astro.props;
+const pageUrl = new URL(permalink, SITE.url).href;
+---
+<section id="comments" style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+  <div id="disqus_thread"></div>
+</section>
+<script is:inline define:vars={{ shortname: SITE.disqus, pageUrl, title }}>
+  window.disqus_config = function () {
+    this.page.url = pageUrl;
+    this.page.identifier = pageUrl;
+    this.page.title = title;
+  };
+  (function () {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://' + shortname + '.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
