@@ -21,6 +21,12 @@ export function formatDate(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
+/** 月-日（首页列表用，年份已由分组标题展示） */
+export function formatMonthDay(date: Date): string {
+  const { m, d } = cstParts(date);
+  return `${m}-${d}`;
+}
+
 /** 按发布时间倒序 */
 export function byDateDesc(a: CollectionEntry<'posts'>, b: CollectionEntry<'posts'>) {
   return b.data.date.getTime() - a.data.date.getTime();

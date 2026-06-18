@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config';
-import { postPermalink, formatDate, byDateDesc } from '../lib/posts';
+import { postPermalink, formatMonthDay, byDateDesc } from '../lib/posts';
 
 const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(byDateDesc);
 
@@ -19,8 +19,7 @@ const years = [...groups.keys()].sort((a, b) => b - a);
 <BaseLayout>
   <div class="wrap">
     <section class="home__intro">
-      <h1>{SITE.title}</h1>
-      <p>{SITE.description}</p>
+      <h1>{SITE.description}</h1>
     </section>
 
     {years.map((year) => (
@@ -29,7 +28,7 @@ const years = [...groups.keys()].sort((a, b) => b - a);
         <ul class="plist">
           {groups.get(year)!.map((post) => (
             <li class="plist__item">
-              <span class="plist__date">{formatDate(post.data.date)}</span>
+              <span class="plist__date">{formatMonthDay(post.data.date)}</span>
               <a class="plist__title" href={postPermalink(post)}>{post.data.title}</a>
               <a class="plist__cat" href={`/categories/${encodeURIComponent(post.data.category)}/`}>
                 {post.data.category}

@@ -1,0 +1,80 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+  variant: 'mobile' | 'desktop';
+}
+const { headings, variant } = Astro.props;
+const toc = headings.filter((h) => (h.depth === 2 || h.depth === 3) && h.text.trim());
+const hasToc = toc.length > 1;
+---
+
+{hasToc && variant === 'mobile' && (
+  <details class="toc toc--mobile">
+    <summary class="toc__mobile-toggle">
+      <span>目录</span>
+      <svg class="toc__caret" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </summary>
+    <ul class="toc__list">
+      {toc.map((h) => (
+        <li class={`toc__item toc__item--d${h.depth}`}>
+          <a href={`#${h.slug}`} data-toc-link>{h.text}</a>
+        </li>
+      ))}
+    </ul>
+  </details>
+)}
+
+{hasToc && variant === 'desktop' && (
+  <div class="toc toc--desktop-wrap">
+    <nav class="toc__desktop" aria-label="目录">
+      <p class="toc__label">目录</p>
+      <ul class="toc__list">
+        {toc.map((h) => (
+          <li class={`toc__item toc__item--d${h.depth}`}>
+            <a href={`#${h.slug}`} data-toc-link>{h.text}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+)}
+
+{hasToc && (
+  <script>
+    // 滚动时高亮当前章节（处理页面上全部 [data-toc-link]，移动端/桌面端同步）
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+    const ids = [...new Set(links.map((a) => a.getAttribute('href')?.slice(1)).filter(Boolean))] as string[];
+    const targets = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+
+    if (targets.length) {
+      let activeId: string | null = null;
+      const setActive = (id: string | null) => {
+        if (id === activeId) return;
+        activeId = id;
+        links.forEach((a) => {
+          a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`);
+        });
+      };
+      const onScroll = () => {
+        const probe = window.scrollY + 90;
+        let current: string | null = null;
+        for (const t of targets) {
+          if (t.offsetTop <= probe) current = t.id;
+          else break;
+        }
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 4) {
+          current = targets[targets.length - 1].id;
+        }
+        setActive(current);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+  </script>
+)}
