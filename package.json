@@ -8,8 +8,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "migrate": "node scripts/migrate.mjs"
+    "astro": "astro"
   },
   "dependencies": {
     "astro": "^5.7.0",
