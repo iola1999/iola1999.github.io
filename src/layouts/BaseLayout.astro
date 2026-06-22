@@ -1,5 +1,6 @@
 ---
 import { SITE } from '../config';
+import IdleArticlePrefetch from '../components/IdleArticlePrefetch.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -54,5 +55,6 @@ const currentPath = Astro.url.pathname;
         </div>
       </footer>
     </div>
+    <IdleArticlePrefetch />
   </body>
 </html>

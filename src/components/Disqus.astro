@@ -5,18 +5,62 @@ const { title, permalink } = Astro.props;
 const pageUrl = new URL(permalink, SITE.url).href;
 ---
 <section id="comments" style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);">
-  <div id="disqus_thread"></div>
+  <div id="disqus_thread" aria-live="polite" style="min-height:4rem;color:var(--text-muted);font-size:.9rem;">
+    评论区将在滚动到这里后加载，避免 Disqus 影响正文阅读。
+  </div>
 </section>
 <script is:inline define:vars={{ shortname: SITE.disqus, pageUrl, title }}>
-  window.disqus_config = function () {
-    this.page.url = pageUrl;
-    this.page.identifier = pageUrl;
-    this.page.title = title;
-  };
-  (function () {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://' + shortname + '.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', +new Date());
-    (d.head || d.body).appendChild(s);
+  (() => {
+    const comments = document.getElementById('comments');
+    const thread = document.getElementById('disqus_thread');
+    let loaded = false;
+
+    if (!comments || !thread) return;
+
+    const loadDisqus = () => {
+      if (loaded) return;
+      loaded = true;
+      thread.setAttribute('aria-busy', 'true');
+
+      window.disqus_config = function () {
+        this.page.url = pageUrl;
+        this.page.identifier = pageUrl;
+        this.page.title = title;
+      };
+
+      const script = document.createElement('script');
+      script.src = 'https://' + shortname + '.disqus.com/embed.js';
+      script.async = true;
+      script.setAttribute('data-timestamp', +new Date());
+      script.onload = () => thread.removeAttribute('aria-busy');
+      script.onerror = () => {
+        thread.removeAttribute('aria-busy');
+        thread.textContent = '评论加载失败，可刷新页面后重试。';
+      };
+      (document.head || document.body).appendChild(script);
+    };
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        loadDisqus();
+      }, { rootMargin: '200px 0px' });
+
+      observer.observe(comments);
+      return;
+    }
+
+    const onScroll = () => {
+      const distanceToBottom = document.documentElement.scrollHeight - window.innerHeight - window.scrollY;
+      if (distanceToBottom > 400) return;
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      loadDisqus();
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    onScroll();
   })();
 </script>
