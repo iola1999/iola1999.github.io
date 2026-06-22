@@ -11,40 +11,15 @@ const publicDir = path.join(rootDir, 'public');
 const dimensionCache = new Map();
 const webpCache = new Map();
 
-function readImageDimensions(filePath) {
+async function readImageDimensions(filePath) {
   if (dimensionCache.has(filePath)) return dimensionCache.get(filePath);
 
-  let dimensions;
-  try {
-    const buffer = fs.readFileSync(filePath);
-    const ext = path.extname(filePath).toLowerCase();
-
-    if (ext === '.png' && buffer.length >= 24 && buffer.toString('ascii', 1, 4) === 'PNG') {
-      dimensions = { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
-    } else if (ext === '.gif' && buffer.length >= 10 && buffer.toString('ascii', 0, 3) === 'GIF') {
-      dimensions = { width: buffer.readUInt16LE(6), height: buffer.readUInt16LE(8) };
-    } else if ((ext === '.jpg' || ext === '.jpeg') && buffer.readUInt16BE(0) === 0xffd8) {
-      let offset = 2;
-      while (offset < buffer.length) {
-        if (buffer[offset] !== 0xff) break;
-        const marker = buffer[offset + 1];
-        const length = buffer.readUInt16BE(offset + 2);
-        const isSof = (
-          (marker >= 0xc0 && marker <= 0xc3) ||
-          (marker >= 0xc5 && marker <= 0xc7) ||
-          (marker >= 0xc9 && marker <= 0xcb) ||
-          (marker >= 0xcd && marker <= 0xcf)
-        );
-        if (isSof) {
-          dimensions = { width: buffer.readUInt16BE(offset + 7), height: buffer.readUInt16BE(offset + 5) };
-          break;
-        }
-        offset += 2 + length;
-      }
-    }
-  } catch {
-    dimensions = undefined;
-  }
+  const dimensions = sharp(filePath)
+    .metadata()
+    .then(({ width, height }) => (
+      width && height ? { width, height } : undefined
+    ))
+    .catch(() => undefined);
 
   dimensionCache.set(filePath, dimensions);
   return dimensions;
@@ -111,7 +86,7 @@ function visitImages(node, visitor, parent, index) {
 function rehypeImagePerformance() {
   return async (tree) => {
     let imageIndex = 0;
-    const webpTasks = [];
+    const imageTasks = [];
 
     visitImages(tree, (node, parent, index) => {
       const properties = node.properties ??= {};
@@ -124,14 +99,16 @@ function rehypeImagePerformance() {
       }
 
       const filePath = publicImagePath(src);
-      const dimensions = filePath ? readImageDimensions(filePath) : undefined;
-      if (dimensions) {
-        properties.width ??= dimensions.width;
-        properties.height ??= dimensions.height;
-      }
+      if (filePath) {
+        imageTasks.push((async () => {
+          const dimensions = await readImageDimensions(filePath);
+          if (dimensions) {
+            properties.width ??= dimensions.width;
+            properties.height ??= dimensions.height;
+          }
 
-      if (filePath && parent && typeof index === 'number') {
-        webpTasks.push((async () => {
+          if (!parent || typeof index !== 'number') return;
+
           const webpSrc = await ensureWebpVariant(filePath);
           if (!webpSrc) return;
 
@@ -155,7 +132,7 @@ function rehypeImagePerformance() {
       imageIndex += 1;
     });
 
-    await Promise.all(webpTasks);
+    await Promise.all(imageTasks);
   };
 }
 
