@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "generate:assets": "node scripts/generate-brand-assets.mjs",
+    "prebuild": "npm run generate:assets",
     "build": "astro build",
     "preview": "astro preview",
     "test": "vitest run",

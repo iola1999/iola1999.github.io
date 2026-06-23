@@ -7,6 +7,7 @@ import {
   postDescription,
   postImage,
   postJsonLd,
+  postOgImagePath,
   stripMarkdown,
   truncateDescription,
 } from './seo';
@@ -62,6 +63,11 @@ describe('seo helpers', () => {
     });
     expect(postDescription(post)).toBe('手写摘要');
     expect(postImage(post)).toBe('/custom-og.png');
+  });
+
+  it('uses generated post OG card by default', () => {
+    expect(postOgImagePath(mockPost())).toBe('/og/posts/Example-Post.png');
+    expect(postImage(mockPost())).toBe('/og/posts/Example-Post.png');
   });
 
   it('builds BlogPosting JSON-LD with canonical article URL', () => {

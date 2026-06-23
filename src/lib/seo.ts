@@ -64,13 +64,13 @@ export function postDescription(post: CollectionEntry<'posts'>): string {
     : excerptFromMarkdown(post.body) ?? SITE.description;
 }
 
-function firstMarkdownImage(markdown = ''): string | undefined {
-  const match = markdown.match(/!\[[^\]]*]\(([^)\s]+)(?:\s+"[^"]*")?\)/);
-  return match?.[1];
+export function postOgImagePath(post: CollectionEntry<'posts'>): string {
+  const encodedId = post.id.split('/').map(encodeURIComponent).join('/');
+  return `/og/posts/${encodedId}.png`;
 }
 
 export function postImage(post: CollectionEntry<'posts'>): string {
-  return post.data.ogImage ?? post.data.image ?? firstMarkdownImage(post.body) ?? SITE.defaultImage;
+  return post.data.ogImage ?? post.data.image ?? postOgImagePath(post);
 }
 
 export function postKeywords(post: CollectionEntry<'posts'>): string[] {

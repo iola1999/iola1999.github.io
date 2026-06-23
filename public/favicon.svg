@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="iolaSay">
+  <rect width="512" height="512" rx="118" fill="#c2410c"/>
+  <path d="M128 126C213 70 299 70 384 126" fill="none" stroke="#fff7ed" stroke-width="34" stroke-linecap="round" opacity=".56"/>
+  <circle cx="256" cy="178" r="50" fill="#fff7ed"/>
+  <path d="M256 272V386" fill="none" stroke="#fff7ed" stroke-width="58" stroke-linecap="round"/>
+  <path d="M164 400L384 180" fill="none" stroke="#ffd7c2" stroke-width="34" stroke-linecap="round" opacity=".72"/>
+</svg>
