@@ -5,6 +5,13 @@ import BaseLayout from './BaseLayout.astro';
 import Disqus from '../components/Disqus.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import { postPermalink, formatDate } from '../lib/posts';
+import {
+  breadcrumbJsonLd,
+  postDescription,
+  postImage,
+  postJsonLd,
+  postKeywords,
+} from '../lib/seo';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -15,12 +22,43 @@ interface Props {
 const { post, headings, prev, next } = Astro.props;
 const { title, date, category, tags } = post.data;
 const permalink = postPermalink(post);
+const description = postDescription(post);
+const image = postImage(post);
+const keywords = postKeywords(post);
+const modifiedDate = post.data.updatedDate ?? date;
+const breadcrumbs = [
+  { name: '首页', href: '/' },
+  { name: category, href: `/categories/${encodeURIComponent(category)}/` },
+  { name: title, href: permalink },
+];
+const jsonLd = [
+  postJsonLd(post),
+  breadcrumbJsonLd(breadcrumbs),
+];
 ---
 
-<BaseLayout title={title} permalink={permalink}>
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink}
+  image={image}
+  imageAlt={`${title} - ${category}`}
+  type="article"
+  publishedTime={date.toISOString()}
+  modifiedTime={modifiedDate.toISOString()}
+  section={category}
+  tags={keywords}
+  jsonLd={jsonLd}
+>
   <article class="post">
     <div class="post__grid">
       <div class="wrap post__main">
+        <nav class="breadcrumbs" aria-label="面包屑">
+          <a href="/">首页</a>
+          <span aria-hidden="true">/</span>
+          <a href={`/categories/${encodeURIComponent(category)}/`}>{category}</a>
+        </nav>
+
         <header class="post__header">
           <h1 class="post__title">{title}</h1>
           <div class="post__meta">
@@ -57,4 +95,3 @@ const permalink = postPermalink(post);
     </div>
   </article>
 </BaseLayout>
-

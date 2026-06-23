@@ -3,8 +3,19 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config';
 import { postPermalink, formatMonthDay, byDateDesc } from '../lib/posts';
+import { collectionPageJsonLd, personJsonLd, websiteJsonLd } from '../lib/seo';
 
 const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(byDateDesc);
+const jsonLd = [
+  websiteJsonLd(),
+  personJsonLd(),
+  collectionPageJsonLd({
+    name: SITE.title,
+    description: SITE.description,
+    url: '/',
+    items: posts.slice(0, 10),
+  }),
+];
 
 // 按年分组
 const groups = new Map<number, typeof posts>();
@@ -16,7 +27,7 @@ for (const p of posts) {
 const years = [...groups.keys()].sort((a, b) => b - a);
 ---
 
-<BaseLayout>
+<BaseLayout jsonLd={jsonLd}>
   <div class="wrap">
     <section class="home__intro">
       <h1>{SITE.description}</h1>

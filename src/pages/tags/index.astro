@@ -7,9 +7,10 @@ const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(byDateDe
 const counts = new Map<string, number>();
 for (const p of posts) for (const t of p.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
 const tags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+const description = `按标签浏览 iolaSay 的 ${posts.length} 篇文章。`;
 ---
 
-<BaseLayout title="标签">
+<BaseLayout title="标签" description={description} permalink="/tags/">
   <div class="wrap taxo">
     <h1>标签</h1>
     <div class="cloud">

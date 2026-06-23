@@ -151,6 +151,12 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
    文章页
    ============================================================ */
 .post { padding-block: 2.5rem 1rem; }
+.breadcrumbs {
+  display: flex; align-items: center; gap: .45rem;
+  margin-bottom: 1.2rem; color: var(--text-muted); font-size: .82rem;
+}
+.breadcrumbs a { color: var(--text-muted); transition: color .2s ease; }
+.breadcrumbs a:hover { color: var(--accent); text-decoration: none; }
 .post__header { margin-bottom: 2rem; }
 .post__title { font-size: 2rem; line-height: 1.25; margin: 0 0 .6rem; letter-spacing: -.025em; }
 .post__meta { color: var(--text-muted); font-size: .88rem; display: flex; gap: .8rem; flex-wrap: wrap; }

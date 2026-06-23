@@ -11,8 +11,12 @@ const posts = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    description: z.string().max(200).optional(),
     category: z.string().default('未分类'),
     tags: z.array(z.string()).default([]),
+    image: z.string().optional(),
+    ogImage: z.string().optional(),
     draft: z.boolean().default(false),
   }),
 });

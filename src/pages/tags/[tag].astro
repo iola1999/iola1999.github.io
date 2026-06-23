@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { postPermalink, formatDate, byDateDesc } from '../../lib/posts';
+import { breadcrumbJsonLd, collectionPageJsonLd } from '../../lib/seo';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(byDateDesc);
@@ -18,9 +19,24 @@ export async function getStaticPaths() {
   }));
 }
 const { tag, items } = Astro.props;
+const permalink = `/tags/${encodeURIComponent(tag)}/`;
+const description = `iolaSay「${tag}」标签下的 ${items.length} 篇文章。`;
+const jsonLd = [
+  collectionPageJsonLd({
+    name: `标签: ${tag}`,
+    description,
+    url: permalink,
+    items,
+  }),
+  breadcrumbJsonLd([
+    { name: '首页', href: '/' },
+    { name: '标签', href: '/tags/' },
+    { name: tag, href: permalink },
+  ]),
+];
 ---
 
-<BaseLayout title={`标签: ${tag}`}>
+<BaseLayout title={`标签: ${tag}`} description={description} permalink={permalink} jsonLd={jsonLd}>
   <div class="wrap taxo">
     <h1>#{tag} <span style="color:var(--text-muted);font-size:1rem;">· {items.length} 篇</span></h1>
     <ul class="plist">

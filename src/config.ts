@@ -3,6 +3,9 @@ export const SITE = {
   description: '影言 · 个人博客',
   author: 'iola1999',
   url: 'https://678234.xyz',
+  locale: 'zh-CN',
+  ogLocale: 'zh_CN',
+  defaultImage: '/social-card.png',
   github: 'https://github.com/iola1999',
   email: 'fwl1998@foxmail.com',
   /** 导航 */
