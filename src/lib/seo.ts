@@ -69,8 +69,13 @@ export function postOgImagePath(post: CollectionEntry<'posts'>): string {
   return `/og/posts/${encodedId}.png`;
 }
 
+export function versionedImagePath(pathOrUrl: string): string {
+  const separator = pathOrUrl.includes('?') ? '&' : '?';
+  return `${pathOrUrl}${separator}v=${SITE.ogImageVersion}`;
+}
+
 export function postImage(post: CollectionEntry<'posts'>): string {
-  return post.data.ogImage ?? post.data.image ?? postOgImagePath(post);
+  return versionedImagePath(post.data.ogImage ?? post.data.image ?? postOgImagePath(post));
 }
 
 export function postKeywords(post: CollectionEntry<'posts'>): string[] {
