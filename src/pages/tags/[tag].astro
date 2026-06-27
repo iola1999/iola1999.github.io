@@ -1,19 +1,12 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { postPermalink, formatDate, byDateDesc } from '../../lib/posts';
+import { getPublishedPosts } from '../../lib/content';
+import { postPermalink, formatDate, groupByTag } from '../../lib/posts';
 import { breadcrumbJsonLd, collectionPageJsonLd } from '../../lib/seo';
 
 export async function getStaticPaths() {
-  const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(byDateDesc);
-  const tags = new Map<string, typeof posts>();
-  for (const p of posts) {
-    for (const t of p.data.tags) {
-      if (!tags.has(t)) tags.set(t, []);
-      tags.get(t)!.push(p);
-    }
-  }
-  return [...tags.entries()].map(([tag, items]) => ({
+  const posts = await getPublishedPosts();
+  return [...groupByTag(posts).entries()].map(([tag, items]) => ({
     params: { tag },
     props: { tag, items },
   }));

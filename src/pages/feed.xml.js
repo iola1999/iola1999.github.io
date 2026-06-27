@@ -1,13 +1,12 @@
 import rss from '@astrojs/rss';
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { SITE } from '../config';
-import { postPermalink, byDateDesc } from '../lib/posts';
+import { getPublishedPosts } from '../lib/content';
+import { postPermalink } from '../lib/posts';
 
 export async function GET(context) {
-  const posts = (await getCollection('posts', (p) => !p.data.draft))
-    .sort(byDateDesc)
-    .slice(0, 10);
+  const posts = (await getPublishedPosts()).slice(0, 10);
   const container = await AstroContainer.create();
 
   const items = await Promise.all(

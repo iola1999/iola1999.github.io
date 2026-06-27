@@ -3,6 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [master]
+  pull_request:
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -10,12 +12,14 @@ permissions:
   pages: write
   id-token: write
 
+# 同一分支的新提交取消进行中的旧运行；master 与各 PR 互不取消
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
+  # 测试 + 构建合并为一个 job：单次 npm ci，测试在构建前作为门禁
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -23,23 +27,23 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm test
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
       - name: Install CJK fonts for social card rendering
         run: |
           sudo apt-get update
           sudo apt-get install -y fonts-noto-cjk
           fc-match 'Noto Sans CJK SC'
-      - uses: withastro/action@v6
+      - run: npm ci
+      - run: npm test
+      # prebuild 生成 OG 卡片 / favicon，astro build 产出 dist（含按需 webp 变体）
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
 
+  # 仅 master 的 push 才部署；PR 只跑上面的 build + test 做校验
   deploy:
     needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

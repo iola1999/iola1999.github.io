@@ -2,6 +2,8 @@
    设计令牌 — 改这里即可换肤
    ============================================================ */
 :root {
+  color-scheme: light;
+
   /* 强调色：克制的暖橙红（对比度 ≥4.5:1 满足 WCAG AA） */
   --accent: #c2410c;
   --accent-soft: #fff0e6;
@@ -22,20 +24,46 @@
   --maxw: 820px;
   --maxw-prose: 760px;
   --content: 1044px;   /* 文章页正文(820) + 间距(24) + 目录(200)，与导航共用以左对齐 */
+  --toc-w: 200px;
   --radius: 8px;
 }
 
+/* 深色调色板：中性偏暖的干净深背景（参考 jt26wzz.com），保留 iolaSay 暖橙强调，
+   不照搬其绿色，以免与品牌（favicon / OG 卡片均为暖橙）割裂。
+   两处定义：① 系统深色且未手动选浅色；② 手动 data-theme="dark"。
+   注意 theme-color 同步值在 BaseLayout 内联脚本里（#1b1b1d / #fcfcfb），改这里需一并更新。 */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
     --accent: #ff7a45;
     --accent-soft: #2a1c14;
-    --bg: #16140f;
-    --surface: #1d1a15;
-    --text: #e9e5dd;
-    --text-muted: #9a948a;
-    --border: #2e2a23;
-    --code-bg: #211e18;
+    --bg: #1b1b1d;
+    --surface: #242428;
+    --text: #e9e7e3;
+    --text-muted: #9b9a97;
+    --border: #323236;
+    --code-bg: #222226;
   }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --accent: #ff7a45;
+  --accent-soft: #2a1c14;
+  --bg: #1b1b1d;
+  --surface: #242428;
+  --text: #e9e7e3;
+  --text-muted: #9b9a97;
+  --border: #323236;
+  --code-bg: #222226;
+}
+
+/* 主题切换平滑过渡：仅在用户主动点击切换（JS 临时加 .theme-transition）时启用，
+   首屏按系统/存储应用主题时不过渡，避免闪烁 */
+:root.theme-transition,
+:root.theme-transition *,
+:root.theme-transition *::before,
+:root.theme-transition *::after {
+  transition: background-color .25s ease, border-color .25s ease, color .2s ease !important;
 }
 
 /* ============================================================
@@ -58,6 +86,23 @@ body {
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
 img { max-width: 100%; height: auto; }
+
+/* 键盘可见焦点（鼠标点击不显示，仅键盘/辅助技术触发） */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* 跳到主内容：默认藏在视口上方，聚焦时滑入 */
+.skip-link {
+  position: fixed; left: 12px; top: -56px; z-index: 100;
+  padding: .5rem .9rem; border-radius: var(--radius);
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); font-size: .9rem;
+  transition: top .18s ease;
+}
+.skip-link:focus { top: 12px; text-decoration: none; }
 hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
@@ -99,10 +144,27 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 .nav__inner { display: flex; align-items: center; gap: 1.5rem; height: 60px; width: 100%; max-width: var(--maxw); }
 .nav__brand { font-weight: 700; font-size: 1.15rem; color: var(--text); letter-spacing: -.02em; transition: color .2s ease; }
 .nav__brand:hover { text-decoration: none; color: var(--accent); }
-.nav__links { display: flex; gap: 1.25rem; margin-left: auto; }
+.nav__links { display: flex; align-items: center; gap: 1.25rem; margin-left: auto; }
 .nav__links a { color: var(--text-muted); font-size: .95rem; transition: color .2s ease; }
 .nav__links a:hover { color: var(--text); text-decoration: none; }
 .nav__links a[aria-current="page"] { color: var(--accent); }
+
+/* 主题切换按钮（跟随系统 / 浅色 / 深色 三态循环） */
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; padding: 0;
+  background: none; border: 1px solid transparent; border-radius: 8px;
+  color: var(--text-muted); cursor: pointer;
+  transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+.theme-toggle:hover { color: var(--text); background: var(--code-bg); }
+.theme-toggle svg { width: 18px; height: 18px; display: block; }
+/* 按当前模式只显示对应图标；无 JS 时默认显示「跟随系统」 */
+.theme-toggle [data-icon] { display: none; }
+:root[data-theme-mode='system'] .theme-toggle [data-icon='system'],
+:root[data-theme-mode='light'] .theme-toggle [data-icon='light'],
+:root[data-theme-mode='dark'] .theme-toggle [data-icon='dark'],
+:root:not([data-theme-mode]) .theme-toggle [data-icon='system'] { display: block; }
 
 .footer {
   border-top: 1px solid var(--border);
@@ -299,15 +361,17 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
   to { opacity: 1; transform: none; }
 }
 
-/* 宽屏：正文用 .wrap(820) 居中（与导航/首页左缘统一对齐），
-   目录 fixed 浮在正文右侧视口留白处。仅在足够宽时显示，overflow-x 兜底防溢出 */
+/* 宽屏：正文用 .wrap(820) 居中（与导航/首页左缘统一对齐），目录 fixed 浮在正文右侧
+   视口留白处、滚动时常驻可见（即 sticky 侧栏的效果）。改用 fixed 而非 grid 内 sticky，
+   是为了保持正文左缘与全站导航对齐——若改成内容+目录整体居中，正文会左移而失对齐。
+   仅在足够宽时显示，body overflow-x:hidden 兜底防溢出；宽度收敛到 --toc-w 便于维护。 */
 @media (min-width: 1280px) {
   .post__grid { display: block; }
   .post__aside {
     display: block;
     position: fixed; top: 80px;
     left: calc(50% + var(--maxw) / 2 + 1.5rem);
-    width: 200px;
+    width: var(--toc-w);
   }
   .toc--mobile { display: none; }
   .toc__desktop-wrap {

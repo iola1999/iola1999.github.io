@@ -1,10 +1,11 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import PostLayout from '../layouts/PostLayout.astro';
-import { postPermalink, byDateDesc } from '../lib/posts';
+import { getPublishedPosts } from '../lib/content';
+import { postPermalink } from '../lib/posts';
 
 export async function getStaticPaths() {
-  const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(byDateDesc);
+  const posts = await getPublishedPosts();
   return posts.map((post, i) => ({
     // 去掉首尾斜杠交给 trailingSlash 处理
     params: { permalink: postPermalink(post).replace(/^\/|\/$/g, '') },

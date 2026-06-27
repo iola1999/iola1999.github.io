@@ -1,12 +1,10 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { byDateDesc } from '../../lib/posts';
+import { getPublishedPosts } from '../../lib/content';
+import { groupByTag, countsBySize } from '../../lib/posts';
 
-const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(byDateDesc);
-const counts = new Map<string, number>();
-for (const p of posts) for (const t of p.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
-const tags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+const posts = await getPublishedPosts();
+const tags = countsBySize(groupByTag(posts));
 const description = `按标签浏览 iolaSay 的 ${posts.length} 篇文章。`;
 ---
 

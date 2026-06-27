@@ -1,10 +1,25 @@
 import { describe, it, expect } from 'vitest';
-import { postPermalink, formatDate, formatMonthDay, byDateDesc } from './posts';
+import {
+  postPermalink,
+  formatDate,
+  formatMonthDay,
+  byDateDesc,
+  groupByYear,
+  groupByCategory,
+  groupByTag,
+  countsBySize,
+  type Post,
+} from './posts';
 import type { CollectionEntry } from 'astro:content';
 
 // 构造一个最小可用的 post mock（只用到 date 和 id）
 function mockPost(dateISO: string, id: string): CollectionEntry<'posts'> {
   return { data: { date: new Date(dateISO) }, id } as unknown as CollectionEntry<'posts'>;
+}
+
+// 带分类/标签的 mock（分组用）
+function richPost(dateISO: string, category: string, tags: string[]): Post {
+  return { id: dateISO, data: { date: new Date(dateISO), category, tags } } as unknown as Post;
 }
 
 describe('postPermalink', () => {
@@ -71,5 +86,48 @@ describe('byDateDesc', () => {
     // byDateDesc(earlier, later) = later - earlier > 0 → earlier 应排在 later 之后
     expect(byDateDesc(earlier, later)).toBeGreaterThan(0);
     expect(byDateDesc(later, earlier)).toBeLessThan(0);
+  });
+});
+
+describe('groupByYear', () => {
+  it('按东八区年份分组并年倒序', () => {
+    const groups = groupByYear([
+      richPost('2026-01-01T08:00:00+08:00', '折腾', []),
+      richPost('2025-06-01T08:00:00+08:00', '折腾', []),
+      richPost('2026-12-31T08:00:00+08:00', '折腾', []),
+    ]);
+    expect(groups.map(([y]) => y)).toEqual([2026, 2025]);
+    expect(groups[0][1]).toHaveLength(2);
+  });
+
+  it('UTC 跨年边界按东八区归属', () => {
+    // 2025-12-31T16:00:00Z = 2026-01-01T00:00+08:00 → 归 2026
+    const groups = groupByYear([richPost('2025-12-31T16:00:00Z', 'x', [])]);
+    expect(groups[0][0]).toBe(2026);
+  });
+});
+
+describe('groupByCategory / groupByTag', () => {
+  const posts = [
+    richPost('2026-03-01T08:00:00+08:00', '折腾', ['Astro', 'SEO']),
+    richPost('2026-02-01T08:00:00+08:00', '折腾', ['Astro']),
+    richPost('2026-01-01T08:00:00+08:00', '文字', ['随笔']),
+  ];
+
+  it('按分类聚合', () => {
+    const byCat = groupByCategory(posts);
+    expect(byCat.get('折腾')).toHaveLength(2);
+    expect(byCat.get('文字')).toHaveLength(1);
+  });
+
+  it('一篇多标签重复计入各标签', () => {
+    const byTag = groupByTag(posts);
+    expect(byTag.get('Astro')).toHaveLength(2);
+    expect(byTag.get('SEO')).toHaveLength(1);
+    expect(byTag.get('随笔')).toHaveLength(1);
+  });
+
+  it('countsBySize 按数量倒序', () => {
+    expect(countsBySize(groupByTag(posts))[0]).toEqual(['Astro', 2]);
   });
 });

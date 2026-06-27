@@ -1,11 +1,12 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config';
-import { postPermalink, formatMonthDay, byDateDesc } from '../lib/posts';
+import { getPublishedPosts } from '../lib/content';
+import { postPermalink, formatMonthDay, groupByYear } from '../lib/posts';
 import { collectionPageJsonLd, personJsonLd, websiteJsonLd } from '../lib/seo';
 
-const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(byDateDesc);
+const posts = await getPublishedPosts();
+const yearGroups = groupByYear(posts);
 const jsonLd = [
   websiteJsonLd(),
   personJsonLd(),
@@ -16,15 +17,6 @@ const jsonLd = [
     items: posts.slice(0, 10),
   }),
 ];
-
-// 按年分组
-const groups = new Map<number, typeof posts>();
-for (const p of posts) {
-  const y = new Date(p.data.date.getTime() + 8 * 3600 * 1000).getUTCFullYear();
-  if (!groups.has(y)) groups.set(y, []);
-  groups.get(y)!.push(p);
-}
-const years = [...groups.keys()].sort((a, b) => b - a);
 ---
 
 <BaseLayout jsonLd={jsonLd}>
@@ -33,11 +25,11 @@ const years = [...groups.keys()].sort((a, b) => b - a);
       <h1>{SITE.description}</h1>
     </section>
 
-    {years.map((year) => (
+    {yearGroups.map(([year, items]) => (
       <>
         <h2 class="year">{year}</h2>
         <ul class="plist">
-          {groups.get(year)!.map((post) => (
+          {items.map((post) => (
             <li class="plist__item">
               <span class="plist__date">{formatMonthDay(post.data.date)}</span>
               <a class="plist__title" href={postPermalink(post)}>{post.data.title}</a>

@@ -42,31 +42,52 @@ function webPathForPublicFile(filePath) {
   return `/${relativePath}`;
 }
 
-async function ensureWebpVariant(filePath) {
+// 正文列宽 760px：1x(768) 覆盖移动端，2x(1536) 覆盖高密度桌面；超宽原图据此降采样
+const VARIANT_WIDTHS = [768, 1536];
+const WEBP_QUALITY = 82;
+
+/**
+ * 为一张公共图片生成多宽度 webp 变体（不超过原图宽、去重升序）。
+ * 返回 [{ width, src }]（升序）；若无可用变体则 undefined（退回原始 <img>）。
+ */
+async function ensureWebpVariants(filePath, originalWidth) {
   const ext = path.extname(filePath).toLowerCase();
   if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') return undefined;
+  if (!originalWidth) return undefined; // 读不到尺寸的图同样无法可靠转码，退回原图
   if (webpCache.has(filePath)) return webpCache.get(filePath);
 
   const promise = (async () => {
     const sourceStat = await fs.promises.stat(filePath);
-    const relativePath = path.relative(publicDir, filePath);
-    const outputPath = path.join(
-      publicDir,
-      'optimized',
-      relativePath.replace(/\.(png|jpe?g)$/i, '.webp'),
-    );
+    const relativeNoExt = path.relative(publicDir, filePath).replace(/\.(png|jpe?g)$/i, '');
+    const widths = [...new Set(VARIANT_WIDTHS.map((w) => Math.min(w, originalWidth)))]
+      .sort((a, b) => a - b);
 
-    const existingStat = await fs.promises.stat(outputPath).catch(() => undefined);
-    if (existingStat && existingStat.mtimeMs >= sourceStat.mtimeMs) {
-      return existingStat.size < sourceStat.size * 0.95 ? webPathForPublicFile(outputPath) : undefined;
+    const variants = [];
+    for (const width of widths) {
+      const isFullSize = width >= originalWidth;
+      const outputPath = path.join(publicDir, 'optimized', `${relativeNoExt}-${width}w.webp`);
+
+      const existingStat = await fs.promises.stat(outputPath).catch(() => undefined);
+      if (existingStat && existingStat.mtimeMs >= sourceStat.mtimeMs) {
+        // 复用缓存：同尺寸仍要求比原图明显更小才值得用
+        if (!isFullSize || existingStat.size < sourceStat.size * 0.95) {
+          variants.push({ width, src: webPathForPublicFile(outputPath) });
+        }
+        continue;
+      }
+
+      const pipeline = sharp(filePath);
+      if (!isFullSize) pipeline.resize({ width });
+      const webp = await pipeline.webp({ quality: WEBP_QUALITY, effort: 6 }).toBuffer();
+      // 同尺寸且没比原图小：转码无收益，跳过
+      if (isFullSize && webp.length >= sourceStat.size * 0.95) continue;
+
+      await fs.promises.mkdir(path.dirname(outputPath), { recursive: true });
+      await fs.promises.writeFile(outputPath, webp);
+      variants.push({ width, src: webPathForPublicFile(outputPath) });
     }
 
-    const webp = await sharp(filePath).webp({ quality: 88, effort: 6 }).toBuffer();
-    if (webp.length >= sourceStat.size * 0.95) return undefined;
-
-    await fs.promises.mkdir(path.dirname(outputPath), { recursive: true });
-    await fs.promises.writeFile(outputPath, webp);
-    return webPathForPublicFile(outputPath);
+    return variants.length ? variants : undefined;
   })();
 
   webpCache.set(filePath, promise);
@@ -109,8 +130,10 @@ function rehypeImagePerformance() {
 
           if (!parent || typeof index !== 'number') return;
 
-          const webpSrc = await ensureWebpVariant(filePath);
-          if (!webpSrc) return;
+          const variants = await ensureWebpVariants(filePath, dimensions?.width);
+          if (!variants) return;
+
+          const srcset = variants.map((variant) => `${variant.src} ${variant.width}w`).join(', ');
 
           parent.children[index] = {
             type: 'element',
@@ -120,7 +143,12 @@ function rehypeImagePerformance() {
               {
                 type: 'element',
                 tagName: 'source',
-                properties: { type: 'image/webp', srcset: webpSrc },
+                properties: {
+                  type: 'image/webp',
+                  srcset,
+                  // 正文最宽 760px；窄屏满宽
+                  sizes: '(max-width: 800px) 100vw, 760px',
+                },
                 children: [],
               },
               node,
