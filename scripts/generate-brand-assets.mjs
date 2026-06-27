@@ -94,15 +94,17 @@ function wrapText(text, maxUnits, maxLines) {
   return lines.filter(Boolean);
 }
 
-function brandMarkSvg({ size = 72, radius = 18 } = {}) {
-  const scale = size / 72;
+// 单曲线引号标记（呼应 iolaSay / 言）。在 512 基准坐标系绘制，按 size 等比缩放。
+function quoteMarkPath(cx, cy, r, fill = '#fff7ed') {
+  return `<path d="M${cx - r} ${cy}a${r} ${r} 0 1 1 ${2 * r} 0c0 ${r * 1.25} ${-r * 0.45} ${r * 2} ${-r * 1.75} ${r * 2.55}c${r * 0.35} ${-r * 0.95} ${r * 0.3} ${-r * 1.5} ${-r * 0.25} ${-r * 1.95}z" fill="${fill}"/>`;
+}
+
+function brandMarkSvg({ size = 72 } = {}) {
+  const k = size / 512;
   return `
     <g>
-      <rect width="${size}" height="${size}" rx="${radius}" fill="${COLORS.accent}"/>
-      <path d="M${18 * scale} ${17 * scale}C${30 * scale} ${9 * scale} ${46 * scale} ${9 * scale} ${58 * scale} ${17 * scale}" fill="none" stroke="#fff7ed" stroke-width="${4.5 * scale}" stroke-linecap="round" opacity=".52"/>
-      <circle cx="${36 * scale}" cy="${24 * scale}" r="${8 * scale}" fill="#fff7ed"/>
-      <path d="M${36 * scale} ${38 * scale}V${54 * scale}" fill="none" stroke="#fff7ed" stroke-width="${8 * scale}" stroke-linecap="round"/>
-      <path d="M${23 * scale} ${57 * scale}L${55 * scale} ${25 * scale}" fill="none" stroke="#ffd7c2" stroke-width="${4.5 * scale}" stroke-linecap="round" opacity=".72"/>
+      <rect width="${size}" height="${size}" rx="${size * 0.226}" fill="${COLORS.accent}"/>
+      ${quoteMarkPath(256 * k, 196 * k, 86 * k)}
     </g>`;
 }
 
@@ -134,7 +136,7 @@ function defaultSocialSvg() {
   <title id="title">iolaSay social card</title>
   <desc id="desc">Default social sharing image for iolaSay.</desc>
   ${baseBackgroundSvg()}
-  <g transform="translate(144 164)">${brandMarkSvg({ size: 74, radius: 16 })}</g>
+  <g transform="translate(144 164)">${brandMarkSvg({ size: 74 })}</g>
   <text x="144" y="330" fill="${COLORS.ink}" font-family="Georgia, 'Times New Roman', serif" font-size="96" font-weight="700" letter-spacing="-3">${SITE.title}</text>
   <text x="149" y="390" fill="${COLORS.muted}" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="32" letter-spacing=".2">Personal blog by ${SITE.author}</text>
   <text x="149" y="458" fill="${COLORS.accent}" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="30">${SITE.url}</text>
@@ -162,7 +164,7 @@ function postCardSvg(post) {
   <circle cx="1010" cy="92" r="260" fill="#fb923c" opacity=".10"/>
   <circle cx="315" cy="315" r="250" fill="${COLORS.teal}" opacity=".035"/>
   <path d="M0 629.5H1200" stroke="${COLORS.border}" stroke-width="1"/>
-  <g transform="translate(82 54)">${brandMarkSvg({ size: 48, radius: 24 })}</g>
+  <g transform="translate(82 54)">${brandMarkSvg({ size: 48 })}</g>
   <text x="146" y="88" fill="${COLORS.ink}" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="-1">${SITE.title}</text>
   <text x="82" y="${titleY + titleLines.length * lineHeight + 102}" fill="${COLORS.muted}" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="24">${escapeHtml(date)} · ${SITE.url}</text>
   ${titleLines.map((line, index) => `<text x="82" y="${titleY + index * lineHeight}" fill="${COLORS.ink}" font-family="'Noto Sans CJK SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif" font-size="${fontSize}" font-weight="700" letter-spacing="-1.6">${escapeHtml(line)}</text>`).join('\n  ')}
@@ -172,11 +174,11 @@ function postCardSvg(post) {
 
 function faviconSvg() {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="${SITE.title}">
-  <rect width="512" height="512" rx="118" fill="${COLORS.accent}"/>
-  <path d="M128 126C213 70 299 70 384 126" fill="none" stroke="#fff7ed" stroke-width="34" stroke-linecap="round" opacity=".56"/>
-  <circle cx="256" cy="178" r="50" fill="#fff7ed"/>
-  <path d="M256 272V386" fill="none" stroke="#fff7ed" stroke-width="58" stroke-linecap="round"/>
-  <path d="M164 400L384 180" fill="none" stroke="#ffd7c2" stroke-width="34" stroke-linecap="round" opacity=".72"/>
+  <defs><linearGradient id="iolaBg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#e0591b"/><stop offset="1" stop-color="${COLORS.accent}"/>
+  </linearGradient></defs>
+  <rect width="512" height="512" rx="116" fill="url(#iolaBg)"/>
+  ${quoteMarkPath(256, 196, 86)}
 </svg>`;
 }
 

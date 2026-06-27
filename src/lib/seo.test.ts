@@ -63,16 +63,16 @@ describe('seo helpers', () => {
       },
     });
     expect(postDescription(post)).toBe('手写摘要');
-    expect(postImage(post)).toBe('/custom-og.png?v=20260623-cjk');
+    expect(postImage(post)).toBe('/custom-og.png?v=20260627-quote');
   });
 
   it('uses generated post OG card by default', () => {
     expect(postOgImagePath(mockPost())).toBe('/og/posts/Example-Post.png');
-    expect(postImage(mockPost())).toBe('/og/posts/Example-Post.png?v=20260623-cjk');
+    expect(postImage(mockPost())).toBe('/og/posts/Example-Post.png?v=20260627-quote');
   });
 
   it('appends OG image version without dropping existing query strings', () => {
-    expect(versionedImagePath('/og/example.png?x=1')).toBe('/og/example.png?x=1&v=20260623-cjk');
+    expect(versionedImagePath('/og/example.png?x=1')).toBe('/og/example.png?x=1&v=20260627-quote');
   });
 
   it('builds BlogPosting JSON-LD with canonical article URL', () => {
