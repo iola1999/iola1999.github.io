@@ -14,6 +14,8 @@ tags:
 >
 > 折腾仅因个人兴趣，记录分享仅为研究学习交流，请勿用于违法用途。
 
+> 2026-06-29 更新：修正了重签名步骤。初版里我图省事用了 `--deep`，它会把 app 内嵌的 framework 连带重签成 ad-hoc，系统更新后触发签名加载失败、整个客户端双击都打不开了。已改为只重签主可执行文件、补 `--options runtime`，详见方案 B。
+
 ## 起因
 
 接着 [如何愉快地使用钉钉](/2023/05/27/How-to-use-DingTalk-happily/) 那篇往下写。上次留了个尾巴：「如何不让别人看自己的已读状态」那节，我偷懒只甩了俩链接没展开。这次把它补上。
@@ -77,7 +79,17 @@ codesign -d --entitlements :- /Applications/DingTalk.app 2>&1
 | `allow-dyld-environment-variables` | `true` | 允许 DYLD 环境变量注入（方案 B 的前提） |
 | `disable-library-validation` | `false` | 库校验没关，要重签名才能塞第三方 dylib |
 
-方案 B 会用到，先记下。
+方案 B 会用到，先记下。顺手把原始 entitlements 导出存成文件，后面两个方案重签都要用：
+
+```bash
+codesign -d --entitlements :- /Applications/DingTalk.app > entitlements.plist 2>/dev/null
+```
+
+这份文件别手敲——钉钉的 entitlements 有二十多项，漏一项都可能让某些功能哑掉。直接从官方签名导出来用，改动越少越稳。方案 A 重签原样用这份；方案 B 只需把 `com.apple.security.cs.disable-library-validation` 一项翻成 `true`，其余不动：
+
+```bash
+plutil -replace com.apple.security.cs.disable-library-validation -bool true entitlements.plist
+```
 
 ---
 
@@ -162,22 +174,28 @@ with open(target, 'wb') as f:
     f.write(data)
 
 print(f'\nDone. Patched {count} occurrence(s).')
-print('Now run: codesign --force --deep --sign - /Applications/DingTalk.app')
+print('Now run: codesign --force --sign - --options runtime --entitlements entitlements.plist /Applications/DingTalk.app')
 ```
 
 #### 4. 重签名
 
-改完二进制原签名就废了，ad-hoc 重签一下：
+改完二进制原签名就废了，重签一下。方案 A 不注入 dylib，不用动 `disable-library-validation`，直接用前置分析里导出的那份原始 `entitlements.plist`：
 
 ```bash
-codesign --force --deep --sign - /Applications/DingTalk.app
+codesign --force --sign - --options runtime \
+    --entitlements entitlements.plist \
+    /Applications/DingTalk.app
 ```
+
+同样别用 `--deep`——它会连带把内嵌 framework 改成 ad-hoc，某次系统更新后随时触发加载失败、整个客户端打不开。这条坑的细节见方案 B 的警告框。`--options runtime` 则是补回 hardened runtime 标志。
 
 #### 5. 还原
 
 ```bash
 cp ./DingTalk.backup /Applications/DingTalk.app/Contents/MacOS/DingTalk
-codesign --force --deep --sign - /Applications/DingTalk.app
+codesign --force --sign - --options runtime \
+    --entitlements entitlements.plist \
+    /Applications/DingTalk.app
 ```
 
 ---
@@ -190,7 +208,7 @@ codesign --force --deep --sign - /Applications/DingTalk.app
 
 macOS 的 `DYLD_INSERT_LIBRARIES` 能在进程启动时塞一个自定义 dylib 进去。这个 dylib 在 constructor 里用 ObjC Runtime 的 `method_setImplementation`，把 `DTMojoMessageService` 的 `updateToRead:mids:uuid:completionHandler:` 换成自己的实现。新实现啥也不干，调一下 success callback 就 return，请求根本不发出去。
 
-比方案 A 好在三处：不动原始文件，不跑注入脚本就自动恢复原状；请求没出门，服务器不会回错误；还能用 `NSLog` 把每次拦截打出来，心里有数。
+比方案 A 好在三处：不 patch 二进制字节，改的是运行时内存（唯一动静是为放下 dylib，把主二进制重签一下——但只签这一层、不碰内嵌 framework，远没 A 的逐字节破坏那么重），不跑注入脚本就回到原生已读行为；请求没出门，服务器不会回错误；还能用 `NSLog` 把每次拦截打出来，心里有数。
 
 调用链拦截点：
 
@@ -275,36 +293,46 @@ clang -dynamiclib -arch arm64 -arch x86_64 -framework Foundation -o noread_hook.
 
 #### 1. 准备 entitlements.plist
 
-先导出看一眼：
+就用前置分析里导出的那份 `entitlements.plist`，把 `disable-library-validation` 一项翻成 `true`，其余一律不动：
 
 ```bash
-codesign -d --entitlements :- /Applications/DingTalk.app 2>/dev/null
+plutil -replace com.apple.security.cs.disable-library-validation -bool true entitlements.plist
 ```
 
-然后在原有 entitlements 基础上把这两项设好，存成 `entitlements.plist`：
+还没导出的话，导出加翻转一步到位：
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <!-- 保留原有的 entitlements，关键修改项如下 -->
-    <key>com.apple.security.cs.allow-dyld-environment-variables</key>
-    <true/>
-    <key>com.apple.security.cs.disable-library-validation</key>
-    <true/>
-    <!-- ... 其余保持原样 ... -->
-</dict>
-</plist>
+```bash
+codesign -d --entitlements :- /Applications/DingTalk.app 2>/dev/null > entitlements.plist
+plutil -replace com.apple.security.cs.disable-library-validation -bool true entitlements.plist
 ```
+
+别手敲一份新的——钉钉 entitlements 二十多项，漏一项都可能让某些功能哑掉。从官方签名导出再改，最稳。
 
 #### 2. 重签名 App
 
+先给结论——**别用 `--deep`**，这条命令才是对的：
+
 ```bash
-codesign --force --deep --sign - \
+codesign --force --sign - --options runtime \
     --entitlements entitlements.plist \
     /Applications/DingTalk.app
+```
+
+> ⚠️ **关于 `--deep`，我踩过一个很痛的坑。**
+> 文章初版我图省事写了 `codesign --force --deep --sign -`。`--deep` 会把 app 里二十多个内嵌 framework 连带 ad-hoc 重签，顺手抹掉它们原本的 Team ID 和公证信息。重签当天一切正常，十来天后系统更新收紧了对 ad-hoc loadable code 的 mmap 校验，`Masonry.framework`、`QtNetwork.framework` 一个接一个加载失败，`dyld` 报 `code signing blocked mmap()`——**整个钉钉双击都打不开了**，最后只能重装。
+>
+> 教训：注入第三方 dylib 只需要重签**主可执行文件**这一层、翻一个 entitlement 就够。内嵌 framework 的官方签名千万别碰，所以不用 `--deep`。`--options runtime` 是把 hardened runtime 标志补回来——原签名带这个标志，重签不补会丢。
+
+重签完顺手验证一下：主二进制应是 `adhoc,runtime`，framework 仍是原厂的 `runtime` + Team ID（凡是 framework 被改成 ad-hoc，就是签错位置了）：
+
+```bash
+# 主二进制：adhoc + runtime
+codesign -dvvv /Applications/DingTalk.app/Contents/MacOS/DingTalk 2>&1 | grep flags
+# 期望：flags=0x10002(adhoc,runtime)
+
+# framework：仍是官方签名，没被动过
+codesign -dvvv /Applications/DingTalk.app/Contents/Frameworks/Masonry.framework 2>&1 | grep -E "flags|TeamIdentifier"
+# 期望：flags=0x10000(runtime)，TeamIdentifier 仍有值
 ```
 
 #### 3. 签名 dylib
@@ -364,7 +392,12 @@ log stream --predicate 'message contains "NoRead"'
 
 ### 还原
 
-不用注入脚本，正常双击启动钉钉就行，DYLD 注入只在运行时生效，一个文件都没动。之前要是改过 entitlements，等钉钉下次自动更新就盖回去了。
+要分两层：
+
+- **只关掉 hook**：不用终端注入脚本，正常双击启动即可，dylib 不会被加载，已读回执恢复原状。注入本身就是运行时行为，不跑就不生效。
+- **恢复官方签名**：方案 B 为了放下 dylib 已经把主二进制 ad-hoc 重签、改了 entitlements。没有钉钉的开发者证书，没法手工签回官方签名——要么等钉钉自动更新覆盖（新版会带官方签名盖回去），要么干脆重装。在此之前 app 能正常用，只是签名栏变成了「自己签的」。
+
+`hook` 这层随时能开关，底子干不干净取决于你介意不介意签名那栏。
 
 ## 套话
 
