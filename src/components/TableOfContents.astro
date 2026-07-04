@@ -86,7 +86,16 @@ const hasToc = toc.length > 1;
         }
         setActive(current);
       };
-      window.addEventListener('scroll', onScroll, { passive: true });
+      // rAF 节流：onScroll 里读 offsetTop 会触发布局，避免每个滚动事件都算
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          onScroll();
+        });
+      }, { passive: true });
       onScroll();
     }
   </script>

@@ -7,10 +7,12 @@
 ## 开发
 
 ```bash
-npm install      # 安装依赖
+npm install      # 安装依赖（Node ≥22.18）
 npm run dev      # 本地开发 http://localhost:4321
 npm run build    # 构建到 dist/
 npm run preview  # 预览构建产物
+npm test         # 单元测试（vitest）
+npm run check    # astro check 类型检查（CI 也会跑）
 ```
 
 ## 写文章
@@ -47,5 +49,8 @@ src/
   pages/               路由
   lib/posts.ts         永久链接 / 日期工具
   styles/global.css    全部样式（设计令牌化，换肤改 :root 即可）
+scripts/
+  generate-brand-assets.mjs  构建前生成 favicon / OG 卡片（prebuild 自动执行）
+  lib/read-posts.mjs         磁盘直读 frontmatter（脚本与 astro.config 共用）
 public/                静态资源（图片、CNAME、favicon）
 ```

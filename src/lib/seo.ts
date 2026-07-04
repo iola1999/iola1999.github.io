@@ -21,6 +21,31 @@ export function absoluteUrl(pathOrUrl: string): string {
   return new URL(pathOrUrl, SITE.url).href;
 }
 
+/** RSS 阅读器普遍不解析根相对路径（RSS 2.0 无标准 base URL 机制）：
+ *  把 feed 全文 HTML 里的 src/href/srcset 绝对化到站点域名。
+ *  只处理 `/...` 根相对地址；绝对地址、`//` 协议相对、`#` 锚点原样保留。 */
+export function absolutizeHtml(html: string, base = SITE.url): string {
+  return html
+    .replace(
+      /(\s(?:src|href)=")(\/(?!\/)[^"]*)(")/g,
+      (_, prefix: string, url: string, suffix: string) =>
+        `${prefix}${new URL(url, base).href}${suffix}`,
+    )
+    .replace(/(\ssrcset=")([^"]*)(")/g, (_, prefix: string, value: string, suffix: string) => {
+      const rewritten = value
+        .split(',')
+        .map((candidate) => {
+          const [url, ...descriptors] = candidate.trim().split(/\s+/);
+          const absolute = url.startsWith('/') && !url.startsWith('//')
+            ? new URL(url, base).href
+            : url;
+          return [absolute, ...descriptors].join(' ');
+        })
+        .join(', ');
+      return `${prefix}${rewritten}${suffix}`;
+    });
+}
+
 function compactWhitespace(value: string): string {
   return value.replace(/\s+/g, ' ').trim();
 }

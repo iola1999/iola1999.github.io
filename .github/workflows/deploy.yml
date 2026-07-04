@@ -7,10 +7,9 @@ on:
     branches: [master]
   workflow_dispatch:
 
+# 默认最小权限；Pages 发布所需的 pages/id-token 只授给 deploy job
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # 同一分支的新提交取消进行中的旧运行；master 与各 PR 互不取消
 concurrency:
@@ -34,6 +33,8 @@ jobs:
           fc-match 'Noto Sans CJK SC'
       - run: npm ci
       - run: npm test
+      # astro check：.astro / .ts 全量类型检查（astro build 不做完整检查）
+      - run: npm run check
       # prebuild 生成 OG 卡片 / favicon，astro build 产出 dist（含按需 webp 变体）
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
@@ -44,6 +45,9 @@ jobs:
   deploy:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    permissions:
+      pages: write
+      id-token: write
     runs-on: ubuntu-latest
     environment:
       name: github-pages

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { CollectionEntry } from 'astro:content';
 import {
   absoluteUrl,
+  absolutizeHtml,
   breadcrumbJsonLd,
   excerptFromMarkdown,
   postDescription,
@@ -73,6 +74,20 @@ describe('seo helpers', () => {
 
   it('appends OG image version without dropping existing query strings', () => {
     expect(versionedImagePath('/og/example.png?x=1')).toBe('/og/example.png?x=1&v=20260627-quote');
+  });
+
+  it('absolutizes root-relative src/href/srcset in RSS content HTML', () => {
+    const html = '<picture><source type="image/webp" srcset="/optimized/a-768w.webp 768w, /optimized/a-1536w.webp 1536w"/>'
+      + '<img src="/upload/a.png" alt=""/></picture><a href="/2026/06/18/Example-Post/">继续阅读</a>';
+    const out = absolutizeHtml(html);
+    expect(out).toContain('srcset="https://678234.xyz/optimized/a-768w.webp 768w, https://678234.xyz/optimized/a-1536w.webp 1536w"');
+    expect(out).toContain('src="https://678234.xyz/upload/a.png"');
+    expect(out).toContain('href="https://678234.xyz/2026/06/18/Example-Post/"');
+  });
+
+  it('leaves absolute, protocol-relative and anchor URLs untouched', () => {
+    const html = '<a href="https://example.com/x">a</a><img src="//cdn.example.com/i.png"/><a href="#section">b</a>';
+    expect(absolutizeHtml(html)).toBe(html);
   });
 
   it('builds BlogPosting JSON-LD with canonical article URL', () => {

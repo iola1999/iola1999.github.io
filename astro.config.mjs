@@ -3,14 +3,23 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
+// Astro 7 默认换用原生 Markdown 管线；显式走 unified()，
+// 保留下方自定义 rehype 插件与 remark 时代的 heading slug / shiki 行为
+import { unified } from '@astrojs/markdown-remark';
 import sitemap from '@astrojs/sitemap';
 import sharp from 'sharp';
+import { SITE } from './src/config';
+import { permalinkFor } from './src/lib/posts';
+import { readPostsFromDisk } from './scripts/lib/read-posts.mjs';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(rootDir, 'public');
+/** @type {Map<string, Promise<{ width: number, height: number } | undefined>>} */
 const dimensionCache = new Map();
+/** @type {Map<string, Promise<Array<{ width: number, src: string }> | undefined>>} */
 const webpCache = new Map();
 
+/** @param {string} filePath */
 async function readImageDimensions(filePath) {
   if (dimensionCache.has(filePath)) return dimensionCache.get(filePath);
 
@@ -25,6 +34,7 @@ async function readImageDimensions(filePath) {
   return dimensions;
 }
 
+/** @param {string} src */
 function publicImagePath(src) {
   if (!src.startsWith('/')) return undefined;
 
@@ -37,6 +47,7 @@ function publicImagePath(src) {
   }
 }
 
+/** @param {string} filePath */
 function webPathForPublicFile(filePath) {
   const relativePath = path.relative(publicDir, filePath).split(path.sep).join('/');
   return `/${relativePath}`;
@@ -49,6 +60,8 @@ const WEBP_QUALITY = 82;
 /**
  * 为一张公共图片生成多宽度 webp 变体（不超过原图宽、去重升序）。
  * 返回 [{ width, src }]（升序）；若无可用变体则 undefined（退回原始 <img>）。
+ * @param {string} filePath
+ * @param {number | undefined} originalWidth
  */
 async function ensureWebpVariants(filePath, originalWidth) {
   const ext = path.extname(filePath).toLowerCase();
@@ -94,6 +107,21 @@ async function ensureWebpVariants(filePath, originalWidth) {
   return promise;
 }
 
+/**
+ * @typedef {{
+ *   type?: string,
+ *   tagName?: string,
+ *   properties?: Record<string, unknown>,
+ *   children?: HastNode[],
+ * }} HastNode
+ */
+
+/**
+ * @param {HastNode} node
+ * @param {(node: HastNode, parent: HastNode | undefined, index: number | undefined) => void} visitor
+ * @param {HastNode} [parent]
+ * @param {number} [index]
+ */
 function visitImages(node, visitor, parent, index) {
   if (!node || typeof node !== 'object') return;
   if (node.type === 'element' && node.tagName === 'img') {
@@ -105,8 +133,10 @@ function visitImages(node, visitor, parent, index) {
 }
 
 function rehypeImagePerformance() {
+  /** @param {HastNode} tree */
   return async (tree) => {
     let imageIndex = 0;
+    /** @type {Promise<void>[]} */
     const imageTasks = [];
 
     visitImages(tree, (node, parent, index) => {
@@ -128,14 +158,15 @@ function rehypeImagePerformance() {
             properties.height ??= dimensions.height;
           }
 
-          if (!parent || typeof index !== 'number') return;
+          const siblings = parent?.children;
+          if (!siblings || typeof index !== 'number') return;
 
           const variants = await ensureWebpVariants(filePath, dimensions?.width);
           if (!variants) return;
 
           const srcset = variants.map((variant) => `${variant.src} ${variant.width}w`).join(', ');
 
-          parent.children[index] = {
+          siblings[index] = {
             type: 'element',
             tagName: 'picture',
             properties: {},
@@ -164,16 +195,34 @@ function rehypeImagePerformance() {
   };
 }
 
+// sitemap lastmod：文章页取 updatedDate ?? date；其余页面（首页/分类/标签）不标
+const publishedPosts = (await readPostsFromDisk(path.join(rootDir, 'src/content/posts')))
+  .filter((post) => !post.draft);
+const lastmodByUrl = new Map(publishedPosts.map((post) => [
+  new URL(permalinkFor(post.id, post.date), SITE.url).href,
+  (post.updatedDate ?? post.date).toISOString(),
+]));
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://678234.xyz',
+  site: SITE.url,
   // 目录式输出 + 末尾斜杠：复刻 Jekyll /:y/:m/:d/:slug/ 的 index.html 产物
   trailingSlash: 'always',
+  // Astro 7 默认按 JSX 规则压缩空白，会吞行内元素间的空格；恢复 HTML 语义压缩
+  compressHTML: true,
   build: {
     format: 'directory',
   },
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      serialize(item) {
+        const lastmod = lastmodByUrl.get(item.url);
+        return lastmod ? { ...item, lastmod } : item;
+      },
+    }),
+  ],
   markdown: {
+    processor: unified(),
     rehypePlugins: [rehypeImagePerformance],
     shikiConfig: {
       theme: 'github-dark',

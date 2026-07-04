@@ -4,6 +4,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { SITE } from '../config';
 import { getPublishedPosts } from '../lib/content';
 import { postPermalink } from '../lib/posts';
+import { absolutizeHtml } from '../lib/seo';
 
 export async function GET(context) {
   const posts = (await getPublishedPosts()).slice(0, 10);
@@ -12,7 +13,8 @@ export async function GET(context) {
   const items = await Promise.all(
     posts.map(async (post) => {
       const { Content } = await render(post);
-      const content = await container.renderToString(Content);
+      // 阅读器里相对路径的图片/链接会挂：统一绝对化
+      const content = absolutizeHtml(await container.renderToString(Content));
       return {
         title: post.data.title,
         pubDate: post.data.date,

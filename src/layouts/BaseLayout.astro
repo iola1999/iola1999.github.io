@@ -70,6 +70,7 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/feed.xml" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
@@ -78,6 +79,9 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta property="og:site_name" content={SITE.title} />
     <meta property="og:locale" content={SITE.ogLocale} />
     <meta property="og:image" content={socialImage} />
+    {/* 社交图统一为构建生成的 1200×630 卡片（scripts/generate-brand-assets.mjs） */}
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={socialImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
@@ -89,7 +93,7 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     {section && <meta property="article:section" content={section} />}
     {tags.map((tag) => <meta property="article:tag" content={tag} />)}
     {jsonLdItems.map((item) => (
-      <script type="application/ld+json" set:html={safeJsonLd(item)} />
+      <script is:inline type="application/ld+json" set:html={safeJsonLd(item)} />
     ))}
     <meta name="generator" content={Astro.generator} />
   </head>

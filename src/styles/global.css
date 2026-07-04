@@ -374,7 +374,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
     width: var(--toc-w);
   }
   .toc--mobile { display: none; }
-  .toc__desktop-wrap {
+  .toc--desktop-wrap {
     max-height: calc(100vh - 100px); overflow-y: auto;
   }
   .toc__label {

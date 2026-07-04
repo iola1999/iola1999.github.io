@@ -3,6 +3,7 @@ title: 换工作的想法
 date: '2021-10-08T08:00:00+08:00'
 category: 文字
 tags: []
+draft: true
 ---
 
 ## 正文

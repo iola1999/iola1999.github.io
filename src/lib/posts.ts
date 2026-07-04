@@ -10,10 +10,15 @@ function cstParts(date: Date) {
   };
 }
 
-/** 复刻 Jekyll 永久链接 /:year/:month/:day/:slug/（slug = 文件名，保留大小写） */
+/** 复刻 Jekyll 永久链接 /:year/:month/:day/:slug/（slug = 文件名，保留大小写）。
+ *  纯函数版本供 astro.config（sitemap lastmod）等无 CollectionEntry 的场景复用 */
+export function permalinkFor(id: string, date: Date): string {
+  const { y, m, d } = cstParts(date);
+  return `/${y}/${m}/${d}/${id}/`;
+}
+
 export function postPermalink(post: CollectionEntry<'posts'>): string {
-  const { y, m, d } = cstParts(post.data.date);
-  return `/${y}/${m}/${d}/${post.id}/`;
+  return permalinkFor(post.id, post.data.date);
 }
 
 export function formatDate(date: Date): string {

@@ -1,20 +1,20 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import matter from 'gray-matter';
 import sharp from 'sharp';
+// Node ≥22.18 默认支持 type stripping，可直接 import .ts（站点信息单一来源）
+import { SITE } from '../src/config.ts';
+import { readPostsFromDisk } from './lib/read-posts.mjs';
 
 const rootDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const publicDir = path.join(rootDir, 'public');
 const postsDir = path.join(rootDir, 'src/content/posts');
 const ogPostsDir = path.join(publicDir, 'og/posts');
 
-const SITE = {
-  title: 'iolaSay',
-  author: 'iola1999',
-  url: '678234.xyz',
-};
+/** 卡片上展示的域名（去协议） */
+const displayUrl = new URL(SITE.url).host;
 
+// 与 src/styles/global.css :root 浅色令牌保持一致（OG 卡片固定用浅色主题渲染）
 const COLORS = {
   accent: '#c2410c',
   paper: '#fcfcfb',
@@ -139,7 +139,7 @@ function defaultSocialSvg() {
   <g transform="translate(144 164)">${brandMarkSvg({ size: 74 })}</g>
   <text x="144" y="330" fill="${COLORS.ink}" font-family="Georgia, 'Times New Roman', serif" font-size="96" font-weight="700" letter-spacing="-3">${SITE.title}</text>
   <text x="149" y="390" fill="${COLORS.muted}" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="32" letter-spacing=".2">Personal blog by ${SITE.author}</text>
-  <text x="149" y="458" fill="${COLORS.accent}" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="30">${SITE.url}</text>
+  <text x="149" y="458" fill="${COLORS.accent}" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="30">${displayUrl}</text>
 </svg>`;
 }
 
@@ -166,7 +166,7 @@ function postCardSvg(post) {
   <path d="M0 629.5H1200" stroke="${COLORS.border}" stroke-width="1"/>
   <g transform="translate(82 54)">${brandMarkSvg({ size: 48 })}</g>
   <text x="146" y="88" fill="${COLORS.ink}" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="-1">${SITE.title}</text>
-  <text x="82" y="${titleY + titleLines.length * lineHeight + 102}" fill="${COLORS.muted}" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="24">${escapeHtml(date)} · ${SITE.url}</text>
+  <text x="82" y="${titleY + titleLines.length * lineHeight + 102}" fill="${COLORS.muted}" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="24">${escapeHtml(date)} · ${displayUrl}</text>
   ${titleLines.map((line, index) => `<text x="82" y="${titleY + index * lineHeight}" fill="${COLORS.ink}" font-family="'Noto Sans CJK SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif" font-size="${fontSize}" font-weight="700" letter-spacing="-1.6">${escapeHtml(line)}</text>`).join('\n  ')}
   <text x="82" y="${categoryY}" fill="${COLORS.muted}" font-family="'Noto Sans CJK SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif" font-size="32">${escapeHtml(meta)}</text>
 </svg>`;
@@ -216,40 +216,7 @@ async function writeIco(outputPath, pngBuffers) {
 }
 
 async function readPosts() {
-  const posts = [];
-
-  async function walk(dir) {
-    const entries = await fs.readdir(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      const filePath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        await walk(filePath);
-        continue;
-      }
-      if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
-
-      const raw = await fs.readFile(filePath, 'utf8');
-      const { data } = matter(raw);
-      if (data.draft) continue;
-
-      const id = path
-        .relative(postsDir, filePath)
-        .replace(/\.md$/, '')
-        .split(path.sep)
-        .join('/');
-
-      posts.push({
-        id,
-        title: data.title,
-        date: data.date,
-        category: data.category ?? '未分类',
-        tags: data.tags ?? [],
-      });
-    }
-  }
-
-  await walk(postsDir);
-  return posts;
+  return (await readPostsFromDisk(postsDir)).filter((post) => !post.draft);
 }
 
 function encodedPostPath(id) {
