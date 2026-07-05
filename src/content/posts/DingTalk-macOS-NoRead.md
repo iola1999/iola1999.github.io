@@ -85,7 +85,7 @@ codesign -d --entitlements :- /Applications/DingTalk.app 2>&1
 codesign -d --entitlements :- /Applications/DingTalk.app > entitlements.plist 2>/dev/null
 ```
 
-这份文件别手敲——钉钉的 entitlements 有二十多项，漏一项都可能让某些功能哑掉。直接从官方签名导出来用，改动越少越稳。方案 A 重签原样用这份；方案 B 只需把 `com.apple.security.cs.disable-library-validation` 一项翻成 `true`，其余不动：
+这份文件别手敲。钉钉的 entitlements 有二十多项，漏一项都可能让某些功能哑掉。直接从官方签名导出来用，改动越少越稳。方案 A 重签原样用这份；方案 B 只需把 `com.apple.security.cs.disable-library-validation` 一项翻成 `true`，其余不动：
 
 ```bash
 plutil -replace com.apple.security.cs.disable-library-validation -bool true entitlements.plist
@@ -187,7 +187,7 @@ codesign --force --sign - --options runtime \
     /Applications/DingTalk.app
 ```
 
-同样别用 `--deep`——它会连带把内嵌 framework 改成 ad-hoc，某次系统更新后随时触发加载失败、整个客户端打不开。这条坑的细节见方案 B 的警告框。`--options runtime` 则是补回 hardened runtime 标志。
+同样别用 `--deep`，它会连带把内嵌 framework 改成 ad-hoc，某次系统更新后随时触发加载失败、整个客户端打不开。这条坑的细节见方案 B 的警告框。`--options runtime` 则是补回 hardened runtime 标志。
 
 #### 5. 还原
 
@@ -306,7 +306,7 @@ codesign -d --entitlements :- /Applications/DingTalk.app 2>/dev/null > entitleme
 plutil -replace com.apple.security.cs.disable-library-validation -bool true entitlements.plist
 ```
 
-别手敲一份新的——钉钉 entitlements 二十多项，漏一项都可能让某些功能哑掉。从官方签名导出再改，最稳。
+还是那句，别手敲。二十多项 entitlement，漏一项就可能让功能哑掉。从官方签名导出再改，最稳。
 
 #### 2. 重签名 App
 

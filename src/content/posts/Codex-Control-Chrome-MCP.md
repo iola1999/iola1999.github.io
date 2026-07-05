@@ -11,11 +11,11 @@ tags:
 
 > **声明：本文包含 AI 辅助创作。**
 
-最近研究了一下 Codex App 里的 Chrome 控制能力。它和常见的浏览器自动化方案不太一样：不是单独启动一个干净的 Chrome，也不是要求用户开启 `--remote-debugging-port`，而是通过 Codex Chrome Extension 控制用户正在使用的正常 Chrome Profile。
+最近研究了一下 Codex App 里的 Chrome 控制能力。它直接通过 Codex Chrome Extension 控制用户正在使用的正常 Chrome Profile，而不是像常见方案那样另起一个干净的 Chrome，或者要求开启 `--remote-debugging-port`。
 
-这带来一个很实际的好处：已有登录态、Cookie、打开的标签页、安装的扩展都可以复用。对于 Agent 来说，这比每次进入一个全新的浏览器环境更自然，也更接近日常使用浏览器的状态。
+这带来一个很实际的好处：已有登录态、Cookie、打开的标签页、安装的扩展都可以复用。对 Agent 来说，这比每次开一个空白浏览器更接近人日常用浏览器的样子。
 
-这个能力本身很好用，但目前主要服务于 Codex App。我想做的是把这套流程抽出来，以 MCP 的形式提供给其他 Agent 工具使用。
+这个能力本身很好用，但目前主要服务于 Codex App。我想做的是把这套流程抽出来包成 MCP，让别的 Agent 工具也能用。
 
 项目地址：
 
@@ -23,7 +23,7 @@ tags:
 
 ## 起因
 
-之前使用 Chrome DevTools MCP 时，一个明显限制是浏览器环境通常和日常 Chrome Profile 分离。这样做对自动化测试很合理，但对通用 Agent 场景不一定理想。
+之前使用 Chrome DevTools MCP 时，一个明显限制是浏览器环境通常和日常 Chrome Profile 分离。这对自动化测试没问题，但换成通用 Agent 场景就有点别扭。
 
 典型问题包括：
 
@@ -32,11 +32,11 @@ tags:
 - 当前已经打开的标签页无法直接接管；
 - 部分网站对新设备、新环境或新登录态比较敏感。
 
-Codex Chrome Extension 走的是另一条路线。它天然处在用户的正常 Chrome Profile 里，因此更适合需要复用真实浏览器状态的 Agent 场景。
+Codex Chrome Extension 走的是另一条路线。它本来就跑在用户日常的 Chrome Profile 里，要复用真实登录态和扩展时更省事。
 
 ## 关键机制
 
-分析之后可以看到，核心链路不是外部 CDP remote debugging port，而是 Chrome Extension + Native Messaging。
+扒了一下发现，核心链路不是外部的 CDP remote debugging port，而是 Chrome Extension + Native Messaging。
 
 大致结构如下：
 
@@ -48,9 +48,7 @@ Codex Chrome Extension
   -> CDP
 ```
 
-也就是说，扩展负责进入用户的真实 Chrome Profile，Native Messaging host 负责和本地进程通信，最终通过 `chrome.debugger` 发送 CDP 命令。
-
-这也是它可以复用正常 Chrome Profile 的原因：控制入口在浏览器扩展内部，而不是从外部调试端口连接一个额外启动的浏览器实例。
+也就是说，扩展负责进到用户的真实 Chrome Profile，Native Messaging host 负责和本地进程通信，最终通过 `chrome.debugger` 发 CDP 命令。控制入口始终在扩展内部，所以日常 Profile 的登录态、扩展都能直接复用。
 
 ## 做了什么
 
@@ -117,9 +115,9 @@ skills/codex-control-chrome-mcp
 
 ## 结尾
 
-Agent 能力不只取决于模型和工具数量，也取决于工具运行在什么上下文里。浏览器自动化尤其如此。复用真实 Chrome Profile，可以显著降低登录态、扩展、当前页面状态带来的割裂感。
+浏览器自动化这块，跑在哪个 Chrome Profile 里其实挺影响体验的。另开一个干净浏览器对测试很合理，但对日常 Agent 来说，登录态、扩展、当前开着的页面全对不上，用起来总有点割裂。
 
-`codex-control-chrome-mcp` 只是把 Codex Chrome Extension 的这条路径整理成一个可复用的 MCP server。实现并不复杂，但对实际体验有帮助。
+`codex-control-chrome-mcp` 没做什么复杂的事，就是把 Codex Chrome Extension 控制真实 Profile 的这条路径包成 MCP server，让别的 Agent 也能白嫖已有的浏览器状态。代码不多，但省掉重新登录、重装扩展这些麻烦，用起来顺手不少。
 
 项目地址：
 

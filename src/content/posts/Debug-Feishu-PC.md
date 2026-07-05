@@ -41,7 +41,7 @@ tags: []
 
 只是，我们都能调试它了，何不换个更优雅的思路：
 
-先在手机上发送一条消息给自己，然后在消息区域 DOM 右键 `Break on - subtree modificiations`。
+先在手机上发送一条消息给自己，然后在消息区域 DOM 右键 `Break on - subtree modifications`。
 
 ![image-20210914232939856](/upload/images/2021-09-14-Debug-Feishu-PC/dom-breakpoint.png)
 

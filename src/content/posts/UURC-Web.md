@@ -23,7 +23,7 @@ tags:
 
 除了前面说的避开公司电脑的安装限制，还有一个重要原因是 UU 远程在 macOS 上的表现确实不错，尤其是低延迟和高画质。但它没有网页版主控端，这就逼得我不得不拿起 IDA Pro 开始“自力更生”。
 
-目标：一个网页，能登录，能看屏幕，能点鼠标，能打字。最好还能白嫖 Cloudflare 的免费做个中转，直连控制互不干扰。
+目标：一个网页，能登录，能看屏幕，能点鼠标，能打字。最好还能白嫖 Cloudflare 的免费额度做个中转，直连控制互不干扰。
 
 ## 考古现场：逆向、调研与“写 Bug”
 
@@ -33,7 +33,7 @@ tags:
 
 分析发现，这玩意儿的业务逻辑基本都在 Java/Kotlin 层，走的是普通的 HTTPS 请求（网易 `nrd` API）。但最核心的音视频流、信令（Signaling）和 WebRTC 协商，全都缩在 `libstreamer.so` 这个 native 库里。
 
-这就是所谓的“硬骨头”。为了对齐协议，我用了 IDA Pro 盯着那些 native 符号反复摩擦。看到了熟悉的 `socket.io`、`SDP`、`ICE` 以及 `DTLS/SRTP`。基本确定了架构：**业务 API + Socket.io 信令 + WebRTC 数据通道**。
+这就是所谓的“硬骨头”。为了对齐协议，我用了 IDA Pro 盯着那些 native 符号反复摩擦。看到了熟悉的 `socket.io`、`SDP`、`ICE` 以及 `DTLS/SRTP`。基本确定了架构：业务 API + Socket.io 信令 + WebRTC 数据通道。
 
 ### 第二阶段：WebRTC 协议的“买家秀”与“卖家秀”
 
