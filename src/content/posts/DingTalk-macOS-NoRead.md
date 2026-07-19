@@ -15,30 +15,30 @@ tags:
 
 ## 起因
 
-接着 [如何愉快地使用钉钉](/2023/05/27/How-to-use-DingTalk-happily/) 那篇往下写。上次留了个尾巴：「如何不让别人看自己的已读状态」那节，我只放了几个参考链接，这次把 macOS 客户端上的完整实现补上。
+接着 [如何愉快地使用钉钉](/2023/05/27/How-to-use-DingTalk-happily/) 那篇往下写。上次写到「如何不让别人看自己的已读状态」时，我只放了几个参考链接。这次把 macOS 客户端上的做法补全。
 
-直接的触发点是最近刷屏的《置身钉内》。里面有段话：
+最近刷屏的《置身钉内》里有段话：
 
 > 钉钉的基因，从诞生的第一天起，就是永远站在「发信人」立场……为什么卡片里的消息一定要算已读，为什么系统要主动把事推到用户面前，很多答案，都可以回到这个原点。
 
-发消息的人那边，「已读」是省心；收消息的人这边，它有时候就是一只盯着你的眼睛。改不了产品站在哪边，那就只能从客户端这一侧想办法，给自己留一点「装没看见」的余地。遇到难回答的问题，至少还有不说话的机会。
+发消息时，我也喜欢看到「已读」。轮到自己收消息，这两个字有时就像一只盯着人的眼睛。我从客户端这一侧下手，给自己留一点「装没看见」的余地。碰到难回答的问题，至少还能先不说话。
 
 ## 原理
 
 钉钉的已读状态由客户端主动上报。点开会话后，客户端会发送消息状态 RPC，服务器更新状态，再把结果同步给其他设备和消息发送方。
 
-本文采用运行时注入：只有通过启动脚本拉起的进程会加载 hook，普通启动保持原生行为。
+下面只讲运行时注入。通过启动脚本拉起的进程会加载 hook，从 Dock 或 Applications 启动时照常上报已读。
 
-## 真实调用链
+## 调用链
 
-当前版本会发送两类消息状态请求：
+当前版本点开会话时会发送两类状态请求：
 
 ```text
 /r/IDLMessageStatus/updateToViewV2
 /r/IDLMessageStatus/updateToReadV2
 ```
 
-一次点开会话通常先上报 View，再上报 Read。完整链路是：
+顺序通常是先 View，再 Read。调用链如下：
 
 ```text
 用户点开会话
@@ -50,7 +50,7 @@ tags:
   -> 服务器更新消息状态
 ```
 
-这里使用钉钉自己的 LWP RPC，统一发送层位于 GaeaMac。
+这些请求走钉钉自己的 LWP RPC，最后都会进 GaeaMac。
 
 主程序从 `GaeaMac.framework` 动态导入下面这个函数：
 
@@ -60,13 +60,13 @@ wukong::lwp::UserAgent::sendRequest(
     std::shared_ptr<wukong::lwp::RequestContext>)
 ```
 
-因此可以用 fishhook 替换主程序的导入指针，在请求进入 GaeaMac 之前读取 `requestLine`。命中 Read/View 状态路径时直接返回，其余 RPC 调回原函数继续发送。
+用 fishhook 替换主程序的导入指针，就能在请求进入 GaeaMac 前读取 `requestLine`。遇到 Read/View 状态路径时直接返回，其余 RPC 仍交给原函数发送。
 
-这个 hook 修改的是当前进程里的动态导入指针，代码页和安装包内容保持原样。退出进程后，运行时修改自然消失。
+hook 只改当前进程里的动态导入指针，不会碰代码页和安装包内容。进程退出后，这次修改也就没了。
 
 ## 文件结构
 
-准备四个文件：
+先准备这四个文件：
 
 ```text
 dingtalk-read/
@@ -76,7 +76,7 @@ dingtalk-read/
 └── launch_noread.sh
 ```
 
-`fishhook.c` 和 `fishhook.h` 来自 [facebook/fishhook](https://github.com/facebook/fishhook)，本文项目目录中已经附带。
+`fishhook.c` 和 `fishhook.h` 取自 [facebook/fishhook](https://github.com/facebook/fishhook)，项目目录里已经放好了。
 
 ## Hook 源码
 
@@ -346,14 +346,14 @@ echo "DingTalk started: pid=$PID, mode=$MODE"
 echo "Log: $LOG"
 ```
 
-脚本做四件事：
+脚本会处理这些事：
 
 1. 根据源码时间自动编译 `dingtalk_noread.dylib`。
 2. 给 dylib 做 ad-hoc 签名。
 3. 应用更新后自动恢复注入所需的 entitlement。
 4. 通过 `DYLD_INSERT_LIBRARIES` 启动并写入独立日志。
 
-重签命令固定为：
+脚本实际执行的重签命令是：
 
 ```bash
 codesign --force --sign - --options runtime \
@@ -361,7 +361,7 @@ codesign --force --sign - --options runtime \
     /Applications/DingTalk.app
 ```
 
-这条命令保留 hardened runtime，并保持内嵌 framework 的官方签名。
+它会保留 hardened runtime，内嵌 framework 仍使用官方签名。
 
 ## 使用方式
 
@@ -391,13 +391,13 @@ tail -f noread.log
 
 ## 日志判读
 
-注入成功时首先出现：
+注入成功后，日志开头会出现：
 
 ```text
 [NoRead] loaded mode=block rebind=0 original=0x11f1fe158 requestLine=0x11f1bb374
 ```
 
-点开会话后会看到：
+再点开一个会话，会看到：
 
 ```text
 [NoRead] SEEN #1 /r/IDLMessageStatus/updateToViewV2
@@ -415,9 +415,9 @@ tail -f noread.log
 
 ## 验证
 
-先记录启动时间，然后在客户端点开一个新的未读会话。日志中应出现 Read/View 的 `BLOCKED` 记录。
+先记下启动时间，再在客户端点开一个新的未读会话。`noread.log` 里应该出现 Read/View 的 `BLOCKED` 记录。
 
-从当前进程打开的文件中定位原生 `gaea.log`：
+接着从当前进程打开的文件中找到原生 `gaea.log`：
 
 ```bash
 PID=$(pgrep -f '/Applications/.+\.app/Contents/MacOS/DingTalk' | head -1)
@@ -425,20 +425,20 @@ LOG=$(lsof -p "$PID" | awk '/gaea\.log/{print $9}' | tail -1)
 echo "$LOG"
 ```
 
-检查注入启动后的真实发送记录：
+再查注入启动后的发送记录：
 
 ```bash
 grep -E 'send request request_line=/r/IDLMessageStatus/updateTo(Read|View)' \
     "$LOG" | tail -20
 ```
 
-注入日志记录 `BLOCKED`，原生 RPC 日志保持在启动前的最后一条，说明请求已经停在 `wukong::lwp::UserAgent::sendRequest` 这一层。
+如果注入日志有 `BLOCKED`，原生 RPC 日志还停在启动前的最后一条，请求就已经被截在 `wukong::lwp::UserAgent::sendRequest` 这一层。
 
-还可以用同账号的另一台设备做状态对照：电脑端点开新的未读会话后，另一台设备继续保留未读状态。
+也可以拿同账号的另一台设备对照。电脑端点开新的未读会话后，另一台设备应继续显示未读。
 
 ## 普通启动
 
-退出当前注入进程后，直接从 Applications 或 Dock 启动钉钉，进程会按原生逻辑运行。
+退出注入进程，再从 Applications 或 Dock 启动钉钉，已读功能就会恢复。
 
 命令行方式：
 
@@ -448,9 +448,9 @@ open /Applications/DingTalk.app
 
 ## 版本更新
 
-客户端更新后，继续运行同一个启动脚本。脚本会重新读取当前 entitlements、编译 dylib，并完成注入启动。
+客户端更新后仍然运行这个启动脚本。它会重新读取 entitlements、编译 dylib，再启动注入进程。
 
-若 GaeaMac 的 C++ 符号在新版本中发生变化，启动日志里的 `original` 或 `requestLine` 会变成空地址。此时重新用 `nm` 确认两个导出符号即可：
+如果新版本改了 GaeaMac 的 C++ 符号，启动日志里的 `original` 或 `requestLine` 会变成空地址。遇到这种情况，用 `nm` 重新确认两个导出符号：
 
 ```bash
 APP=/Applications/DingTalk.app
@@ -464,8 +464,8 @@ nm -arch arm64 "$GAEA" 2>/dev/null |
     grep '__ZNK4gaea3lwp7Request11requestLineEv'
 ```
 
-## 套话
+## 使用边界
 
-本文基于个人设备、个人账号和官方安装的 macOS 客户端。逆向、调试与 Hook 均用于研究客户端运行机制，请勿用于违法用途。
+本文记录的是个人设备、个人账号和官方安装的 macOS 客户端。文中的逆向、调试与 Hook 只应用于自己拥有或明确获准测试的环境，请勿改动他人数据，也不要拿它规避正常的工作协作。
 
 -END-
