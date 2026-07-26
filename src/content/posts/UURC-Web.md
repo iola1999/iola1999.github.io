@@ -14,6 +14,8 @@ tags:
 > 折腾仅因个人兴趣，记录分享仅为研究学习交流，请勿用于违法用途。
 >
 > 2026-07-19 更新：补上开源后两个月的排查记录，内容来自仓库里的实际提交和测试。
+>
+> 2026-07-26 更新：加上我部署的公共实例地址，以及自部署的说明。
 
 很久没写这种长篇“考古”记录了。最近又开了个坑：[UURC-Web](https://github.com/iola1999/uurc-web)。
 
@@ -89,7 +91,15 @@ Windows 端最初只能看到画面，鼠标和键盘完全没反应，console �
 
 到 7 月，我已经会实际拿 [UURC-Web](https://github.com/iola1999/uurc-web) 干活了。短信验证码登录、账号凭证导入导出、设备状态和控制占用都能在网页里处理，Windows、macOS、Android 和 MuMu 也各自走对了输入路径。
 
-部署有两种方式：Docker 直接拉起，或者放到 Cloudflare Worker + Durable Objects。后者刚好能吃到免费额度。
+部署有两种方式：Docker 直接拉起，或者放到 Cloudflare Worker + Durable Objects，后者刚好能吃到免费额度，细节写在下一节。
+
+## 在线体验
+
+公共实例：[https://uurc.678234.xyz](https://uurc.678234.xyz)
+
+这个入口适合看界面、走一遍基本流程。UU Remote Web 要处理短信登录、账号凭证和带鉴权的 UU API 请求，日常使用建议自己部署，验证码、账号登录和凭证导入这几步只在自己控制或者完全信任的实例上做。
+
+自部署里比较省事的是 Cloudflare Worker + Durable Object。Worker 负责页面、UU API 转发和信令网关，远控的画面、声音和输入仍然由浏览器通过 WebRTC 协商。自动路径会优先尝试局域网或者 P2P 直连，条件不满足时才走 UU 中转，部署到 Cloudflare 上不会关掉直连能力。
 
 ## 后记
 
