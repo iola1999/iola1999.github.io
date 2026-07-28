@@ -1,4 +1,5 @@
 // @ts-check
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -56,6 +57,7 @@ function webPathForPublicFile(filePath) {
 // 正文列宽 760px：1x(768) 覆盖移动端，2x(1536) 覆盖高密度桌面；超宽原图据此降采样
 const VARIANT_WIDTHS = [768, 1536];
 const WEBP_QUALITY = 92;
+const SOURCE_HASH_LENGTH = 12;
 
 /**
  * 为一张公共图片生成多宽度 webp 变体（不超过原图宽、去重升序）。
@@ -71,6 +73,11 @@ async function ensureWebpVariants(filePath, originalWidth) {
 
   const promise = (async () => {
     const sourceStat = await fs.promises.stat(filePath);
+    const source = await fs.promises.readFile(filePath);
+    const sourceHash = createHash('sha256')
+      .update(source)
+      .digest('hex')
+      .slice(0, SOURCE_HASH_LENGTH);
     const relativeNoExt = path.relative(publicDir, filePath).replace(/\.(png|jpe?g)$/i, '');
     const widths = [...new Set(VARIANT_WIDTHS.map((w) => Math.min(w, originalWidth)))]
       .sort((a, b) => a - b);
@@ -78,10 +85,14 @@ async function ensureWebpVariants(filePath, originalWidth) {
     const variants = [];
     for (const width of widths) {
       const isFullSize = width >= originalWidth;
-      const outputPath = path.join(publicDir, 'optimized', `${relativeNoExt}-${width}w.webp`);
+      const outputPath = path.join(
+        publicDir,
+        'optimized',
+        `${relativeNoExt}-${sourceHash}-${width}w.webp`,
+      );
 
       const existingStat = await fs.promises.stat(outputPath).catch(() => undefined);
-      if (existingStat && existingStat.mtimeMs >= sourceStat.mtimeMs) {
+      if (existingStat) {
         // 复用缓存：同尺寸仍要求比原图明显更小才值得用
         if (!isFullSize || existingStat.size < sourceStat.size * 0.95) {
           variants.push({ width, src: webPathForPublicFile(outputPath) });
@@ -89,7 +100,7 @@ async function ensureWebpVariants(filePath, originalWidth) {
         continue;
       }
 
-      const pipeline = sharp(filePath);
+      const pipeline = sharp(source);
       if (!isFullSize) pipeline.resize({ width });
       const webp = await pipeline.webp({ quality: WEBP_QUALITY, effort: 6 }).toBuffer();
       // 同尺寸且没比原图小：转码无收益，跳过
