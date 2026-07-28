@@ -55,7 +55,7 @@ function webPathForPublicFile(filePath) {
 
 // 正文列宽 760px：1x(768) 覆盖移动端，2x(1536) 覆盖高密度桌面；超宽原图据此降采样
 const VARIANT_WIDTHS = [768, 1536];
-const WEBP_QUALITY = 82;
+const WEBP_QUALITY = 92;
 
 /**
  * 为一张公共图片生成多宽度 webp 变体（不超过原图宽、去重升序）。
