@@ -1,169 +1,214 @@
 {
-  "captured_at": "2026-07-28T12:23:03.440552+00:00",
-  "base_url": "http://127.0.0.1:8082",
+  "captured_at": "2026-07-29T15:47:30Z",
+  "base_url": "http://localhost:8080",
+  "analysis_range": {
+    "from": "2026-07-01",
+    "to": "2026-07-29"
+  },
   "viewport_css": {
-    "width": 1422,
-    "height": 800
+    "width": 1807,
+    "height": 985
   },
   "correlation_viewport_css": {
-    "width": 1600,
-    "height": 800
+    "width": 1807,
+    "height": 985
   },
   "device_scale_factor": 2,
+  "privacy": {
+    "full_nicknames": "redacted_except_approved_graph",
+    "uids": "redacted",
+    "graph_root_recorded": false,
+    "graph_image": "user_provided_with_consent"
+  },
   "files": [
     {
-      "file": "ai-array-position.png",
-      "width": 2396,
-      "height": 1056,
-      "bytes": 277058,
-      "sha256": "d8c1388a9d430cde225c1fbb4750980496f098ff24bb31b0204d7f352e0b811e"
-    },
-    {
       "file": "ai-daily-distribution.png",
-      "width": 2396,
+      "width": 2920,
       "height": 1122,
-      "bytes": 256868,
-      "sha256": "3170ea7800ad870f7d0586011f8c98ff71a44274783f8b02dabbface2e6f98f6"
+      "bytes": 304307,
+      "sha256": "e6cc61b146a2e12822c066670a9cb2dfce377a4df20cfabb8d6d5c3a3e1d00e8"
     },
     {
       "file": "ai-duration-distribution.png",
-      "width": 2396,
-      "height": 1234,
-      "bytes": 298234,
-      "sha256": "8f21ea3ffde2ad59ca1e22c1305f733b99fc2c7c22e3a1082421c67d9bb0b4f9"
+      "width": 2920,
+      "height": 1190,
+      "bytes": 269190,
+      "sha256": "eb3bffd26d72c8fae3372323728e727a561faed4f3d9edbcc7a78352c9491d7b"
     },
     {
       "file": "ai-hero-full-preferences.png",
-      "width": 2396,
+      "width": 2920,
       "height": 2700,
-      "bytes": 739021,
-      "sha256": "555529187153d609b98549290ab26506803c87897630d53a0226730cd0383b77"
+      "bytes": 823573,
+      "sha256": "a1eb097de30d72325c86c23f4262848a83f25e701aaac8f0fd88b087dd86c954"
     },
     {
       "file": "ai-hero-pair-preferences.png",
-      "width": 2396,
+      "width": 2920,
       "height": 2700,
-      "bytes": 698237,
-      "sha256": "f10e0b4b8e4499ae1de03c56500a75dbddd358d333f62a4788df5230665fa7b3"
+      "bytes": 821585,
+      "sha256": "6764001ff49bc127264778ed4aa6eb7a6f6b9bc7b450c6161f304c991db61b25"
     },
     {
       "file": "ai-hourly-distribution.png",
-      "width": 2396,
-      "height": 1030,
-      "bytes": 222852,
-      "sha256": "7aea8a488225c1cb06e5fddca16a8801d4eb3052598cf6dc1ad426504892caa1"
+      "width": 2920,
+      "height": 1028,
+      "bytes": 269925,
+      "sha256": "08adfef9555001768d8c438728d75b2df87609c3e96925391e6e18bab494c0d1"
+    },
+    {
+      "file": "ai-identity-reuse.png",
+      "width": 2920,
+      "height": 690,
+      "bytes": 147083,
+      "sha256": "835fa940362b32bd8c76485208bc317a4b95c9325a31244ced2fb20c442f79f0"
+    },
+    {
+      "file": "ai-mode-summary.png",
+      "width": 2920,
+      "height": 608,
+      "bytes": 96022,
+      "sha256": "4127b01cbd3b48472c9b362fd1610ed79ef4395c5b95fbf3d8907a419e0942c4"
     },
     {
       "file": "ai-opponent-history.png",
-      "width": 2396,
+      "width": 2920,
       "height": 1748,
-      "bytes": 347177,
-      "sha256": "16150e8a12b2898d4d57b437d8493542f7bef677f882718e6055ca26e11d1cb4"
+      "bytes": 476572,
+      "sha256": "57b37b0b347f8a97d3566014b40fa8a2323cedef3795d7e3e4fbf84402a1c516"
     },
     {
       "file": "ai-opponent-previous.png",
-      "width": 2396,
+      "width": 2920,
       "height": 1010,
-      "bytes": 287619,
-      "sha256": "b14d0a5a6dec501708de99f7bfc3f4f29eef086be34c72a69d6e9940f0e74d49"
-    },
-    {
-      "file": "ai-playstyle-case.png",
-      "width": 2396,
-      "height": 3090,
-      "bytes": 936027,
-      "sha256": "5f2844f81d72c06b95bf7aa19da78a68b8b7d6925828e84ce570c00e5c536562"
+      "bytes": 338116,
+      "sha256": "0ef09d8af4a1b506c1e041d2b20cb7973c42b958153dfc6b67e6d6090b091c59"
     },
     {
       "file": "ai-proficiency.png",
-      "width": 2396,
-      "height": 470,
-      "bytes": 117846,
-      "sha256": "d52a86e3235c391b107bcdfd17f7bfe46097638f5b2d4e08021b54abc69e5e0f"
+      "width": 2920,
+      "height": 468,
+      "bytes": 123352,
+      "sha256": "106da4acff89ebd31cdb25b21c358e3dbb3ff4c0138ec70ff3bc1e59dd642853"
     },
     {
       "file": "ai-role-distribution.png",
-      "width": 2396,
+      "width": 2920,
       "height": 974,
-      "bytes": 251666,
-      "sha256": "fde9e37d4120777116c33e30455589b353c297aa9d909873f7c1ee9e7f10a329"
+      "bytes": 271062,
+      "sha256": "19ae38d53d634c1e9e5cb4d39f6a72949df7894d0808ddd75551aaef0d042936"
+    },
+    {
+      "file": "bfs-expansion.png",
+      "width": 2920,
+      "height": 2016,
+      "bytes": 272124,
+      "sha256": "42aea26dc93d718477fb7cb96d32155b76d811a69054b706c136012d5b41bd05"
     },
     {
       "file": "collection-overview.png",
-      "width": 2844,
-      "height": 1600,
-      "bytes": 263896,
-      "sha256": "2ae7fb75a90e2525ab872d60b8194a1f1b23fba0923535c945459b7e005ba317"
+      "width": 3000,
+      "height": 1468,
+      "bytes": 227910,
+      "sha256": "ce2e490932ef059f562e578857a1de6ee87269767d57878e39ad50c0be72e6ff"
     },
     {
       "file": "correlation-matrix.png",
-      "width": 2752,
-      "height": 2086,
-      "bytes": 643296,
-      "sha256": "32fece729d664cbb48b3499e285a0a30551367734a12b8158ac47fe98d0bc7fe"
+      "width": 2920,
+      "height": 2010,
+      "bytes": 646503,
+      "sha256": "d73037d7633348e42b389b8bb1f5999b396fbbdde64536ba22e395a3cc2ec749"
     },
     {
       "file": "hero-appearance-winrate.png",
-      "width": 2428,
-      "height": 1126,
-      "bytes": 253705,
-      "sha256": "7adb3fd820fb27dfd25374166fddaf5a1aaa8b3ccd0899835c5cf9b365375c6a"
+      "width": 2920,
+      "height": 1118,
+      "bytes": 269604,
+      "sha256": "368b42e205f083f2dc647eb512b2f7e0356fd935425ff65e57aea86e1f4a3a9c"
     },
     {
       "file": "hourly-activity-trend.png",
-      "width": 2396,
-      "height": 650,
-      "bytes": 73560,
-      "sha256": "ff94e0221acc571f8ce0e8d9067ac43770aa28b115759e7df65798ca5200bbf3"
+      "width": 2920,
+      "height": 648,
+      "bytes": 77542,
+      "sha256": "efe7f2471e681fcae47ecb7537c101a309102cf4cbc003ce8a3b8e64e0b9b677"
     },
     {
       "file": "player-age-distribution.png",
-      "width": 2396,
+      "width": 2920,
       "height": 668,
-      "bytes": 123011,
-      "sha256": "987bc76db4530706f8777c97dde1591f8da56c42059ba23b24cbdc853f451d3a"
+      "bytes": 128607,
+      "sha256": "f44a9206a7e4e24f646b3bac0d464c7f5a580a15b915db6f3341df50dd23dd79"
     },
     {
       "file": "player-engagement-metrics.png",
-      "width": 2752,
+      "width": 2920,
       "height": 1006,
-      "bytes": 144801,
-      "sha256": "e890760c82f7891d4546f37e52b673543912c8be91d6f80ca2dce6d024452be1"
+      "bytes": 125627,
+      "sha256": "63597ca73a1c463ed015c573c514044fac855c232bd499611e8903683042e7e2"
     },
     {
       "file": "rank-distribution.png",
-      "width": 2396,
+      "width": 2920,
       "height": 870,
-      "bytes": 86809,
-      "sha256": "41f125b13d3c3270231db2172812702ca0642d583e987b52c0dd3c3ced68bec3"
+      "bytes": 59487,
+      "sha256": "6f065b24e13e6e8dd5c4abaa410347fde2b942aace0de726b2d30e04d37c3e75"
     },
     {
       "file": "ranked-ai-placement.png",
-      "width": 2396,
-      "height": 828,
-      "bytes": 97249,
-      "sha256": "a1cc570216c1a18e6a0d172aeae4f56c13daddb47a89ce414e2436217ecd3e12"
+      "width": 2920,
+      "height": 826,
+      "bytes": 100306,
+      "sha256": "8be857cab2d64cca0d0332846661c9bf34017f730b3a4f4346b04d933366dfa1"
+    },
+    {
+      "file": "rename-activity.png",
+      "width": 2920,
+      "height": 1342,
+      "bytes": 351126,
+      "sha256": "41fb0c3257df6992730b23b9f0e182211a34d19edd0880b704bae024e199a274"
     },
     {
       "file": "squad-coordination.png",
       "width": 1520,
       "height": 554,
-      "bytes": 97694,
-      "sha256": "a2ae85971204f567bcb41cc33a279c655c576cf61a5343b12ded4f414c11a3b4"
+      "bytes": 114176,
+      "sha256": "c05c97da8e771c4296ce2785a04b148202fb0099da735aae8cce3035c25336d8"
     },
     {
       "file": "squad-duration.png",
-      "width": 2396,
-      "height": 650,
-      "bytes": 119126,
-      "sha256": "a02514137ddce34154ea340d365e4103fe56b1e2242cf597224b6701f5a380c7"
+      "width": 2920,
+      "height": 648,
+      "bytes": 129844,
+      "sha256": "0ed8366e0a9f520548b62c2aa8e2c7fd76c42c90f2fc335ddde70d24d39e6dfe"
+    },
+    {
+      "file": "star-trend.png",
+      "width": 1936,
+      "height": 836,
+      "bytes": 109220,
+      "sha256": "60ddfb1b8ad5c15639b78bbdeeda9cfe3ffc353031e343e5b52b4c097eb2f3b0"
+    },
+    {
+      "file": "strict-party-graph.png",
+      "width": 2954,
+      "height": 1698,
+      "bytes": 712607,
+      "sha256": "4246f23ef17f7ee9b8b7c72668f02a9d08d1c80c0cf14bd55e8d69718d8f4b7a"
     },
     {
       "file": "team-composition.png",
       "width": 1520,
-      "height": 1294,
-      "bytes": 163212,
-      "sha256": "6a9ff436c0a347a95a8c1b070289698895258fcb73c077d495dadb926c9be483"
+      "height": 1244,
+      "bytes": 183664,
+      "sha256": "faebc20c6a4be65f758d0842f46125bc5a738d46a8a28991e00fa016c3feafa5"
+    },
+    {
+      "file": "zone-pseudo-rate.png",
+      "width": 1520,
+      "height": 808,
+      "bytes": 104755,
+      "sha256": "9eab167a2d5b836f8635919876ef685147eb549a34013461044bfcf35d2548aa"
     }
   ]
 }
