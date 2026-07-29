@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-29T16:03:06Z",
+  "captured_at": "2026-07-29T16:59:11Z",
   "base_url": "http://localhost:8080",
   "analysis_range": {
     "from": "2026-07-01",
@@ -18,6 +18,30 @@
   "graph": {
     "graph_image": "user_provided"
   },
+  "capture_batches": [
+    {
+      "method": "chrome_cdp",
+      "viewport_css": {
+        "width": 1600,
+        "height": 1000
+      },
+      "files": [
+        "channel-platform-comparison.png",
+        "match-duration-distribution.png",
+        "rank-combat-trend.png"
+      ]
+    },
+    {
+      "method": "chrome_cdp",
+      "viewport_css": {
+        "width": 1900,
+        "height": 1100
+      },
+      "files": [
+        "ranked-single-match-boards.png"
+      ]
+    }
+  ],
   "files": [
     {
       "file": "ai-daily-distribution.png",
@@ -104,6 +128,13 @@
       "sha256": "42aea26dc93d718477fb7cb96d32155b76d811a69054b706c136012d5b41bd05"
     },
     {
+      "file": "channel-platform-comparison.png",
+      "width": 2752,
+      "height": 670,
+      "bytes": 160381,
+      "sha256": "d2e212008ec01abc304781e07a87e9187a4b9b25af341f66979d830c307107b0"
+    },
+    {
       "file": "collection-overview.png",
       "width": 3000,
       "height": 1468,
@@ -132,6 +163,13 @@
       "sha256": "efe7f2471e681fcae47ecb7537c101a309102cf4cbc003ce8a3b8e64e0b9b677"
     },
     {
+      "file": "match-duration-distribution.png",
+      "width": 1824,
+      "height": 590,
+      "bytes": 60744,
+      "sha256": "b1024436d93a04f7ba4b8c53eb20c29deea7a403f9d7e506a45e3ca2d63fe539"
+    },
+    {
       "file": "player-age-distribution.png",
       "width": 2920,
       "height": 668,
@@ -146,6 +184,13 @@
       "sha256": "63597ca73a1c463ed015c573c514044fac855c232bd499611e8903683042e7e2"
     },
     {
+      "file": "rank-combat-trend.png",
+      "width": 1520,
+      "height": 588,
+      "bytes": 49344,
+      "sha256": "684a7a5e11c82665005909b289db865ad85fc3891a616b6dbfe0732fa9f5a0bc"
+    },
+    {
       "file": "rank-distribution.png",
       "width": 2920,
       "height": 870,
@@ -158,6 +203,13 @@
       "height": 826,
       "bytes": 100306,
       "sha256": "8be857cab2d64cca0d0332846661c9bf34017f730b3a4f4346b04d933366dfa1"
+    },
+    {
+      "file": "ranked-single-match-boards.png",
+      "width": 3120,
+      "height": 948,
+      "bytes": 444250,
+      "sha256": "28e7b91bbf08175af07cc8af011b93be68b5678a6a3cc1279568da32afe7924b"
     },
     {
       "file": "rename-activity.png",
