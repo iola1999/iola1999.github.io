@@ -54,13 +54,6 @@
   ],
   "files": [
     {
-      "file": "ai-daily-distribution.png",
-      "width": 2920,
-      "height": 1122,
-      "bytes": 304307,
-      "sha256": "e6cc61b146a2e12822c066670a9cb2dfce377a4df20cfabb8d6d5c3a3e1d00e8"
-    },
-    {
       "file": "ai-duration-distribution.png",
       "width": 2920,
       "height": 1190,
@@ -80,13 +73,6 @@
       "height": 2700,
       "bytes": 821585,
       "sha256": "6764001ff49bc127264778ed4aa6eb7a6f6b9bc7b450c6161f304c991db61b25"
-    },
-    {
-      "file": "ai-hourly-distribution.png",
-      "width": 2920,
-      "height": 1028,
-      "bytes": 269925,
-      "sha256": "08adfef9555001768d8c438728d75b2df87609c3e96925391e6e18bab494c0d1"
     },
     {
       "file": "ai-identity-reuse.png",
