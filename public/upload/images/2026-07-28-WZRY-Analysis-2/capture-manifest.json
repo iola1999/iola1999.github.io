@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-29T16:59:11Z",
+  "captured_at": "2026-07-29T17:29:31Z",
   "base_url": "http://localhost:8080",
   "analysis_range": {
     "from": "2026-07-01",
@@ -39,6 +39,16 @@
       },
       "files": [
         "ranked-single-match-boards.png"
+      ]
+    },
+    {
+      "method": "chrome_cdp",
+      "viewport_css": {
+        "width": 1422,
+        "height": 800
+      },
+      "files": [
+        "ai-playstyle-case.png"
       ]
     }
   ],
@@ -105,6 +115,13 @@
       "height": 1010,
       "bytes": 338116,
       "sha256": "0ef09d8af4a1b506c1e041d2b20cb7973c42b958153dfc6b67e6d6090b091c59"
+    },
+    {
+      "file": "ai-playstyle-case.png",
+      "width": 2396,
+      "height": 3090,
+      "bytes": 954845,
+      "sha256": "3d61dda59dc7b1555ede650d6b370376ef1448fe14d351177153fe64e7f27f67"
     },
     {
       "file": "ai-proficiency.png",
