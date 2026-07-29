@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-29T15:47:30Z",
+  "captured_at": "2026-07-29T16:03:06Z",
   "base_url": "http://localhost:8080",
   "analysis_range": {
     "from": "2026-07-01",
@@ -14,11 +14,9 @@
     "height": 985
   },
   "device_scale_factor": 2,
-  "privacy": {
-    "full_nicknames": "redacted_except_approved_graph",
-    "uids": "redacted",
-    "graph_root_recorded": false,
-    "graph_image": "user_provided_with_consent"
+  "player_identifiers": "shown_as_rendered",
+  "graph": {
+    "graph_image": "user_provided"
   },
   "files": [
     {
@@ -109,8 +107,8 @@
       "file": "collection-overview.png",
       "width": 3000,
       "height": 1468,
-      "bytes": 227910,
-      "sha256": "ce2e490932ef059f562e578857a1de6ee87269767d57878e39ad50c0be72e6ff"
+      "bytes": 224040,
+      "sha256": "0968685574eb84abdf34984f77736984fa5bdbb536ba192b6af9f675c8116e9f"
     },
     {
       "file": "correlation-matrix.png",
@@ -164,9 +162,9 @@
     {
       "file": "rename-activity.png",
       "width": 2920,
-      "height": 1342,
-      "bytes": 351126,
-      "sha256": "41fb0c3257df6992730b23b9f0e182211a34d19edd0880b704bae024e199a274"
+      "height": 1340,
+      "bytes": 365610,
+      "sha256": "7b0906dc310fb06e255316a84a98a73b54559fb7aaee6523bd3bdf8c179170cf"
     },
     {
       "file": "squad-coordination.png",
