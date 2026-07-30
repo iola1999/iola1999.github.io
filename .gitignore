@@ -6,6 +6,7 @@ _site/
 # 不入库以免每次加文章/图片产生二进制 diff。品牌资源(favicon/social-card)仍保留提交。
 public/og/
 public/optimized/
+public/upload/images/**/capture-manifest.json
 
 # dependencies
 node_modules/
