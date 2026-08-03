@@ -88,12 +88,6 @@ Java 层负责识别触摸暗码并切换显示开关。Unity/IL2CPP 层能找�
 
 对局中使用动态调试工具会触发腾讯 TerSafe 检测，所以调用面板前还得先处理 TP。
 
-### TP 反外挂绕过
-
-对局中 TerSafe（`libtersafe.so` + `libtprt.so`）会检测动态调试工具并触发进程崩溃。
-
-TP 检测线程由 `libtprt.so` 里的线程创建函数启动。我的做法是在选服页用 ptrace 冻结游戏进程，把该函数入口的 4 字节指令改成 RET。写入期间目标进程一直处于冻结状态，恢复运行后检测线程不会启动。这样进对局时没有再出现 crash 或 tombstone。
-
 ### 唤起方式
 
 一开始我用短时 Frida 调用确认了面板存在，随后两次遇到封号。`frida-agent.so` 注入后会留在进程里，`frida-server` 还要监听端口，这些都是 TP 的检测目标。实际链路是 TP 发现异常、进程崩溃、tombstone 上报，最后由服务器标记账号。
@@ -160,14 +154,3 @@ metadata 中的 `CheatCommandBattleEntry` 一共有 23 个方法。下面这些�
 | `sgame_qtsvfs_compare_blocks.py` | 正式服/体验服资源块字节级对比 |
 
 设备侧工具路径：`/data/adb/.sgame_diag/`。
-
-### 后续待补充
-
-- [x] 训练营中唤起「策划属性调试」面板
-- [x] TP 反外挂绕过（libtprt patch + ptrace 安全写入）
-- [ ] `_GMBluePrintFrameCommand`（5 参数）蓝图调试面板
-- [ ] `SendCommand`（7 参数）对局内调试命令发送
-- [ ] 「策划属性调试」面板 Canvas 缩放适配（当前 UI 偏小）
-- [ ] 旧截图 `DldGMPanel` / `OpenGM` 资源链的完整唤起路径
-- [ ] `CCheatSystem.OpenCheatForm()` 是否还可单独强拉旧版命令列表
-- [ ] 当前版本 GM 命令资源和旧截图命令列表的差异
