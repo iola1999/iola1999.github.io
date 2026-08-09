@@ -5,8 +5,8 @@ export const SITE = {
   url: 'https://678234.xyz',
   locale: 'zh-CN',
   ogLocale: 'zh_CN',
-  ogImageVersion: '20260627-quote',
-  defaultImage: '/social-card.png?v=20260627-quote',
+  ogImageVersion: '20260809-editorial',
+  defaultImage: '/social-card.png?v=20260809-editorial',
   github: 'https://github.com/iola1999',
   email: 'fwl1998@foxmail.com',
   /** 导航 */

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 // Node ≥22.18 默认支持 type stripping，可直接 import .ts（站点信息单一来源）
 import { SITE } from '../src/config.ts';
+import { excerptFromMarkdown, truncateDescription } from '../src/lib/markdown-summary.ts';
 import { readPostsFromDisk } from './lib/read-posts.mjs';
 
 const rootDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -14,15 +15,20 @@ const ogPostsDir = path.join(publicDir, 'og/posts');
 /** 卡片上展示的域名（去协议） */
 const displayUrl = new URL(SITE.url).host;
 
-// 与 src/styles/global.css :root 浅色令牌保持一致（OG 卡片固定用浅色主题渲染）
+const CARD = {
+  left: 74,
+  right: 1126,
+  width: 1052,
+};
+
+// OG 卡片固定使用白色主题；橙色沿用站点品牌色。
 const COLORS = {
   accent: '#c2410c',
-  paper: '#fcfcfb',
-  surface: '#fffefd',
+  white: '#ffffff',
   ink: '#1f1d1b',
-  muted: '#6b6660',
-  border: '#eadfd1',
-  teal: '#0f766e',
+  body: '#34312e',
+  muted: '#77716b',
+  line: '#ebe7e3',
 };
 
 function escapeHtml(value = '') {
@@ -49,13 +55,23 @@ function charUnits(char) {
   return isWideChar(char) ? 1 : 0.72;
 }
 
-function wrapText(text, maxUnits, maxLines) {
+function normalizeText(text) {
+  return String(text ?? '').replace(/\s+/gu, ' ').trim();
+}
+
+function measureText(text) {
+  return [...text].reduce((sum, char) => sum + charUnits(char), 0);
+}
+
+export function wrapText(text, maxUnits, maxLines, { ellipsis = true } = {}) {
+  const source = normalizeText(text);
   const lines = [];
   let line = '';
   let units = 0;
   let lastBreak = -1;
+  let truncated = false;
 
-  for (const char of text) {
+  for (const char of source) {
     const nextUnits = units + charUnits(char);
     if (/\s/u.test(char)) lastBreak = line.length;
 
@@ -73,7 +89,11 @@ function wrapText(text, maxUnits, maxLines) {
       }
       lastBreak = -1;
 
-      if (lines.length === maxLines) break;
+      if (lines.length === maxLines) {
+        truncated = true;
+        line = '';
+        break;
+      }
       continue;
     }
 
@@ -83,15 +103,53 @@ function wrapText(text, maxUnits, maxLines) {
 
   if (line && lines.length < maxLines) lines.push(line.trim());
 
-  if (lines.length === maxLines) {
+  if (!truncated && lines.length === maxLines) {
     const consumed = lines.join('').replace(/\s/g, '').length;
-    const total = text.replace(/\s/g, '').length;
-    if (consumed < total) {
-      lines[maxLines - 1] = `${lines[maxLines - 1].replace(/[，。,.!！?？、；;:\s]+$/u, '')}…`;
-    }
+    const total = source.replace(/\s/g, '').length;
+    truncated = consumed < total;
   }
 
-  return lines.filter(Boolean);
+  if (truncated && ellipsis && lines.length > 0) {
+    lines[lines.length - 1] = `${lines[lines.length - 1].replace(/[，。,.!！?？、；;:\s]+$/u, '')}…`;
+  }
+
+  return { lines: lines.filter(Boolean), truncated };
+}
+
+export function titleLayout(title) {
+  const source = normalizeText(title);
+  if (measureText(source) <= 16.2) {
+    return { lines: [source], fontSize: 64, lineHeight: 76, truncated: false };
+  }
+
+  const chars = [...source];
+  let best;
+  for (let index = 1; index < chars.length; index += 1) {
+    const left = chars.slice(0, index).join('').trim();
+    const right = chars.slice(index).join('').trim();
+    if (!left || !right) continue;
+
+    const leftUnits = measureText(left);
+    const rightUnits = measureText(right);
+    if (leftUnits > 18.2 || rightUnits > 18.2) continue;
+
+    const previous = chars[index - 1];
+    const next = chars[index];
+    let score = Math.abs(leftUnits - rightUnits);
+    if (/[A-Za-z0-9]/u.test(previous) && /[A-Za-z0-9]/u.test(next)) score += 100;
+    if (/[，。,.!！?？、；;:：)\]】》」』]/u.test(next)) score += 40;
+    if (/[(\[【《「『]/u.test(previous)) score += 40;
+    if (/\s/u.test(previous) || /\s/u.test(next)) score -= 0.4;
+
+    if (!best || score < best.score) best = { lines: [left, right], score };
+  }
+
+  if (best) {
+    return { lines: best.lines, fontSize: 56, lineHeight: 68, truncated: false };
+  }
+
+  const wrapped = wrapText(source, 18.2, 2);
+  return { ...wrapped, fontSize: 54, lineHeight: 66 };
 }
 
 // 单曲线引号标记（呼应 iolaSay / 言）。在 512 基准坐标系绘制，按 size 等比缩放。
@@ -108,48 +166,49 @@ function brandMarkSvg({ size = 72 } = {}) {
     </g>`;
 }
 
-function baseBackgroundSvg() {
-  return `
-    <defs>
-      <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-        <stop offset="0%" stop-color="#fff7ed"/>
-        <stop offset="48%" stop-color="${COLORS.paper}"/>
-        <stop offset="100%" stop-color="#e7f0ff"/>
-      </linearGradient>
-      <radialGradient id="orb" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fb923c" stop-opacity=".55"/>
-        <stop offset="100%" stop-color="#fb923c" stop-opacity="0"/>
-      </radialGradient>
-      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#7c2d12" flood-opacity=".14"/>
-      </filter>
-    </defs>
-    <rect width="1200" height="630" fill="url(#bg)"/>
-    <circle cx="1046" cy="112" r="252" fill="url(#orb)"/>
-    <circle cx="128" cy="558" r="220" fill="${COLORS.teal}" opacity=".08"/>
-    <path d="M86 104h1028v422H86z" fill="${COLORS.surface}" opacity=".80" filter="url(#shadow)"/>
-    <path d="M86 104h1028v422H86z" fill="none" stroke="${COLORS.border}" stroke-width="2"/>`;
+function brandHeaderSvg() {
+  return `<g transform="translate(${CARD.left} 54)">${brandMarkSvg({ size: 48 })}</g>
+  <text x="138" y="91" fill="${COLORS.ink}" font-family="Georgia, 'Times New Roman', serif" font-size="32" font-weight="700" letter-spacing="0">${escapeHtml(SITE.title)}</text>`;
 }
 
-function defaultSocialSvg() {
+export function defaultSocialSvg() {
+  const [headline, ...descriptionParts] = SITE.description.split('·').map((part) => part.trim());
+  const description = [...descriptionParts, SITE.author].filter(Boolean).join(' · ');
+
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">iolaSay social card</title>
   <desc id="desc">Default social sharing image for iolaSay.</desc>
-  ${baseBackgroundSvg()}
-  <g transform="translate(144 164)">${brandMarkSvg({ size: 74 })}</g>
-  <text x="144" y="330" fill="${COLORS.ink}" font-family="Georgia, 'Times New Roman', serif" font-size="96" font-weight="700" letter-spacing="-3">${SITE.title}</text>
-  <text x="149" y="390" fill="${COLORS.muted}" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="32" letter-spacing=".2">Personal blog by ${SITE.author}</text>
-  <text x="149" y="458" fill="${COLORS.accent}" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="30">${displayUrl}</text>
+  <rect width="1200" height="630" fill="${COLORS.white}"/>
+  ${brandHeaderSvg()}
+  <text x="${CARD.left}" y="310" fill="${COLORS.ink}" font-family="'Noto Serif CJK SC', 'Songti SC', 'STSong', Georgia, serif" font-size="96" font-weight="700" letter-spacing="0">${escapeHtml(headline)}</text>
+  <text x="78" y="382" fill="${COLORS.body}" font-family="'Noto Sans CJK SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif" font-size="38" letter-spacing="0">${escapeHtml(description)}</text>
+  <path d="M${CARD.left} 548H${CARD.right}" stroke="${COLORS.line}" stroke-width="2"/>
+  <text x="${CARD.left}" y="590" fill="${COLORS.muted}" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="22" letter-spacing="0">${displayUrl}</text>
+  <text x="${CARD.right}" y="590" text-anchor="end" fill="${COLORS.muted}" font-family="'Noto Sans CJK SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif" font-size="22" letter-spacing="0">${escapeHtml(SITE.author)}</text>
 </svg>`;
 }
 
-function postCardSvg(post) {
-  const titleLines = wrapText(post.title, 14.4, 3);
-  const fontSize = titleLines.length >= 3 ? 54 : 62;
-  const lineHeight = fontSize * 1.17;
-  const titleY = titleLines.length >= 3 ? 216 : 238;
-  const categoryY = titleY + titleLines.length * lineHeight + 42;
-  const meta = [post.category, ...(post.tags ?? []).slice(0, 3)].filter(Boolean).join(' / ');
+export function postCardSummary(post) {
+  const explicitDescription = normalizeText(post.description);
+  if (explicitDescription) return truncateDescription(explicitDescription);
+  return excerptFromMarkdown(post.body) ?? SITE.description;
+}
+
+export function postCardSvg(post) {
+  const title = titleLayout(post.title);
+  const titleFirstY = title.lines.length === 1 ? 220 : 190;
+  const titleLastY = titleFirstY + (title.lines.length - 1) * title.lineHeight;
+  const summaryFirstY = titleLastY + (title.lines.length === 1 ? 98 : 88);
+  const summaryLineHeight = 51;
+  const summaryMaxLines = title.lines.length === 1 ? 5 : 4;
+  const summary = wrapText(postCardSummary(post), 28.5, summaryMaxLines, { ellipsis: false });
+  const summaryTop = summaryFirstY - 36;
+  const summaryBottom = Math.min(536, summaryFirstY + (summary.lines.length - 1) * summaryLineHeight + 28);
+  const fadeStart = summaryFirstY + Math.max(1, summary.lines.length - 2) * summaryLineHeight - 14;
+  const fadeOffset = Math.max(0, Math.min(100, ((fadeStart - summaryTop) / (summaryBottom - summaryTop)) * 100));
+  const tags = (post.tags ?? []).slice(0, 3).map((tag) => `#${tag}`);
+  const metaTail = tags.length > 0 ? ` · ${tags.join(' · ')}` : '';
+  const metaText = wrapText(`${post.category}${metaTail}`, 38, 1).lines[0] ?? post.category;
   const date = new Date(post.date).toLocaleDateString('zh-CN', {
     timeZone: 'Asia/Shanghai',
     year: 'numeric',
@@ -160,15 +219,27 @@ function postCardSvg(post) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">${escapeHtml(post.title)}</title>
   <desc id="desc">${escapeHtml(SITE.title)} article card.</desc>
-  <rect width="1200" height="630" fill="${COLORS.paper}"/>
-  <circle cx="1010" cy="92" r="260" fill="#fb923c" opacity=".10"/>
-  <circle cx="315" cy="315" r="250" fill="${COLORS.teal}" opacity=".035"/>
-  <path d="M0 629.5H1200" stroke="${COLORS.border}" stroke-width="1"/>
-  <g transform="translate(82 54)">${brandMarkSvg({ size: 48 })}</g>
-  <text x="146" y="88" fill="${COLORS.ink}" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="-1">${SITE.title}</text>
-  <text x="82" y="${titleY + titleLines.length * lineHeight + 102}" fill="${COLORS.muted}" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="24">${escapeHtml(date)} · ${displayUrl}</text>
-  ${titleLines.map((line, index) => `<text x="82" y="${titleY + index * lineHeight}" fill="${COLORS.ink}" font-family="'Noto Sans CJK SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif" font-size="${fontSize}" font-weight="700" letter-spacing="-1.6">${escapeHtml(line)}</text>`).join('\n  ')}
-  <text x="82" y="${categoryY}" fill="${COLORS.muted}" font-family="'Noto Sans CJK SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif" font-size="32">${escapeHtml(meta)}</text>
+  <rect width="1200" height="630" fill="${COLORS.white}"/>
+  ${summary.truncated ? `<defs>
+    <linearGradient id="summaryFade" gradientUnits="userSpaceOnUse" x1="0" y1="${summaryTop}" x2="0" y2="${summaryBottom}">
+      <stop offset="0%" stop-color="#fff"/>
+      <stop offset="${fadeOffset.toFixed(1)}%" stop-color="#fff"/>
+      <stop offset="${(fadeOffset + (100 - fadeOffset) * 0.44).toFixed(1)}%" stop-color="#d4d4d4"/>
+      <stop offset="${(fadeOffset + (100 - fadeOffset) * 0.76).toFixed(1)}%" stop-color="#707070"/>
+      <stop offset="100%" stop-color="#000"/>
+    </linearGradient>
+    <mask id="summaryMask" maskUnits="userSpaceOnUse" x="${CARD.left}" y="${summaryTop}" width="${CARD.width}" height="${summaryBottom - summaryTop}">
+      <rect x="${CARD.left}" y="${summaryTop}" width="${CARD.width}" height="${summaryBottom - summaryTop}" fill="url(#summaryFade)"/>
+    </mask>
+  </defs>` : ''}
+  ${brandHeaderSvg()}
+  ${title.lines.map((line, index) => `<text x="${CARD.left}" y="${titleFirstY + index * title.lineHeight}" fill="${COLORS.ink}" font-family="'Noto Sans CJK SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif" font-size="${title.fontSize}" font-weight="700" letter-spacing="0">${escapeHtml(line)}</text>`).join('\n  ')}
+  <g${summary.truncated ? ' mask="url(#summaryMask)"' : ''}>
+    ${summary.lines.map((line, index) => `<text x="${CARD.left}" y="${summaryFirstY + index * summaryLineHeight}" fill="${COLORS.body}" font-family="'Noto Sans CJK SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif" font-size="35" font-weight="400" letter-spacing="0">${escapeHtml(line)}</text>`).join('\n    ')}
+  </g>
+  <path d="M${CARD.left} 548H${CARD.right}" stroke="${COLORS.line}" stroke-width="2"/>
+  <text x="${CARD.left}" y="590" fill="${COLORS.muted}" font-family="'Noto Sans CJK SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif" font-size="22" letter-spacing="0">${escapeHtml(metaText)}</text>
+  <text x="${CARD.right}" y="590" text-anchor="end" fill="${COLORS.muted}" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="22" letter-spacing="0">${escapeHtml(date)}</text>
 </svg>`;
 }
 
@@ -257,7 +328,9 @@ async function generatePostCards() {
   return posts.length;
 }
 
-const postCount = await generatePostCards();
-await generateBrandAssets();
-
-console.log(`Generated ${postCount} post OG cards and brand assets.`);
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+  const postCount = await generatePostCards();
+  await generateBrandAssets();
+  console.log(`Generated ${postCount} post OG cards and brand assets.`);
+}
