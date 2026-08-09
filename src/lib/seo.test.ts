@@ -64,16 +64,16 @@ describe('seo helpers', () => {
       },
     });
     expect(postDescription(post)).toBe('手写摘要');
-    expect(postImage(post)).toBe('/custom-og.png?v=20260627-quote');
+    expect(postImage(post)).toBe('/custom-og.png?v=20260809-editorial');
   });
 
   it('uses generated post OG card by default', () => {
     expect(postOgImagePath(mockPost())).toBe('/og/posts/Example-Post.png');
-    expect(postImage(mockPost())).toBe('/og/posts/Example-Post.png?v=20260627-quote');
+    expect(postImage(mockPost())).toBe('/og/posts/Example-Post.png?v=20260809-editorial');
   });
 
   it('appends OG image version without dropping existing query strings', () => {
-    expect(versionedImagePath('/og/example.png?x=1')).toBe('/og/example.png?x=1&v=20260627-quote');
+    expect(versionedImagePath('/og/example.png?x=1')).toBe('/og/example.png?x=1&v=20260809-editorial');
   });
 
   it('absolutizes root-relative src/href/srcset in RSS content HTML', () => {

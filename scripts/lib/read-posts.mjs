@@ -12,9 +12,11 @@ import { parse } from 'yaml';
  *   title: string,
  *   date: Date,
  *   updatedDate: Date | undefined,
+ *   description: string | undefined,
  *   category: string,
  *   tags: string[],
  *   draft: boolean,
+ *   body: string,
  * }>>}
  */
 export async function readPostsFromDisk(postsDir) {
@@ -43,9 +45,11 @@ export async function readPostsFromDisk(postsDir) {
         title: data.title,
         date: new Date(data.date),
         updatedDate: data.updatedDate ? new Date(data.updatedDate) : undefined,
+        description: data.description,
         category: data.category ?? '未分类',
         tags: data.tags ?? [],
         draft: data.draft ?? false,
+        body: match ? raw.slice(match[0].length).trimStart() : raw,
       });
     }
   }
