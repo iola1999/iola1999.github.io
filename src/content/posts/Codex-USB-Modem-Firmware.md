@@ -1,7 +1,7 @@
 ---
 title: 和 Codex 爆改 USB 上网卡：从备份固件到网页短信与通话
 date: '2026-10-17T04:33:53+08:00'
-updatedDate: '2026-10-18T04:15:00+08:00'
+updatedDate: '2026-10-18T14:09:05+08:00'
 description: 把闲置的 USB 上网卡翻出来，和 Codex 一起拆机、备份固件、写加载器、运行自定义 C 代码。先做了一个能收发短信和通话的 Mac 应用，后来又做了网页版本，把模块接到 NAS，通过电脑或手机访问。
 category: 折腾
 tags:
@@ -124,11 +124,13 @@ Python 服务独占 USB，负责设备连接、短信归档和通话控制，短
 
 界面统一用了 Material Design，主导航只留电话、短信和设置。桌面上分栏查看会话和正文，设备状态与诊断放进设置；手机 H5 则用底部导航，点进会话后看全屏详情。刷新后能回到之前打开的内容，短信草稿和滚动位置也保留着。
 
-下面两张截图里的号码、短信和通话记录均为模拟数据。
+下面三组拼图包含八张页面截图，号码、短信、通话记录和设置均为模拟数据。
 
-![桌面 Web 短信界面：会话列表与短信正文，内容为模拟数据](/upload/images/2026-10-17-Codex-USB-Modem-Firmware/web-messages.png)
+[![桌面 Web：通话详情与录音、短信会话与编辑区](/upload/images/2026-10-17-Codex-USB-Modem-Firmware/web-phone-messages.png)](/upload/images/2026-10-17-Codex-USB-Modem-Firmware/web-phone-messages.png)
 
-![手机 H5 电话界面：通话记录与底部导航，内容为模拟数据](/upload/images/2026-10-17-Codex-USB-Modem-Firmware/h5-phone.png)
+[![桌面设置：消息推送、设备与诊断](/upload/images/2026-10-17-Codex-USB-Modem-Firmware/web-settings.png)](/upload/images/2026-10-17-Codex-USB-Modem-Firmware/web-settings.png)
+
+[![手机 H5：电话、短信、设置、来电与留言](/upload/images/2026-10-17-Codex-USB-Modem-Firmware/h5-overview.png)](/upload/images/2026-10-17-Codex-USB-Modem-Firmware/h5-overview.png)
 
 收到短信和来电后，Bark 会推送通知，点击可以定位到对应内容。iPhone 上也已经加到了主屏幕，打开后没有浏览器地址栏。不过点 Bark 通知里的链接，仍然会进入浏览器，PWA 自身的 Web Push 和缓存更新提醒还在测试。
 
