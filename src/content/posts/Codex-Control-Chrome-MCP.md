@@ -1,5 +1,5 @@
 ---
-title: Codex Control Chrome MCP：把 Chrome 控制能力借给其他 Agent
+title: Codex Control Chrome MCP：把 Chrome 控制能力开放给其他 Agent
 date: '2026-06-26T23:20:00+08:00'
 category: 折腾
 tags:
@@ -11,7 +11,7 @@ tags:
 
 > **声明：本文包含 AI 辅助创作。**
 
-最近扒了扒 Codex App 控制 Chrome 的办法。它通过 Codex Chrome Extension 接管用户平时使用的 Chrome Profile，登录态、Cookie、打开的标签页和已安装扩展都在。常见的浏览器自动化方案会新开一个干净的 Profile，有些还要求开启 `--remote-debugging-port`。碰到需要登录的网站，重新收拾环境很麻烦。
+最近分析了 Codex App 控制 Chrome 的办法。它通过 Codex Chrome Extension 接管用户平时使用的 Chrome Profile，登录态、Cookie、打开的标签页和已安装扩展都在。常见的浏览器自动化方案会新开一个干净的 Profile，有些还要求开启 `--remote-debugging-port`。碰到需要登录的网站，重新配置环境很麻烦。
 
 这套能力目前主要给 Codex App 使用。我想把通信链路抽出来包成 MCP，交给其他 Agent 工具。
 
@@ -34,7 +34,7 @@ Codex Chrome Extension 直接运行在用户日常的 Chrome Profile 里，可�
 
 ## 通信链路
 
-扒完发现，链路走的是 Chrome Extension + Native Messaging。外部 CDP remote debugging port 没有参与。
+分析完发现，链路使用的是 Chrome Extension + Native Messaging。外部 CDP remote debugging port 没有用到。
 
 大致结构如下：
 
