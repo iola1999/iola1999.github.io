@@ -1,5 +1,5 @@
 ---
-title: 调戏钉钉 PC 客户端
+title: 调试钉钉 PC 客户端
 date: '2021-01-21T12:00:00+08:00'
 category: 逆向与调试
 tags: []

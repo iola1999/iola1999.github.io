@@ -25,9 +25,9 @@ tags: []
 
 ## 如何不去看别人的已读状态
 
-这个就略技术流了，其实前面也水过几篇「调戏」钉钉的文档，例如 [调戏钉钉 PC 客户端](/2021/01/21/DingTalk-mod/)、 [调戏钉钉 PC 客户端之 Hook CEF 函数调用](/2021/09/15/DingTalk-Mod-Hook-CEF-Call/)，针对该问题的解决方案是通过修改前端代码隐藏会话窗口内的「x 人未读」的 DOM 节点，看不到自然也不会想去点击了。
+这个就略技术流了，其实前面也水过几篇调试钉钉的文档，例如 [调试钉钉 PC 客户端](/2021/01/21/DingTalk-mod/)、 [调试钉钉 PC 客户端之 Hook CEF 函数调用](/2021/09/15/DingTalk-Mod-Hook-CEF-Call/)，针对该问题的解决方案是通过修改前端代码隐藏会话窗口内的「x 人未读」的 DOM 节点，看不到自然也不会想去点击了。
 
-Windows 上需要参考前文找一下 webContents 压缩包密码，而 macOS 上的钉钉干脆直接没压缩 webContents ~~任人摆布~~（飞书：？）。
+Windows 上需要参考前文找一下 webContents 压缩包密码，而 macOS 上的钉钉直接没有压缩 webContents。
 
 要修改的文件是 `webContents/assets/chatbox-index.[hash].js`（跟撤回的一样），文件中搜一下 `msg-unread-indicator` 可以看到几处 createElement，不用管具体都是啥场景，都将第三个参数改成空字符串即可。
 
