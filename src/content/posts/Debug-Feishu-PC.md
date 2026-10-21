@@ -1,5 +1,5 @@
 ---
-title: 调戏飞书 PC 客户端
+title: 调试飞书 PC 客户端
 date: '2021-09-14T23:00:00+08:00'
 category: 逆向与调试
 tags: []
@@ -7,9 +7,9 @@ tags: []
 
 ## 闲聊
 
-之前一直尝试[调试钉钉 PC 客户端](https://678234.xyz/2021/01/21/DingTalk-mod/)，奈何钉钉捂得紧，除了解开 `web_content` 改改前端代码外没有更多进展了。今天因为一些需求下载了飞书 PC 客户端，不得不说比钉钉好看的多（可能是天天看钉钉烦了）。
+之前一直尝试[调试钉钉 PC 客户端](https://678234.xyz/2021/01/21/DingTalk-mod/)，奈何钉钉没有开放更多调试入口，除了解开 `web_content` 改改前端代码外没有更多进展了。今天因为一些需求下载了飞书 PC 客户端，不得不说比钉钉好看的多（可能是天天看钉钉烦了）。
 
-看了下应用目录，哦嚯直接把 `webcontent` 亮出来了~~任我玩弄~~（划掉）。
+看了下应用目录，`webcontent` 直接放在目录里。
 
 ![image-20210914231709252](/upload/images/2021-09-14-Debug-Feishu-PC/web-content.png)
 
@@ -27,7 +27,7 @@ tags: []
 
 执行 `path-to-app/Feishu.exe  --remote-debugging-port=9222`
 
-使用 Chrome 打开 `chrome://inspect` 即可看到飞书乖乖地躺在那里
+使用 Chrome 打开 `chrome://inspect` 即可看到飞书页面
 
 ![image-20210914232039033](/upload/images/2021-09-14-Debug-Feishu-PC/chrome-inspect.png)
 

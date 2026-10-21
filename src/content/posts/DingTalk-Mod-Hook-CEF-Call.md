@@ -1,5 +1,5 @@
 ---
-title: 调戏钉钉 PC 客户端之 Hook CEF 函数调用
+title: 调试钉钉 PC 客户端之 Hook CEF 函数调用
 date: '2021-09-15T12:00:00+08:00'
 category: 逆向与调试
 tags: []
@@ -7,7 +7,7 @@ tags: []
 
 ## 书接上回
 
-在之前[调试钉钉 PC 客户端](https://678234.xyz/2021/01/21/DingTalk-mod/)中，文末提到了没能成功通过命令行参数启用 CEF 调试。昨天研究[调戏飞书 PC 客户端](https://678234.xyz/2021/09/14/Debug-Feishu-PC/)时，仔细看了一下 CEF 的调试开启方法，想到一个新的思路，趁午休测试一下记录下来。
+在之前[调试钉钉 PC 客户端](https://678234.xyz/2021/01/21/DingTalk-mod/)中，文末提到了没能成功通过命令行参数启用 CEF 调试。昨天研究[调试飞书 PC 客户端](https://678234.xyz/2021/09/14/Debug-Feishu-PC/)时，仔细看了一下 CEF 的调试开启方法，想到一个新的思路，趁午休测试一下记录下来。
 
 ## 准备
 
@@ -118,11 +118,11 @@ function hookCEF() {
 
 参数标签也标反了。`cef_initialize` 的签名是 `(args, settings, application, windows_sandbox_info)`，Win32 cdecl 下 Frida 的 `args[1]` 就是 settings。可上图控制台中把 `args[1]` 标成了 `main_args`、`args[2]` 标成 settings，反了。好在脚本实际改的是 `args[1]`，盯的指针没错，纯粹是标签打反。
 
-### 真正的拦路虎：`size` 字段
+### 真正的原因：`size` 字段
 
 这才是「偏移怎么这么难找」的根本原因，当年根本没往这想。
 
-CEF 结构体顶部那个 `size` 字段不是摆设。它配合一个 `CEF_MEMBER_EXISTS` 宏，给每个字段做版本判断（以 master 为例）：
+CEF 结构体顶部的 `size` 字段决定了哪些字段会被识别。它配合一个 `CEF_MEMBER_EXISTS` 宏，给每个字段做版本判断（以 master 为例）：
 
 ```c
 #define CEF_MEMBER_EXISTS(s, f)                                     \
@@ -144,7 +144,7 @@ offsetof(remote_debugging_port) + sizeof(int) = 0xC8 + 4 = 0xCC
 
 ### 正路其实不该这么走
 
-兜了一大圈才发现，CEF 自己留了后门。`remote_debugging_port` 的注释里就写着：Also configurable using the "remote-debugging-port" command-line switch。而且就算钉钉把普通命令行参数禁了（`command_line_args_disabled`），`CefApp::OnBeforeCommandLineProcessing()` 这个回调照样能塞开关进去。hook 这个回调，往里加一个 `--remote-debugging-port=9222`，比在 `cef_initialize` 里抠结构体偏移省事一百倍。当年要是知道这条，一下午就搞定了，也不会有文章里那句「我真菜」。
+兜了一大圈才发现，CEF 提供了配置入口。`remote_debugging_port` 的注释里就写着：Also configurable using the "remote-debugging-port" command-line switch。而且就算钉钉把普通命令行参数禁了（`command_line_args_disabled`），`CefApp::OnBeforeCommandLineProcessing()` 这个回调照样能塞开关进去。hook 这个回调，往里加一个 `--remote-debugging-port=9222`，比在 `cef_initialize` 里抠结构体偏移省事一百倍。当年要是知道这条，一下午就搞定了，也不会有文章里那句「我真菜」。
 
 ## 套话
 
