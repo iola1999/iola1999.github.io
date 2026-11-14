@@ -2,21 +2,26 @@
 import { render } from 'astro:content';
 import PostLayout from '../layouts/PostLayout.astro';
 import { getPublishedPosts } from '../lib/content';
-import { postPermalink } from '../lib/posts';
+import { postPermalink, relatedPosts } from '../lib/posts';
 
 export async function getStaticPaths() {
   const posts = await getPublishedPosts();
   return posts.map((post, i) => ({
     // 去掉首尾斜杠交给 trailingSlash 处理
     params: { permalink: postPermalink(post).replace(/^\/|\/$/g, '') },
-    props: { post, prev: posts[i + 1], next: posts[i - 1] },
+    props: {
+      post,
+      prev: posts[i + 1],
+      next: posts[i - 1],
+      related: relatedPosts(post, posts, 4),
+    },
   }));
 }
 
-const { post, prev, next } = Astro.props;
+const { post, prev, next, related } = Astro.props;
 const { Content, headings } = await render(post);
 ---
 
-<PostLayout post={post} headings={headings} prev={prev} next={next}>
+<PostLayout post={post} headings={headings} prev={prev} next={next} related={related}>
   <Content />
 </PostLayout>

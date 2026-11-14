@@ -1,8 +1,11 @@
 ---
 title: 调试飞书 PC 客户端
 date: '2021-09-14T23:00:00+08:00'
+description: 记录通过 CEF 远程调试端口参数连接 Chrome DevTools 调试飞书 PC 客户端，并利用 DOM 断点定位消息撤回前端逻辑的过程。
 category: 逆向与调试
-tags: []
+tags:
+  - 逆向
+  - 调试
 ---
 
 ## 闲聊

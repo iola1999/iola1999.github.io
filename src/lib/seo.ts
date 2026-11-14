@@ -41,10 +41,29 @@ export function absolutizeHtml(html: string, base = SITE.url): string {
     });
 }
 
+export function postSeoTitle(post: CollectionEntry<'posts'>): string {
+  return post.data.seoTitle ?? post.data.title;
+}
+
 export function postDescription(post: CollectionEntry<'posts'>): string {
   return post.data.description
     ? truncateDescription(post.data.description)
     : excerptFromMarkdown(post.body) ?? SITE.description;
+}
+
+/** 提取正文 Markdown 图片（跳过围栏代码块），转为去重后的绝对 URL 供结构化数据使用 */
+export function extractMarkdownImages(markdown = ''): string[] {
+  const withoutCode = markdown.replace(/```[\s\S]*?```/g, '');
+  const urls: string[] = [];
+  const pattern = /!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
+  for (const match of withoutCode.matchAll(pattern)) {
+    const raw = match[1]?.trim();
+    if (!raw) continue;
+    if ((raw.startsWith('/') && !raw.startsWith('//')) || /^https?:\/\//i.test(raw)) {
+      urls.push(absoluteUrl(raw));
+    }
+  }
+  return [...new Set(urls)];
 }
 
 export function postOgImagePath(post: CollectionEntry<'posts'>): string {
@@ -65,13 +84,15 @@ export function postKeywords(post: CollectionEntry<'posts'>): string[] {
   return [...new Set([post.data.category, ...post.data.tags].filter(Boolean))];
 }
 
+const AUTHOR_ID = `${SITE.url}/#author`;
+
 export function personJsonLd(): JsonLd {
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',
+    '@id': AUTHOR_ID,
     name: SITE.author,
     url: SITE.url,
-    email: SITE.email,
     sameAs: [SITE.github],
   };
 }
@@ -81,11 +102,13 @@ export function websiteJsonLd(): JsonLd {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: SITE.title,
-    alternateName: SITE.description,
+    alternateName: SITE.tagline,
+    description: SITE.description,
     url: SITE.url,
     inLanguage: SITE.locale,
     publisher: {
       '@type': 'Person',
+      '@id': AUTHOR_ID,
       name: SITE.author,
       url: SITE.url,
     },
@@ -108,7 +131,7 @@ export function breadcrumbJsonLd(items: BreadcrumbItem[]): JsonLd {
 export function postJsonLd(post: CollectionEntry<'posts'>): JsonLd {
   const permalink = postPermalink(post);
   const description = postDescription(post);
-  const image = absoluteUrl(postImage(post));
+  const images = [...new Set([absoluteUrl(postImage(post)), ...extractMarkdownImages(post.body)])];
   const keywords = postKeywords(post);
   const dateModified = post.data.updatedDate ?? post.data.date;
 
@@ -121,17 +144,20 @@ export function postJsonLd(post: CollectionEntry<'posts'>): JsonLd {
     },
     headline: post.data.title,
     description,
-    image: [image],
+    image: images,
     url: absoluteUrl(permalink),
     datePublished: post.data.date.toISOString(),
     dateModified: dateModified.toISOString(),
     author: {
       '@type': 'Person',
+      '@id': AUTHOR_ID,
       name: SITE.author,
       url: SITE.url,
+      sameAs: [SITE.github],
     },
     publisher: {
       '@type': 'Person',
+      '@id': AUTHOR_ID,
       name: SITE.author,
       url: SITE.url,
     },

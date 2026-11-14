@@ -1,12 +1,16 @@
 ---
 title: UURC-Web：如何愉快地从公司电脑连回家
+seoTitle: UURC-Web：逆向网易 UU 远程协议实现浏览器 WebRTC 远控
 date: '2026-05-18T10:00:00+08:00'
+updatedDate: '2026-07-26T20:00:00+08:00'
+description: 配合 IDA Pro MCP 逆向网易 UU 远程原生库 libstreamer.so，对齐自定义 SOAC 信令与多轨 WebRTC 协议，开源纯浏览器远控主控端 UURC-Web 并支持 Cloudflare Worker 部署。
 category: 折腾
 tags:
   - 远控
   - 逆向
   - WebRTC
   - Cloudflare
+  - AI
 ---
 
 > **声明：本文包含 AI 辅助创作。**

@@ -19,10 +19,11 @@ const jsonLd = [
 ];
 ---
 
-<BaseLayout jsonLd={jsonLd}>
+<BaseLayout fullTitle={SITE.homeTitle} description={SITE.description} jsonLd={jsonLd}>
   <div class="wrap">
     <section class="home__intro">
-      <h1>{SITE.description}</h1>
+      <h1>{SITE.tagline}</h1>
+      <p>{SITE.description}</p>
     </section>
 
     {yearGroups.map(([year, items]) => (

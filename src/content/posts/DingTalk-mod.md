@@ -1,8 +1,12 @@
 ---
 title: 调试钉钉 PC 客户端
 date: '2021-01-21T12:00:00+08:00'
+description: 使用 OllyDbg 动态调试 Windows 版钉钉客户端与 libcef.dll，提取 web_content.pak 解压密码并分析前端资源结构。
 category: 逆向与调试
-tags: []
+tags:
+  - 钉钉
+  - 逆向
+  - 调试
 ---
 
 ## 提前致谢

@@ -1,8 +1,13 @@
 ---
 title: 调试钉钉 PC 客户端之 Hook CEF 函数调用
 date: '2021-09-15T12:00:00+08:00'
+description: 使用 Frida 拦截 Windows 版钉钉对 libcef.dll cef_initialize 的调用，修改 remote_debugging_port 开启 Chrome DevTools 远程调试。
 category: 逆向与调试
-tags: []
+tags:
+  - 钉钉
+  - 逆向
+  - Hook
+  - 调试
 ---
 
 ## 书接上回

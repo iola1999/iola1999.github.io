@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE } from '../../config';
 import { getPublishedPosts } from '../../lib/content';
 import { postPermalink, formatDate, groupByTag } from '../../lib/posts';
 import { breadcrumbJsonLd, collectionPageJsonLd } from '../../lib/seo';
@@ -29,7 +30,13 @@ const jsonLd = [
 ];
 ---
 
-<BaseLayout title={`标签: ${tag}`} description={description} permalink={permalink} jsonLd={jsonLd}>
+<BaseLayout
+  title={`标签: ${tag}`}
+  description={description}
+  permalink={permalink}
+  noindex={items.length < SITE.minIndexableTagPosts}
+  jsonLd={jsonLd}
+>
   <div class="wrap taxo">
     <h1>#{tag} <span style="color:var(--text-muted);font-size:1rem;">· {items.length} 篇</span></h1>
     <ul class="plist">

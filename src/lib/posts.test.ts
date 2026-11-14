@@ -8,6 +8,7 @@ import {
   groupByCategory,
   groupByTag,
   countsBySize,
+  relatedPosts,
   type Post,
 } from './posts';
 import type { CollectionEntry } from 'astro:content';
@@ -129,5 +130,26 @@ describe('groupByCategory / groupByTag', () => {
 
   it('countsBySize 按数量倒序', () => {
     expect(countsBySize(groupByTag(posts))[0]).toEqual(['Astro', 2]);
+  });
+});
+
+describe('relatedPosts', () => {
+  it('按共享标签权重与同分类排序，同分按时间倒序且排除自身', () => {
+    const target = richPost('2026-07-28T08:00:00+08:00', '折腾', ['王者荣耀', '逆向']);
+    const twoShared = richPost('2026-07-26T08:00:00+08:00', '折腾', ['王者荣耀', '逆向', 'IL2CPP']);
+    const oneSharedNewer = richPost('2026-11-10T08:00:00+08:00', '折腾', ['逆向']);
+    const oneSharedOlder = richPost('2019-06-14T08:00:00+08:00', '折腾', ['王者荣耀']);
+    const sameCatOnly = richPost('2026-11-11T08:00:00+08:00', '折腾', ['LLM']);
+    const unrelated = richPost('2017-03-07T08:00:00+08:00', '文字', ['旧文']);
+
+    const all = [target, unrelated, sameCatOnly, oneSharedOlder, twoShared, oneSharedNewer];
+    const result = relatedPosts(target, all, 4);
+
+    expect(result.map((p) => p.id)).toEqual([
+      twoShared.id,
+      oneSharedNewer.id,
+      oneSharedOlder.id,
+      sameCatOnly.id,
+    ]);
   });
 });

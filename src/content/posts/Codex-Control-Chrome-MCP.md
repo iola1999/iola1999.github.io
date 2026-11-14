@@ -1,9 +1,12 @@
 ---
 title: Codex Control Chrome MCP：把 Chrome 控制能力开放给其他 Agent
+seoTitle: Codex Control Chrome MCP：复用日常 Chrome 登录态控制浏览器
 date: '2026-06-26T23:20:00+08:00'
+description: 拆解 Codex Chrome Extension 的 Native Messaging 通信链路并封装为开源 MCP 服务 codex-control-chrome-mcp，让 Claude Code 与 Cursor 直接复用日常 Chrome 登录态、Cookie 与已打开标签页。
 category: 折腾
 tags:
   - Codex
+  - Claude Code
   - MCP
   - Chrome
   - AI

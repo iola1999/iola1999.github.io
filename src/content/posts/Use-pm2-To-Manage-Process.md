@@ -1,8 +1,11 @@
 ---
 title: 使用 pm2 管理非 node 进程
 date: '2019-06-02T22:30:00+08:00'
+description: 记录在 Ubuntu on Android 环境下安装 Node.js 与 PM2，并通过自定义启动脚本托管 Python 后台采集任务的实践配置。
 category: 笔记
-tags: []
+tags:
+  - Linux
+  - Python
 ---
 
 最近一直在用[上篇文章](https://678234.xyz/2019/05/04/Run-Ubuntu-On-Android-Phone/)里提到的 `Ubuntu on Android` 跑些后台任务，screen 用起来似乎并不是很方便，这里考虑使用 pm2 来管理后台的进程。

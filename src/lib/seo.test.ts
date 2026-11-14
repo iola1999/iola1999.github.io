@@ -5,13 +5,17 @@ import {
   absolutizeHtml,
   breadcrumbJsonLd,
   excerptFromMarkdown,
+  extractMarkdownImages,
+  personJsonLd,
   postDescription,
   postImage,
   postJsonLd,
   postOgImagePath,
+  postSeoTitle,
   stripMarkdown,
   truncateDescription,
   versionedImagePath,
+  websiteJsonLd,
 } from './seo';
 
 function mockPost(overrides: Partial<CollectionEntry<'posts'>> = {}): CollectionEntry<'posts'> {
@@ -90,11 +94,52 @@ describe('seo helpers', () => {
     expect(absolutizeHtml(html)).toBe(html);
   });
 
-  it('builds BlogPosting JSON-LD with canonical article URL', () => {
+  it('builds BlogPosting JSON-LD with canonical article URL and body images', () => {
     const jsonLd = postJsonLd(mockPost());
     expect(jsonLd['@type']).toBe('BlogPosting');
     expect(jsonLd.url).toBe('https://678234.xyz/2026/06/18/Example-Post/');
     expect(jsonLd.keywords).toEqual(['折腾', 'SEO', 'Astro']);
+    expect(jsonLd.image).toEqual([
+      'https://678234.xyz/og/posts/Example-Post.png?v=20260809-editorial',
+      'https://678234.xyz/upload/example.png',
+    ]);
+    expect((jsonLd.author as Record<string, unknown>).sameAs).toEqual(['https://github.com/iola1999']);
+  });
+
+  it('prefers explicit seoTitle when provided', () => {
+    expect(postSeoTitle(mockPost())).toBe('示例文章');
+    const custom = mockPost({
+      data: {
+        ...mockPost().data,
+        seoTitle: '紧凑搜索标题',
+      },
+    });
+    expect(postSeoTitle(custom)).toBe('紧凑搜索标题');
+  });
+
+  it('extracts deduplicated markdown images while ignoring fenced code blocks', () => {
+    const md = [
+      '[![首图](/upload/a.png)](/upload/a.png)',
+      '![重复](/upload/a.png)',
+      '![外链](https://cdn.example.com/b.webp "说明")',
+      '```markdown',
+      '![代码块内忽略](/upload/ignored.png)',
+      '```',
+    ].join('\n\n');
+    expect(extractMarkdownImages(md)).toEqual([
+      'https://678234.xyz/upload/a.png',
+      'https://cdn.example.com/b.webp',
+    ]);
+  });
+
+  it('omits plaintext email in Person JSON-LD and keeps tagline in WebSite JSON-LD', () => {
+    const person = personJsonLd();
+    expect(person.email).toBeUndefined();
+    expect(person.sameAs).toEqual(['https://github.com/iola1999']);
+
+    const site = websiteJsonLd();
+    expect(site.alternateName).toBe('影言 · 个人博客');
+    expect(typeof site.description).toBe('string');
   });
 
   it('builds BreadcrumbList JSON-LD', () => {

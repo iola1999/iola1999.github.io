@@ -1,8 +1,10 @@
 ---
 title: Web3.0 捞钱入门
 date: '2022-04-09T16:00:00+08:00'
+description: 从以太坊区块、EVM 交易与 Gas 机制讲起，记录编写 Solidity 智能合约并结合前端页面与合约交互的 Web3 入门实践。
 category: 折腾
-tags: []
+tags:
+  - Web3
 ---
 
 先看示例 [https://web3-fe.vercel.app/](https://web3-fe.vercel.app/) ，接下来分享如何实现它，看完你也有机会去捞钱。

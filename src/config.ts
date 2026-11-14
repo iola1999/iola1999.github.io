@@ -1,6 +1,8 @@
 export const SITE = {
   title: 'iolaSay',
-  description: '影言 · 个人博客',
+  tagline: '影言 · 个人博客',
+  homeTitle: 'iolaSay · 影言 - AI 工程、逆向分析与硬件折腾记录',
+  description: '记录 AI Coding Agent 工程实践、本地大模型推理、移动系统移植、客户端逆向分析与嵌入式硬件改造的个人技术博客。',
   author: 'iola1999',
   url: 'https://678234.xyz',
   locale: 'zh-CN',
@@ -8,7 +10,8 @@ export const SITE = {
   ogImageVersion: '20260809-editorial',
   defaultImage: '/social-card.png?v=20260809-editorial',
   github: 'https://github.com/iola1999',
-  email: 'fwl1998@foxmail.com',
+  /** 标签页进入索引与 sitemap 的最少文章数 */
+  minIndexableTagPosts: 3,
   /** 导航 */
   nav: [
     { label: '首页', href: '/' },

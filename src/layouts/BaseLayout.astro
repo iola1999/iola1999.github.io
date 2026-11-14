@@ -7,6 +7,8 @@ import '../styles/global.css';
 
 interface Props {
   title?: string;
+  fullTitle?: string;
+  socialTitle?: string;
   description?: string;
   /** 文章页传入，用于 canonical / og */
   permalink?: string;
@@ -18,10 +20,13 @@ interface Props {
   section?: string;
   tags?: string[];
   noindex?: boolean;
+  nofollow?: boolean;
   jsonLd?: JsonLd | JsonLd[];
 }
 const {
   title,
+  fullTitle,
+  socialTitle,
   description = SITE.description,
   permalink,
   image = SITE.defaultImage,
@@ -32,13 +37,16 @@ const {
   section,
   tags = [],
   noindex = false,
+  nofollow = false,
   jsonLd,
 } = Astro.props;
-const pageTitle = title ? `${title} - ${SITE.title}` : SITE.title;
-const canonical = absoluteUrl(permalink ?? Astro.url.pathname);
+const pageTitle = fullTitle ?? (title ? `${title} - ${SITE.title}` : SITE.title);
+const ogTitle = socialTitle ?? title ?? fullTitle ?? SITE.title;
+const robots = `${noindex ? 'noindex' : 'index'}, ${nofollow ? 'nofollow' : 'follow'}`;
+const canonical = noindex && !permalink ? undefined : absoluteUrl(permalink ?? Astro.url.pathname);
 const currentPath = Astro.url.pathname;
 const socialImage = absoluteUrl(image);
-const socialImageAlt = imageAlt ?? pageTitle;
+const socialImageAlt = imageAlt ?? ogTitle;
 const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
@@ -65,16 +73,16 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <meta name="author" content={SITE.author} />
-    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
-    <link rel="canonical" href={canonical} />
+    <meta name="robots" content={robots} />
+    {canonical && <link rel="canonical" href={canonical} />}
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/feed.xml" />
-    <meta property="og:title" content={pageTitle} />
+    <meta property="og:title" content={ogTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {canonical && <meta property="og:url" content={canonical} />}
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content={SITE.title} />
     <meta property="og:locale" content={SITE.ogLocale} />
@@ -84,7 +92,7 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={socialImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:title" content={ogTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
     <meta name="twitter:image:alt" content={socialImageAlt} />

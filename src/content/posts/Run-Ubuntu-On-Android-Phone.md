@@ -1,15 +1,18 @@
 ---
 title: 在安卓设备上运行 Ubuntu
 date: '2019-05-04T17:00:00+08:00'
+description: 记录在已获取 root 权限的闲置 Android 手机上通过 Linux Deploy 与 BusyBox 部署 Ubuntu 16.04、配置 SSH 与 Xfce VNC 桌面的完整步骤。
 category: 折腾
-tags: []
+tags:
+  - Android
+  - Linux
 ---
 
 手上闲置的安卓设备有点多，一直在考虑怎样利用起来。挺久之前就尝试了 [Linux Deploy](https://github.com/meefik/linuxdeploy) 这个应用，只是一直没有仔细地配置过。这里写篇博文记录下今天的折腾。（凑数）
 
 
 
-## 准备			{#one}
+## 准备
 
 + 从[此处](https://github.com/meefik/linuxdeploy/releases)下载 Linux Deploy
 + 从[此处](https://github.com/meefik/busybox/releases)下载 busybox 安装器
@@ -21,8 +24,7 @@ tags: []
 
 
 
-安装			{#two}
-------------------------------------
+## 安装
 1. 将 busybox 安装到 /system/xbin
 2. 打开 Linux Deploy，点右下角设置，做以下修改：
    - 发行版：Ubuntu，版本我选择的是 Xenial（16.04）
@@ -43,8 +45,7 @@ tags: []
 
 
 
-系统配置、使用			{#three}
-------------------------------------
+## 系统配置、使用
 
 ### 连接
 

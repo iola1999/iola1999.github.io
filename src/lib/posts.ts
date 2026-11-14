@@ -71,3 +71,23 @@ export function countsBySize(groups: Map<string, Post[]>): Array<[string, number
   return [...groups.entries()].map(([key, items]) => [key, items.length] as [string, number])
     .sort((a, b) => b[1] - a[1]);
 }
+
+/** 按共享标签数（权重 3）与同分类（权重 1）推荐相关文章，同分按发布时间倒序 */
+export function relatedPosts(target: Post, allPosts: Post[], limit = 4): Post[] {
+  if (limit <= 0) return [];
+  const targetTags = new Set(target.data.tags);
+  return allPosts
+    .filter((candidate) => candidate.id !== target.id)
+    .map((candidate) => {
+      let sharedTags = 0;
+      for (const tag of candidate.data.tags) {
+        if (targetTags.has(tag)) sharedTags += 1;
+      }
+      const sameCategory = candidate.data.category === target.data.category ? 1 : 0;
+      return { post: candidate, score: sharedTags * 3 + sameCategory };
+    })
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score || byDateDesc(a.post, b.post))
+    .slice(0, limit)
+    .map((entry) => entry.post);
+}

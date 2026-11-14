@@ -129,18 +129,24 @@ async function ensureWebpVariants(filePath, originalWidth) {
 
 /**
  * @param {HastNode} node
- * @param {(node: HastNode, parent: HastNode | undefined, index: number | undefined) => void} visitor
+ * @param {(node: HastNode, parent: HastNode | undefined, index: number | undefined, blockIndex: number) => void} visitor
  * @param {HastNode} [parent]
  * @param {number} [index]
+ * @param {number} [blockIndex]
  */
-function visitImages(node, visitor, parent, index) {
+function visitImages(node, visitor, parent, index, blockIndex = 0) {
   if (!node || typeof node !== 'object') return;
   if (node.type === 'element' && node.tagName === 'img') {
-    visitor(node, parent, index);
+    visitor(node, parent, index, blockIndex);
   }
-  if (Array.isArray(node.children)) {
-    node.children.forEach((child, childIndex) => visitImages(child, visitor, node, childIndex));
-  }
+  if (!Array.isArray(node.children)) return;
+  let currentBlock = blockIndex;
+  const isRoot = node.type === 'root';
+  node.children.forEach((child, childIndex) => {
+    const nextBlock = isRoot ? currentBlock : blockIndex;
+    if (isRoot && child?.type === 'element') currentBlock += 1;
+    visitImages(child, visitor, node, childIndex, nextBlock);
+  });
 }
 
 function rehypeImagePerformance() {
@@ -150,12 +156,14 @@ function rehypeImagePerformance() {
     /** @type {Promise<void>[]} */
     const imageTasks = [];
 
-    visitImages(tree, (node, parent, index) => {
+    visitImages(tree, (node, parent, index, blockIndex) => {
       const properties = node.properties ??= {};
       const src = typeof properties.src === 'string' ? properties.src : '';
 
       properties.decoding ??= 'async';
-      if (imageIndex > 0) {
+      if (imageIndex === 0 && blockIndex < 6) {
+        properties.fetchpriority ??= 'high';
+      } else {
         properties.loading ??= 'lazy';
         properties.fetchpriority ??= 'low';
       }
@@ -213,6 +221,13 @@ const lastmodByUrl = new Map(publishedPosts.map((post) => [
   new URL(permalinkFor(post.id, post.date), SITE.url).href,
   (post.updatedDate ?? post.date).toISOString(),
 ]));
+/** @type {Map<string, number>} */
+const tagCounts = new Map();
+for (const post of publishedPosts) {
+  for (const tag of post.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -226,6 +241,14 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
+      filter(page) {
+        const { pathname } = new URL(page);
+        if (pathname.startsWith('/tags/') && pathname !== '/tags/') {
+          const tag = decodeURIComponent(pathname.slice('/tags/'.length, -1));
+          return (tagCounts.get(tag) ?? 0) >= SITE.minIndexableTagPosts;
+        }
+        return true;
+      },
       serialize(item) {
         const lastmod = lastmodByUrl.get(item.url);
         return lastmod ? { ...item, lastmod } : item;

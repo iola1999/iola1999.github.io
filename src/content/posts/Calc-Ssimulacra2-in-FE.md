@@ -1,8 +1,11 @@
 ---
 title: 在浏览器端计算 ssimulacra2
 date: '2023-01-08T19:00:00+08:00'
+description: 对比 SSIMULACRA2 图像质量评估算法的 C++、Rust 与纯 JS 实现，记录将 Rust 实现编译为 WebAssembly 在浏览器端运行的方案。
 category: 折腾
-tags: []
+tags:
+  - Rust
+  - WebAssembly
 ---
 
 > 受限于数据安全规定，暂不能贴出本文的完整版。当前已经有了 [napi 版本的 ssimulacra2](https://github.com/plwljobue77256/nrs-binding-ssimulacra2) 实现，可以用在 Node.js 服务端。

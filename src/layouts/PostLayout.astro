@@ -10,7 +10,7 @@ import {
   postDescription,
   postImage,
   postJsonLd,
-  postKeywords,
+  postSeoTitle,
 } from '../lib/seo';
 
 interface Props {
@@ -18,14 +18,18 @@ interface Props {
   headings: MarkdownHeading[];
   prev?: CollectionEntry<'posts'>;
   next?: CollectionEntry<'posts'>;
+  related?: CollectionEntry<'posts'>[];
 }
-const { post, headings, prev, next } = Astro.props;
+const { post, headings, prev, next, related = [] } = Astro.props;
 const { title, date, category, tags } = post.data;
+const seoTitle = postSeoTitle(post);
 const permalink = postPermalink(post);
 const description = postDescription(post);
 const image = postImage(post);
-const keywords = postKeywords(post);
 const modifiedDate = post.data.updatedDate ?? date;
+const showUpdatedDate = Boolean(
+  post.data.updatedDate && formatDate(post.data.updatedDate) !== formatDate(date),
+);
 const breadcrumbs = [
   { name: '首页', href: '/' },
   { name: category, href: `/categories/${encodeURIComponent(category)}/` },
@@ -38,7 +42,8 @@ const jsonLd = [
 ---
 
 <BaseLayout
-  title={title}
+  title={seoTitle}
+  socialTitle={title}
   description={description}
   permalink={permalink}
   image={image}
@@ -47,7 +52,7 @@ const jsonLd = [
   publishedTime={date.toISOString()}
   modifiedTime={modifiedDate.toISOString()}
   section={category}
-  tags={keywords}
+  tags={tags}
   jsonLd={jsonLd}
 >
   <article class="post">
@@ -63,6 +68,9 @@ const jsonLd = [
           <h1 class="post__title">{title}</h1>
           <div class="post__meta">
             <time datetime={date.toISOString()}>{formatDate(date)}</time>
+            {showUpdatedDate && (
+              <span>更新于 <time datetime={modifiedDate.toISOString()}>{formatDate(modifiedDate)}</time></span>
+            )}
             <a href={`/categories/${encodeURIComponent(category)}/`}>{category}</a>
           </div>
         </header>
@@ -77,6 +85,23 @@ const jsonLd = [
               <a href={`/tags/${encodeURIComponent(t)}/`}>#{t}</a>
             ))}
           </div>
+        )}
+
+        {related.length > 0 && (
+          <section class="post__related" aria-labelledby="related-heading">
+            <h2 id="related-heading" class="post__related-title">相关阅读</h2>
+            <ul class="plist">
+              {related.map((item) => (
+                <li class="plist__item">
+                  <span class="plist__date">{formatDate(item.data.date)}</span>
+                  <a class="plist__title" href={postPermalink(item)}>{item.data.title}</a>
+                  <a class="plist__cat" href={`/categories/${encodeURIComponent(item.data.category)}/`}>
+                    {item.data.category}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
 
         {(prev || next) && (
