@@ -1,0 +1,70 @@
+---
+import { SITE } from '../config';
+---
+<section id="comments" class="comments" aria-label="评论">
+  <div class="giscus"></div>
+</section>
+<script is:inline define:vars={{ giscus: SITE.giscus }}>
+  (() => {
+    const container = document.getElementById('comments');
+    if (!container) return;
+
+    const root = document.documentElement;
+    const media = matchMedia('(prefers-color-scheme: dark)');
+    const resolveTheme = () => {
+      const explicit = root.dataset.theme;
+      if (explicit === 'dark' || explicit === 'light') return explicit;
+      return media.matches ? 'dark' : 'light';
+    };
+
+    let appliedTheme = resolveTheme();
+    let ready = false;
+
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+    script.setAttribute('data-repo', giscus.repo);
+    script.setAttribute('data-repo-id', giscus.repoId);
+    script.setAttribute('data-category', giscus.category);
+    script.setAttribute('data-category-id', giscus.categoryId);
+    script.setAttribute('data-mapping', 'pathname');
+    script.setAttribute('data-strict', '0');
+    script.setAttribute('data-reactions-enabled', '1');
+    script.setAttribute('data-emit-metadata', '0');
+    script.setAttribute('data-input-position', 'top');
+    script.setAttribute('data-theme', appliedTheme);
+    script.setAttribute('data-lang', 'zh-CN');
+    script.setAttribute('data-loading', 'lazy');
+    script.crossOrigin = 'anonymous';
+    script.async = true;
+    container.appendChild(script);
+
+    const syncTheme = () => {
+      if (!ready) return;
+      const nextTheme = resolveTheme();
+      if (nextTheme === appliedTheme) return;
+      const frame = container.querySelector('iframe.giscus-frame');
+      if (!frame || !frame.contentWindow) return;
+      frame.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: nextTheme } } },
+        'https://giscus.app',
+      );
+      appliedTheme = nextTheme;
+    };
+
+    // 懒加载 iframe 首帧就绪前若页面已切换过主题，待收到首个 giscus 消息后再同步
+    window.addEventListener('message', (event) => {
+      if (event.origin !== 'https://giscus.app') return;
+      if (!(typeof event.data === 'object' && event.data && 'giscus' in event.data)) return;
+      if (!ready) {
+        ready = true;
+        syncTheme();
+      }
+    });
+
+    new MutationObserver(syncTheme).observe(root, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'data-theme-mode'],
+    });
+    media.addEventListener('change', syncTheme);
+  })();
+</script>

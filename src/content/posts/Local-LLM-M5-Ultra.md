@@ -1,6 +1,5 @@
 ---
 title: 在 Mac Studio M5 Ultra 上跑本地大模型与定制 Splash 推理服务的实践记录
-seoTitle: Mac Studio M5 Ultra 256GB 本地大模型与 Splash 实测
 date: '2026-11-11T02:15:00+08:00'
 description: 在 256GB Mac Studio（M5 Ultra 64 核 GPU）上部署 Qwen3.8 180B MoE 编码模型，实测 Q5_K_M 反慢于 Q8_0 的原因，改造 Splash 1.4.0 跑出单流 100+ tok/s 与 160K 长上下文零衰减。
 category: 折腾

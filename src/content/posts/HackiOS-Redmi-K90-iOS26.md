@@ -1,6 +1,5 @@
 ---
 title: 把 iOS 26.6.2 移植到红米 K90 的三周开发记录与思考
-seoTitle: 红米 K90 (骁龙 8 至尊版) 移植 iOS 26 与 XNU 记录
 date: '2026-11-10T12:15:00+08:00'
 updatedDate: '2026-11-10T12:55:00+08:00'
 description: 记录三周内配合 AI Agent 将未修改的 iOS 26.6.2 用户态与 XNU 12377 内核移植到红米 Redmi K90（骁龙 8 至尊版 SM8750）的全过程，打通 Adreno 830 Metal 120Hz、UFS 双系统持久化与 Wi-Fi 外设。

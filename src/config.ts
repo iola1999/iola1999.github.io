@@ -1,7 +1,6 @@
 export const SITE = {
   title: 'iolaSay',
   tagline: '影言 · 个人博客',
-  homeTitle: 'iolaSay · 影言 - AI 工程、逆向分析与硬件折腾记录',
   description: '记录 AI Coding Agent 工程实践、本地大模型推理、移动系统移植、客户端逆向分析与嵌入式硬件改造的个人技术博客。',
   author: 'iola1999',
   url: 'https://678234.xyz',
@@ -18,8 +17,13 @@ export const SITE = {
     { label: '分类', href: '/categories/' },
     { label: '标签', href: '/tags/' },
   ],
-  /** Disqus shortname（保持与旧站一致，评论延续） */
-  disqus: 'iola1999',
+  /** Giscus 评论配置（关联仓库 GitHub Discussions） */
+  giscus: {
+    repo: 'iola1999/iola1999.github.io',
+    repoId: 'MDEwOlJlcG9zaXRvcnkxNzkwNjY4ODE=',
+    category: 'Announcements',
+    categoryId: 'DIC_kwDOCqxYAc4DLIDX',
+  },
   /** RSS follow 验证块 */
   follow: { feedId: '59899165476559872', userId: '59826467493052416' },
 } as const;

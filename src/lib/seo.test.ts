@@ -11,7 +11,6 @@ import {
   postImage,
   postJsonLd,
   postOgImagePath,
-  postSeoTitle,
   stripMarkdown,
   truncateDescription,
   versionedImagePath,
@@ -104,17 +103,6 @@ describe('seo helpers', () => {
       'https://678234.xyz/upload/example.png',
     ]);
     expect((jsonLd.author as Record<string, unknown>).sameAs).toEqual(['https://github.com/iola1999']);
-  });
-
-  it('prefers explicit seoTitle when provided', () => {
-    expect(postSeoTitle(mockPost())).toBe('示例文章');
-    const custom = mockPost({
-      data: {
-        ...mockPost().data,
-        seoTitle: '紧凑搜索标题',
-      },
-    });
-    expect(postSeoTitle(custom)).toBe('紧凑搜索标题');
   });
 
   it('extracts deduplicated markdown images while ignoring fenced code blocks', () => {

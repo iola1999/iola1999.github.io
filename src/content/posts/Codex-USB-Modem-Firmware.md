@@ -1,6 +1,5 @@
 ---
 title: 和 Codex 改造 USB 上网卡：从备份固件到网页短信与通话
-seoTitle: 改造展锐 USB 4G 随身 Wi-Fi：刷入自研固件收发短信与网页通话
 date: '2026-10-17T04:33:53+08:00'
 updatedDate: '2026-10-21T16:53:02+08:00'
 description: 拆解闲置的紫光展锐 US8310AM（UMS9117）USB 4G 随身 Wi-Fi 上网卡，配合 Codex 备份 NAND 固件、植入自定义 C 程序并接入 NAS Docker，实现网页与手机 H5 短信转发、IMS 双向语音通话、录音与垃圾短信分类。

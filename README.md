@@ -41,7 +41,7 @@ push 到 `master` 即触发 GitHub Actions（`.github/workflows/deploy.yml`）�
 
 ```
 src/
-  config.ts            站点元信息 / 导航 / Disqus
+  config.ts            站点元信息 / 导航 / Giscus
   content.config.ts    内容集合 schema（zod 校验）
   content/posts/       文章 markdown
   layouts/             页面布局

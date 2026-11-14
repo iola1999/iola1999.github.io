@@ -1,6 +1,5 @@
 ---
 title: 王者荣耀消息协议的一些研究
-seoTitle: 王者荣耀协议逆向与 Zygisk 进程内 Hook：IL2CPP 符号还原与改包
 date: '2026-07-26T23:40:00+08:00'
 category: 折腾
 tags:

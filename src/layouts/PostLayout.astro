@@ -2,7 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
-import Disqus from '../components/Disqus.astro';
+import Giscus from '../components/Giscus.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import { postPermalink, formatDate } from '../lib/posts';
 import {
@@ -10,7 +10,6 @@ import {
   postDescription,
   postImage,
   postJsonLd,
-  postSeoTitle,
 } from '../lib/seo';
 
 interface Props {
@@ -22,7 +21,6 @@ interface Props {
 }
 const { post, headings, prev, next, related = [] } = Astro.props;
 const { title, date, category, tags } = post.data;
-const seoTitle = postSeoTitle(post);
 const permalink = postPermalink(post);
 const description = postDescription(post);
 const image = postImage(post);
@@ -42,8 +40,7 @@ const jsonLd = [
 ---
 
 <BaseLayout
-  title={seoTitle}
-  socialTitle={title}
+  title={title}
   description={description}
   permalink={permalink}
   image={image}
@@ -111,7 +108,7 @@ const jsonLd = [
           </nav>
         )}
 
-        <Disqus title={title} permalink={permalink} />
+        <Giscus />
       </div>
 
       <aside class="post__aside">

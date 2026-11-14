@@ -7,8 +7,6 @@ import '../styles/global.css';
 
 interface Props {
   title?: string;
-  fullTitle?: string;
-  socialTitle?: string;
   description?: string;
   /** 文章页传入，用于 canonical / og */
   permalink?: string;
@@ -25,8 +23,6 @@ interface Props {
 }
 const {
   title,
-  fullTitle,
-  socialTitle,
   description = SITE.description,
   permalink,
   image = SITE.defaultImage,
@@ -40,8 +36,8 @@ const {
   nofollow = false,
   jsonLd,
 } = Astro.props;
-const pageTitle = fullTitle ?? (title ? `${title} - ${SITE.title}` : SITE.title);
-const ogTitle = socialTitle ?? title ?? fullTitle ?? SITE.title;
+const pageTitle = title ? `${title} - ${SITE.title}` : SITE.title;
+const ogTitle = title ?? SITE.title;
 const robots = `${noindex ? 'noindex' : 'index'}, ${nofollow ? 'nofollow' : 'follow'}`;
 const canonical = noindex && !permalink ? undefined : absoluteUrl(permalink ?? Astro.url.pathname);
 const currentPath = Astro.url.pathname;

@@ -41,10 +41,6 @@ export function absolutizeHtml(html: string, base = SITE.url): string {
     });
 }
 
-export function postSeoTitle(post: CollectionEntry<'posts'>): string {
-  return post.data.seoTitle ?? post.data.title;
-}
-
 export function postDescription(post: CollectionEntry<'posts'>): string {
   return post.data.description
     ? truncateDescription(post.data.description)

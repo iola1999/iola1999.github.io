@@ -1,6 +1,5 @@
 ---
 title: 最近 Vibe Coding 的业余项目
-seoTitle: 用 AI Coding Agent 做业余项目：远控、ESP8266 副屏与终端工具
 date: '2026-05-18T20:00:00+08:00'
 description: 盘点近期配合 AI Coding Agent 完成的五个业余项目，涵盖网页远控 UURC-Web、ESP8266 远程渲染桌面副屏 SmallDesktopDisplay、终端刷推客户端 x-tui、本地检索库 AnchorDesk 与旧手机延时摄影流水线。
 category: 折腾

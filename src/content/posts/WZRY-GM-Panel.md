@@ -1,6 +1,5 @@
 ---
 title: 王者荣耀 GM 调试面板入口验证记录
-seoTitle: 王者荣耀正式服 GM 调试面板与 CheatCode 触发验证记录
 date: '2026-06-14T20:55:00+08:00'
 description: 分析王者荣耀 Android 正式服安装包中的调试面板分支，记录启动页隐藏触摸暗码打开 CheatCode 面板，以及选服页绕过 TerSafe 检测唤起局内策划属性调试面板的验证过程。
 category: 折腾

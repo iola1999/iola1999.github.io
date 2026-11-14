@@ -1,6 +1,5 @@
 ---
 title: 再谈如何愉快地使用钉钉
-seoTitle: macOS 钉钉客户端拦截已读回执上报：fishhook 动态库注入实现
 date: '2026-06-18T20:00:00+08:00'
 description: 分析 macOS 版钉钉客户端 GaeaMac.framework 的 LWP RPC 消息状态上报链路，使用 fishhook 重绑定 sendRequest 符号按需拦截 updateToReadV2 与 updateToViewV2 已读回执。
 category: 折腾
