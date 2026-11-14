@@ -1,5 +1,5 @@
 ---
-title: 纯软件背景配合 AI 手搓一台全波段收音与双段对讲实验机的两个月记录
+title: 纯软件背景配合 AI 手搓四层 PCB 收音对讲机
 date: '2026-11-11T01:30:00+08:00'
 description: 纯软件背景配合 Claude Code 与 Codex，用脚本驱动嘉立创 EDA（EasyEDA Pro）设计四块四层 PCB 并手工回流焊，完成 ESP32-S3 + SI4732 + SA818S 全波段收音与对讲实验机。
 category: 折腾

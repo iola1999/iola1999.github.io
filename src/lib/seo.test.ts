@@ -67,16 +67,16 @@ describe('seo helpers', () => {
       },
     });
     expect(postDescription(post)).toBe('手写摘要');
-    expect(postImage(post)).toBe('/custom-og.png?v=20260809-editorial');
+    expect(postImage(post)).toBe('/custom-og.png?v=20261114-titles');
   });
 
   it('uses generated post OG card by default', () => {
     expect(postOgImagePath(mockPost())).toBe('/og/posts/Example-Post.png');
-    expect(postImage(mockPost())).toBe('/og/posts/Example-Post.png?v=20260809-editorial');
+    expect(postImage(mockPost())).toBe('/og/posts/Example-Post.png?v=20261114-titles');
   });
 
   it('appends OG image version without dropping existing query strings', () => {
-    expect(versionedImagePath('/og/example.png?x=1')).toBe('/og/example.png?x=1&v=20260809-editorial');
+    expect(versionedImagePath('/og/example.png?x=1')).toBe('/og/example.png?x=1&v=20261114-titles');
   });
 
   it('absolutizes root-relative src/href/srcset in RSS content HTML', () => {
@@ -99,7 +99,7 @@ describe('seo helpers', () => {
     expect(jsonLd.url).toBe('https://678234.xyz/2026/06/18/Example-Post/');
     expect(jsonLd.keywords).toEqual(['折腾', 'SEO', 'Astro']);
     expect(jsonLd.image).toEqual([
-      'https://678234.xyz/og/posts/Example-Post.png?v=20260809-editorial',
+      'https://678234.xyz/og/posts/Example-Post.png?v=20261114-titles',
       'https://678234.xyz/upload/example.png',
     ]);
     expect((jsonLd.author as Record<string, unknown>).sameAs).toEqual(['https://github.com/iola1999']);
