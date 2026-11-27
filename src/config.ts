@@ -6,8 +6,8 @@ export const SITE = {
   url: 'https://678234.xyz',
   locale: 'zh-CN',
   ogLocale: 'zh_CN',
-  ogImageVersion: '20261114-titles',
-  defaultImage: '/social-card.png?v=20261114-titles',
+  ogImageVersion: '20261127-hackios',
+  defaultImage: '/social-card.png?v=20261127-hackios',
   github: 'https://github.com/iola1999',
   /** 标签页进入索引与 sitemap 的最少文章数 */
   minIndexableTagPosts: 3,
